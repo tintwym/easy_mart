@@ -1,0 +1,59 @@
+# Deploy Laravel app to server via SSH
+#
+# Setup: Add these secrets in GitHub → Settings → Secrets and variables → Actions
+#   DEPLOY_HOST  - Server hostname or IP (e.g. your-server.com)
+#   DEPLOY_USER  - SSH username (e.g. forge, root, deploy)
+#   DEPLOY_KEY   - Private SSH key (paste full contents of id_rsa)
+#
+# Edit TARGET below if your app lives elsewhere than /var/www/easymart
+
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - development_testing
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+          npm ci
+          npm run build
+
+      - name: Deploy via rsync
+        uses: easingthemes/ssh-deploy@v4
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+          SOURCE: '.'
+          TARGET: '/var/www/easymart'
+          EXCLUDE: '/node_modules/, /.git/, /.github/, /storage/logs/, /storage/framework/cache/, /storage/framework/sessions/, /storage/framework/views/, /.env, /.env.*'
+          SCRIPT_AFTER: |
+            cd /var/www/easymart
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan storage:link 2>/dev/null || true
