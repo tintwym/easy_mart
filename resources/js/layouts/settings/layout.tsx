@@ -1,12 +1,12 @@
 import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
+import AppTwoFactorController from '@/actions/App/Http/Controllers/Settings/TwoFactorAuthenticationController';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
 import { edit } from '@/routes/profile';
-import AppTwoFactorController from '@/actions/App/Http/Controllers/Settings/TwoFactorAuthenticationController';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
 

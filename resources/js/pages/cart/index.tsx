@@ -7,9 +7,9 @@ import {
     Smartphone,
     Trash2,
 } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 
 const CONDITION_LABELS: Record<string, string> = {

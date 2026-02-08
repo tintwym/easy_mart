@@ -1,10 +1,10 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, ImagePlus, Search, Send } from 'lucide-react';
 import { useRef, useEffect } from 'react';
-import AppLayout from '@/layouts/app-layout';
+import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 
 function getInitials(name: string): string {
     return name

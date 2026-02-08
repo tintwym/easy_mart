@@ -1,9 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
 import { ListingCard } from '@/components/listing-card';
 import type { ListingCardListing } from '@/components/listing-card';
 import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
