@@ -13,8 +13,6 @@ on:
   push:
     branches:
       - main
-      - master
-      - development_testing
   workflow_dispatch:
 
 jobs:
