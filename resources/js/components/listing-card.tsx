@@ -1,12 +1,12 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { MoreVertical, Pencil, ShoppingCart, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 import type { SharedData } from '@/types';
 
 const CONDITION_LABELS: Record<string, string> = {

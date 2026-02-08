@@ -57,7 +57,7 @@ export function useSortedLocations(locations: SharedLocation[]) {
         if (!userCoords) {
             return {
                 sortedLocations: locations,
-                getDistanceKm: (_loc: SharedLocation): number | null => null,
+                getDistanceKm: (): number | null => null,
             };
         }
 

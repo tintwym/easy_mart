@@ -7,9 +7,15 @@ import {
     Settings,
     ShoppingCart,
 } from 'lucide-react';
+import { ChevronDown, Layers, MapPin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -45,12 +51,6 @@ import { cn, toUrl } from '@/lib/utils';
 import { dashboard, login, logout, register } from '@/routes';
 import { edit } from '@/routes/profile';
 import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
-import { ChevronDown, Layers, MapPin } from 'lucide-react';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 

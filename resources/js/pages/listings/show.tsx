@@ -1,7 +1,6 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
-    Leaf,
     MapPin,
     ShoppingBag,
     ShoppingCart,
@@ -9,11 +8,11 @@ import {
     Tag,
     Users,
 } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { SharedData } from '@/types';
 

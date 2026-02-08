@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Package } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
 import Heading from '@/components/heading';
+import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
