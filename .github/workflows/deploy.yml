@@ -33,8 +33,7 @@ jobs:
 
       - name: Deploy via rsync
         uses: easingthemes/ssh-deploy@v4.1.10
-        env:
-          # Match your exact secret names from GitHub Settings
+        with:
           SSH_PRIVATE_KEY: ${{ secrets.DEPL0Y_KEY }}
           REMOTE_HOST: ${{ secrets.DEPL0Y_HOST }}
           REMOTE_USER: ${{ secrets.DEPL0Y_USER }}
