@@ -22,6 +22,8 @@ class ListingController extends Controller
             'listing' => $listing,
             'averageRating' => round($listing->reviews()->avg('rating') ?? 0, 1),
             'reviewCount' => $listing->reviews()->count(),
+            'trendPriceLabel' => config('shop.trend_price_label', '$10 for 7 days'),
+            'trendDurationDays' => config('shop.trend_duration_days', 7),
         ]);
     }
 
@@ -38,15 +40,24 @@ class ListingController extends Controller
 
     public function create(): Response
     {
-        $this->authorize('create', Listing::class);
+        $user = request()->user();
+        $listingCount = $user->listingCount();
+        $maxSlots = $user->maxListingSlots();
 
         return Inertia::render('listings/create', [
             'categories' => Category::orderBy('name')->get(),
+            'listingCount' => $listingCount,
+            'maxListingSlots' => $maxSlots,
+            'canCreate' => $user->canCreateListing(),
+            'slotPrice' => config('shop.slot_price', 5),
+            'slotPriceLabel' => config('shop.slot_price_label', '$5 per slot'),
         ]);
     }
 
     public function store(StoreListingRequest $request): RedirectResponse
     {
+        $this->authorize('create', Listing::class);
+
         $data = $request->validated();
         $imagePath = null;
 
@@ -114,5 +125,19 @@ class ListingController extends Controller
         $listing->delete();
 
         return redirect()->route('dashboard')->with('status', 'Listing deleted.');
+    }
+
+    public function promote(Request $request, Listing $listing): RedirectResponse
+    {
+        $this->authorize('update', $listing);
+
+        $days = config('shop.trend_duration_days', 7);
+        $listing->update([
+            'trending_until' => now()->addDays($days),
+        ]);
+
+        return redirect()
+            ->route('listings.show', $listing)
+            ->with('status', "Listing promoted for {$days} days. It will appear higher in search.");
     }
 }

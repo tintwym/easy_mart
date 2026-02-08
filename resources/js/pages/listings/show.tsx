@@ -4,6 +4,7 @@ import {
     MapPin,
     ShoppingBag,
     ShoppingCart,
+    Sparkles,
     Star,
     Tag,
     Users,
@@ -86,12 +87,20 @@ type Listing = {
 };
 
 type Props = {
-    listing: Listing;
+    listing: Listing & { trending_until?: string | null };
     averageRating: number;
     reviewCount: number;
+    trendPriceLabel: string;
+    trendDurationDays: number;
 };
 
-export default function ShowListing({ listing, averageRating, reviewCount }: Props) {
+export default function ShowListing({
+    listing,
+    averageRating,
+    reviewCount,
+    trendPriceLabel,
+    trendDurationDays,
+}: Props) {
     const { auth } = usePage<SharedData>().props;
     const userReview = listing.reviews.find((r) => r.user?.id === auth?.user?.id);
     const { data, setData, post, processing, errors } = useForm({
@@ -101,6 +110,9 @@ export default function ShowListing({ listing, averageRating, reviewCount }: Pro
 
     const canReview = auth?.user && auth.user.id !== listing.user?.id;
     const isOwner = auth?.user && auth.user.id === listing.user?.id;
+    const isTrending =
+        listing.trending_until &&
+        new Date(listing.trending_until) > new Date();
     const isBuyer = auth?.user && auth.user.id !== listing.user?.id;
     const isGuest = !auth?.user;
     const showBuyerActions = !isOwner && (isBuyer || isGuest);
@@ -489,7 +501,36 @@ export default function ShowListing({ listing, averageRating, reviewCount }: Pro
                                 </div>
                             )}
                             <div className="flex flex-col gap-2">
-                                {showBuyerActions && (auth?.user ? sidebarBuyerActions : sidebarGuestActions)}
+                                {isOwner ? (
+                                    <>
+                                        <Button variant="outline" className="w-full" asChild>
+                                            <Link href={`/listings/${listing.id}/edit`}>
+                                                Edit listing
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full"
+                                            disabled={isTrending}
+                                            onClick={() =>
+                                                !isTrending &&
+                                                router.post(
+                                                    `/listings/${listing.id}/promote`
+                                                )
+                                            }
+                                        >
+                                            <Sparkles className="mr-2 size-4" />
+                                            {isTrending
+                                                ? 'Promoted'
+                                                : `Make it trend (${trendPriceLabel})`}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    showBuyerActions &&
+                                    (auth?.user
+                                        ? sidebarBuyerActions
+                                        : sidebarGuestActions)
+                                )}
                             </div>
                         </div>
                     </aside>

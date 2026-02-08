@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import Heading from '@/components/heading';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +31,19 @@ const CONDITION_OPTIONS = [
 
 type Props = {
     categories: Category[];
+    listingCount: number;
+    maxListingSlots: number;
+    canCreate: boolean;
+    slotPriceLabel: string;
 };
 
-export default function CreateListing({ categories }: Props) {
+export default function CreateListing({
+    categories,
+    listingCount,
+    maxListingSlots,
+    canCreate,
+    slotPriceLabel,
+}: Props) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -69,7 +80,26 @@ export default function CreateListing({ categories }: Props) {
                     title="Add product"
                     description="Create a new product listing"
                 />
-                <form onSubmit={submit} className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation [&_select]:min-h-[44px] [&_select]:touch-manipulation [&_textarea]:min-h-[88px] sm:[&_input]:min-h-0 sm:[&_select]:min-h-0">
+                <p className="mt-2 text-muted-foreground text-sm">
+                    Your listings: {listingCount} / {maxListingSlots}
+                </p>
+                {!canCreate && (
+                    <Alert className="mt-4 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-500/30">
+                        <AlertDescription>
+                            You&apos;ve reached your listing limit. Purchase more slots to list more items.
+                            <Link
+                                href="/upgrades"
+                                className="ml-1 font-medium text-amber-700 underline dark:text-amber-400"
+                            >
+                                Buy slots ({slotPriceLabel})
+                            </Link>
+                        </AlertDescription>
+                    </Alert>
+                )}
+                <form
+                    onSubmit={submit}
+                    className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation [&_select]:min-h-[44px] [&_select]:touch-manipulation [&_textarea]:min-h-[88px] sm:[&_input]:min-h-0 sm:[&_select]:min-h-0"
+                >
                     <div className="space-y-2">
                         <Label htmlFor="title">Title</Label>
                         <Input
@@ -198,7 +228,7 @@ export default function CreateListing({ categories }: Props) {
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <Button
                             type="submit"
-                            disabled={processing}
+                            disabled={processing || !canCreate}
                             className="min-h-[44px] touch-manipulation sm:min-h-0"
                         >
                             {processing ? 'Creating…' : 'Create listing'}

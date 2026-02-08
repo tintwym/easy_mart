@@ -4,6 +4,7 @@ import {
     Folder,
     LayoutGrid,
     MessageCircle,
+    Package,
     ShoppingCart,
 } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
@@ -27,6 +28,11 @@ const allNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Upgrades',
+        href: '/upgrades',
+        icon: Package,
     },
     {
         title: 'Chat',
@@ -58,7 +64,10 @@ export function AppSidebar() {
     const mainNavItems = auth?.user
         ? allNavItems
         : allNavItems.filter(
-              (item) => item.title !== 'Chat' && item.title !== 'Cart',
+              (item) =>
+                  item.title !== 'Upgrades' &&
+                  item.title !== 'Chat' &&
+                  item.title !== 'Cart',
           );
 
     return (

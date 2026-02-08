@@ -44,6 +44,7 @@ export type ListingCardListing = {
     created_at?: string;
     category?: { id: string; name: string; slug: string } | null;
     user?: { id: string; name: string; avatar?: string; seller_type?: string } | null;
+    trending_until?: string | null;
 };
 
 type ListingCardProps = {
@@ -53,6 +54,9 @@ type ListingCardProps = {
 export function ListingCard({ listing }: ListingCardProps) {
     const { auth } = usePage<SharedData>().props;
     const canEdit = auth?.user && listing.user_id === auth.user.id;
+    const isTrending =
+        listing.trending_until &&
+        new Date(listing.trending_until) > new Date();
 
     return (
         <article className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border/50 bg-white shadow-none transition-shadow hover:shadow-md dark:border-border/30 dark:bg-card">
@@ -69,11 +73,18 @@ export function ListingCard({ listing }: ListingCardProps) {
                         No image
                     </div>
                 )}
-                {/* Overlay: time (top-left), ellipsis (top-right) */}
+                {/* Overlay: time (top-left), trending badge, ellipsis (top-right) */}
                 <div className="absolute inset-x-0 top-0 flex items-start justify-between p-2">
-                    <span className="rounded bg-black/40 px-1.5 py-0.5 text-white text-xs">
-                        {formatRelativeTime(listing.created_at)}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                        <span className="rounded bg-black/40 px-1.5 py-0.5 text-white text-xs">
+                            {formatRelativeTime(listing.created_at)}
+                        </span>
+                        {isTrending && (
+                            <span className="rounded bg-primary px-1.5 py-0.5 text-primary-foreground text-xs font-medium">
+                                Trending
+                            </span>
+                        )}
+                    </div>
                     {canEdit && (
                         <div onClick={(e) => e.stopPropagation()}>
                             <DropdownMenu>

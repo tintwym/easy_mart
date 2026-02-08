@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'seller_type',
+        'extra_listing_slots',
     ];
 
     /**
@@ -60,5 +61,31 @@ class User extends Authenticatable
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    public function listings()
+    {
+        return $this->hasMany(Listing::class);
+    }
+
+    /**
+     * Max listing slots = base limit (by seller type) + purchased extra slots.
+     */
+    public function maxListingSlots(): int
+    {
+        $limits = config('shop.listing_limits', ['individual' => 3, 'business' => 5]);
+        $base = $limits[$this->seller_type ?? 'individual'] ?? 3;
+
+        return $base + (int) ($this->extra_listing_slots ?? 0);
+    }
+
+    public function canCreateListing(): bool
+    {
+        return $this->listings()->count() < $this->maxListingSlots();
+    }
+
+    public function listingCount(): int
+    {
+        return $this->listings()->count();
     }
 }

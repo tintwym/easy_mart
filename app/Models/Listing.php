@@ -24,7 +24,15 @@ class Listing extends Model
         'price',
         'image_path',
         'meetup_location',
+        'trending_until',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'trending_until' => 'datetime',
+        ];
+    }
 
     /**
      * Relationship: A listing belongs to a user.
@@ -64,5 +72,17 @@ class Listing extends Model
     public function averageRating(): float
     {
         return (float) $this->reviews()->avg('rating');
+    }
+
+    public function isTrending(): bool
+    {
+        return $this->trending_until && $this->trending_until->isFuture();
+    }
+
+    public function scopeOrderByTrendingFirst($query)
+    {
+        return $query->orderByRaw('CASE WHEN trending_until IS NOT NULL AND trending_until > CURRENT_TIMESTAMP THEN 0 ELSE 1 END')
+            ->orderByDesc('trending_until')
+            ->latest();
     }
 }

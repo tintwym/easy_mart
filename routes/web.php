@@ -5,6 +5,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UpgradeController;
 use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +13,8 @@ use Inertia\Inertia;
 
 // Dashboard is the default page (public; login/register in navbar for guests)
 Route::get('/', function (\Illuminate\Http\Request $request) {
-    $query = Listing::with(['category', 'user:id,name,seller_type'])->latest();
+    $query = Listing::with(['category', 'user:id,name,seller_type'])
+        ->orderByTrendingFirst();
 
     if ($q = $request->query('q')) {
         $query->where(function ($qry) use ($q) {
@@ -38,7 +40,7 @@ Route::get('/categories/{slug}', function (string $slug) {
     $category = Category::where('slug', $slug)->firstOrFail();
     $listings = Listing::with(['category', 'user:id,name,seller_type'])
         ->where('category_id', $category->id)
-        ->latest()
+        ->orderByTrendingFirst()
         ->get();
 
     return Inertia::render('categories/show', [
@@ -57,6 +59,9 @@ Route::post('listings/{listing}/reviews', [ReviewController::class, 'store'])->n
 Route::post('listings/{listing}/chat', [ChatController::class, 'store'])->name('listings.chat.store')->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('upgrades', [UpgradeController::class, 'index'])->name('upgrades.index');
+    Route::post('upgrades/slots', [UpgradeController::class, 'purchaseSlots'])->name('upgrades.slots');
+    Route::post('listings/{listing}/promote', [ListingController::class, 'promote'])->name('listings.promote');
     Route::get('chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('chat/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.messages.store');

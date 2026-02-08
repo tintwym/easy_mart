@@ -70,4 +70,41 @@ return [
 
     'locations' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Listing limits by seller type
+    |--------------------------------------------------------------------------
+    |
+    | Base number of listing slots per account. Users can purchase extra slots.
+    | Total = base_limit + extra_listing_slots (purchased).
+    |
+    */
+
+    'listing_limits' => [
+        'individual' => 3,
+        'business' => 5,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Slot purchase pricing (for display; payment integration separate)
+    |--------------------------------------------------------------------------
+    */
+
+    'slot_price' => 5.00,      // per extra slot
+    'slot_price_label' => '$5 per slot',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trend promotion
+    |--------------------------------------------------------------------------
+    |
+    | Sellers can pay to promote a listing (make it trend). Duration in days.
+    |
+    */
+
+    'trend_duration_days' => 7,
+    'trend_price' => 10.00,
+    'trend_price_label' => '$10 for 7 days',
+
 ];
