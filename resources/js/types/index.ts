@@ -22,5 +22,7 @@ export type SharedData = {
     sidebarOpen: boolean;
     categories: SharedCategory[];
     locations: SharedLocation[];
+    regionLabel?: string;
+    searchQuery?: string;
     [key: string]: unknown;
 };

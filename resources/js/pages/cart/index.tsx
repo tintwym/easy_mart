@@ -1,8 +1,33 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Footprints, Shirt, ShoppingCart, Smartphone, Trash2 } from 'lucide-react';
+import {
+    Footprints,
+    Shirt,
+    ShoppingCart,
+    ShieldCheck,
+    Smartphone,
+    Trash2,
+} from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes';
+
+const CONDITION_LABELS: Record<string, string> = {
+    new: 'Brand new',
+    like_new: 'Lightly used',
+    good: 'Good',
+    fair: 'Fair',
+};
+
+function getInitials(name: string): string {
+    return name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+}
+
 type CartItem = {
     id: string;
     listing: {
@@ -10,6 +35,7 @@ type CartItem = {
         title: string;
         image_path: string | null;
         price: number;
+        condition?: string;
         user: { id: string; name: string };
     };
 };
@@ -28,6 +54,14 @@ export default function CartIndex({ items }: Props) {
         router.delete(`/listings/${listingId}/cart`);
     };
 
+    // Group items by seller
+    const bySeller = items.reduce<Record<string, CartItem[]>>((acc, item) => {
+        const sellerId = item.listing.user.id;
+        if (!acc[sellerId]) acc[sellerId] = [];
+        acc[sellerId].push(item);
+        return acc;
+    }, {});
+
     return (
         <AppLayout breadcrumbs={[]}>
             <Head title="Cart" />
@@ -43,10 +77,10 @@ export default function CartIndex({ items }: Props) {
                             <span className="absolute -right-6 top-1/2 size-2 -translate-y-1/2 rounded-full bg-cyan-400/60" />
                             <span className="absolute -left-2 top-4 size-1.5 rounded-full bg-cyan-400/50" />
                         </div>
-                        <p className="text-foreground text-sm">
+                        <p className="text-foreground text-base">
                             Add listings to your Cart to pay for them
                         </p>
-                        <p className="text-foreground text-sm">
+                        <p className="text-foreground text-base">
                             at one go and save on delivery!
                         </p>
                         <Link
@@ -57,60 +91,100 @@ export default function CartIndex({ items }: Props) {
                         </Link>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {items.map((item) => (
+                    <div className="rounded-xl border border-border/50 bg-muted/30 p-6">
+                        {Object.entries(bySeller).map(([sellerId, sellerItems], idx) => (
                             <div
-                                key={item.id}
-                                className="flex items-center gap-4 rounded-lg border border-border/50 p-4"
+                                key={sellerId}
+                                className={idx > 0 ? 'mt-6 space-y-4 border-t border-border/50 pt-6' : 'space-y-4'}
                             >
-                                <Link
-                                    href={`/listings/${item.listing.id}`}
-                                    className="shrink-0 overflow-hidden rounded-lg bg-muted"
-                                >
-                                    {item.listing.image_path ? (
-                                        <img
-                                            src={item.listing.image_path}
-                                            alt=""
-                                            className="size-20 object-cover"
-                                        />
-                                    ) : (
-                                        <div className="flex size-20 items-center justify-center text-muted-foreground text-xs">
-                                            —
+                                {/* Seller info */}
+                                {sellerItems[0]?.listing.user && (
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="size-9 shrink-0">
+                                            <AvatarFallback className="text-xs font-medium">
+                                                {getInitials(sellerItems[0].listing.user.name)}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <span className="text-sm font-medium">
+                                            {sellerItems[0].listing.user.name}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Product items - Carousell layout */}
+                                <div className="space-y-4">
+                                    {sellerItems.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="flex items-center gap-4 rounded-lg border border-border/40 bg-muted/50 p-4"
+                                        >
+                                            <Link
+                                                href={`/listings/${item.listing.id}`}
+                                                className="shrink-0 overflow-hidden rounded-lg bg-muted"
+                                            >
+                                                {item.listing.image_path ? (
+                                                    <img
+                                                        src={item.listing.image_path}
+                                                        alt=""
+                                                        className="size-20 object-cover sm:size-24"
+                                                    />
+                                                ) : (
+                                                    <div className="flex size-20 items-center justify-center text-muted-foreground text-xs sm:size-24">
+                                                        —
+                                                    </div>
+                                                )}
+                                            </Link>
+                                            <div className="min-w-0 flex-1">
+                                                <Link
+                                                    href={`/listings/${item.listing.id}`}
+                                                    className="line-clamp-2 text-sm font-medium hover:underline"
+                                                >
+                                                    {item.listing.title}
+                                                </Link>
+                                                <p className="mt-0.5 text-muted-foreground text-xs">
+                                                    {CONDITION_LABELS[item.listing.condition ?? ''] ??
+                                                        item.listing.condition ??
+                                                        '—'}
+                                                </p>
+                                                <span className="mt-1.5 inline-flex items-center gap-1 rounded bg-muted/80 px-2 py-0.5 text-xs text-muted-foreground">
+                                                    <ShieldCheck className="size-3.5" />
+                                                    Buyer Protection
+                                                </span>
+                                            </div>
+                                            <div className="flex shrink-0 items-center gap-2">
+                                                <p className="text-sm font-semibold">
+                                                    ${Number(item.listing.price).toFixed(2)}
+                                                </p>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-8 text-destructive hover:text-destructive"
+                                                    onClick={() =>
+                                                        removeFromCart(item.listing.id)
+                                                    }
+                                                    aria-label="Remove from cart"
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </Button>
+                                            </div>
                                         </div>
-                                    )}
-                                </Link>
-                                <div className="min-w-0 flex-1">
-                                    <Link
-                                        href={`/listings/${item.listing.id}`}
-                                        className="font-medium hover:underline"
-                                    >
-                                        {item.listing.title}
-                                    </Link>
-                                    <p className="text-muted-foreground text-sm">
-                                        $
-                                        {Number(
-                                            item.listing.price,
-                                        ).toFixed(2)}
-                                    </p>
+                                    ))}
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="text-destructive hover:text-destructive"
-                                    onClick={() =>
-                                        removeFromCart(item.listing.id)
-                                    }
-                                    aria-label="Remove from cart"
-                                >
-                                    <Trash2 className="size-4" />
-                                </Button>
                             </div>
                         ))}
-                        <div className="flex items-center justify-between border-t border-border/50 pt-4">
-                            <p className="font-semibold">Total</p>
-                            <p className="font-semibold">
-                                ${total.toFixed(2)}
+
+                        {/* Summary + Checkout - exactly like reference */}
+                        <div className="mt-6 flex items-center justify-between border-t border-border/50 pt-5">
+                            <p className="text-sm text-muted-foreground">
+                                {items.length} {items.length === 1 ? 'item' : 'items'} • $
+                                {total.toFixed(2)}
                             </p>
+                            <Button
+                                asChild
+                                className="min-h-11 px-6 font-semibold"
+                            >
+                                <Link href="#">Checkout</Link>
+                            </Button>
                         </div>
                     </div>
                 )}

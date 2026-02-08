@@ -6,7 +6,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import type { SharedData } from '@/types';
 
@@ -34,15 +33,6 @@ function formatRelativeTime(dateString: string | undefined): string {
     return date.toLocaleDateString();
 }
 
-function getInitials(name: string): string {
-    return name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-}
-
 export type ListingCardListing = {
     id: string;
     user_id: string;
@@ -65,61 +55,9 @@ export function ListingCard({ listing }: ListingCardProps) {
     const canEdit = auth?.user && listing.user_id === auth.user.id;
 
     return (
-        <article className="flex flex-col overflow-hidden rounded-xl border border-border/50 bg-white shadow-none transition-shadow hover:shadow-md dark:border-border/30 dark:bg-card">
-            {/* User header */}
-            <header className="flex items-center gap-3 px-4 pt-4">
-                <Avatar className="size-9 shrink-0 overflow-hidden rounded-full">
-                    <AvatarImage src={listing.user?.avatar} alt={listing.user?.name} />
-                    <AvatarFallback className="rounded-full bg-muted text-muted-foreground text-xs font-medium">
-                        {listing.user ? getInitials(listing.user.name) : '?'}
-                    </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-foreground">
-                        {listing.user?.name ?? 'Unknown'}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                        {formatRelativeTime(listing.created_at)}
-                    </p>
-                </div>
-                {canEdit && (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-8 shrink-0"
-                                aria-label="Listing options"
-                            >
-                                <MoreVertical className="size-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                                <Link href={`/listings/${listing.id}/edit`}>
-                                    <Pencil className="mr-2 size-4" />
-                                    Edit
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                className="text-destructive focus:text-destructive"
-                                onSelect={(e) => {
-                                    e.preventDefault();
-                                    if (window.confirm('Delete this listing?')) {
-                                        router.delete(`/listings/${listing.id}`);
-                                    }
-                                }}
-                            >
-                                <Trash2 className="mr-2 size-4" />
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                )}
-            </header>
-
-            {/* Product image - clickable */}
-            <Link href={`/listings/${listing.id}`} className="relative mt-3 block aspect-[4/3] w-full overflow-hidden bg-muted">
+        <article className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border/50 bg-white shadow-none transition-shadow hover:shadow-md dark:border-border/30 dark:bg-card">
+            {/* Product image - Carousell style with overlay */}
+            <Link href={`/listings/${listing.id}`} className="relative block aspect-square w-full overflow-hidden bg-muted">
                 {listing.image_path ? (
                     <img
                         src={listing.image_path}
@@ -131,29 +69,71 @@ export function ListingCard({ listing }: ListingCardProps) {
                         No image
                     </div>
                 )}
+                {/* Overlay: time (top-left), ellipsis (top-right) */}
+                <div className="absolute inset-x-0 top-0 flex items-start justify-between p-2">
+                    <span className="rounded bg-black/40 px-1.5 py-0.5 text-white text-xs">
+                        {formatRelativeTime(listing.created_at)}
+                    </span>
+                    {canEdit && (
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="size-8 shrink-0 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white"
+                                        aria-label="Listing options"
+                                    >
+                                    <MoreVertical className="size-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                    <Link href={`/listings/${listing.id}/edit`}>
+                                        <Pencil className="mr-2 size-4" />
+                                        Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        if (window.confirm('Delete this listing?')) {
+                                            router.delete(`/listings/${listing.id}`);
+                                        }
+                                    }}
+                                >
+                                    <Trash2 className="mr-2 size-4" />
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        </div>
+                    )}
+                </div>
             </Link>
 
-            {/* Product details */}
-            <div className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-3">
+            {/* Product details - compact Carousell style */}
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5 px-3 pb-3 pt-2">
                 <Link href={`/listings/${listing.id}`} className="block min-w-0">
-                    <h3 className="line-clamp-2 font-semibold leading-tight text-foreground hover:underline">
+                    <h3 className="line-clamp-2 text-sm font-medium leading-tight text-foreground hover:underline">
                         {listing.title}
                     </h3>
                 </Link>
                 <Link href={`/listings/${listing.id}`} className="inline-block">
-                    <p className="text-xl font-bold text-foreground hover:underline">
+                    <p className="text-base font-bold text-foreground hover:underline sm:text-lg">
                         ${Number(listing.price).toFixed(2)}
                     </p>
                 </Link>
                 <p className="text-muted-foreground text-xs">
-                    {CONDITION_LABELS[listing.condition] ?? listing.condition}
+                    {CONDITION_LABELS[listing.condition] ?? listing.condition} · {listing.user?.name ?? 'Unknown'}
                 </p>
 
                 {/* Add to cart - only for business sellers */}
                 {auth?.user &&
                     auth.user.id !== listing.user_id &&
                     listing.user?.seller_type === 'business' && (
-                    <div className="mt-2 pt-1">
+                    <div className="mt-1.5 pt-1">
                         {auth.cartListingIds?.includes(listing.id) ? (
                             <Link
                                 href="/cart"
