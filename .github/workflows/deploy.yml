@@ -13,14 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set Heroku buildpacks
-        run: |
-          curl -sf -X PUT "https://api.heroku.com/apps/${{ secrets.HEROKU_APP_NAME }}/buildpack-installations" \
-            -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}" \
-            -d '{"updates":[{"buildpack":"https://github.com/heroku/heroku-buildpack-nodejs"},{"buildpack":"https://github.com/heroku/heroku-buildpack-php"}]}'
+        with:
+          fetch-depth: 0
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.14.15
@@ -28,4 +22,5 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          branch: main
+          usedocker: false
+          buildpack: "https://github.com/heroku/heroku-buildpack-nodejs,https://github.com/heroku/heroku-buildpack-php"
