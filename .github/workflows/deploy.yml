@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Use stable v4
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -32,10 +32,9 @@ jobs:
           npm run build
 
       - name: Deploy via rsync
-        uses: easingthemes/ssh-deploy@v5 # Upgraded to v5 for better IPv6 support
+        uses: easingthemes/ssh-deploy@v4.1.10
         env:
-          # IMPORTANT: Use 'env:' instead of 'with:' for this specific action
-          # Match your actual secret names (DEPL0Y with a zero)
+          # Match your exact secret names from GitHub Settings
           SSH_PRIVATE_KEY: ${{ secrets.DEPL0Y_KEY }}
           REMOTE_HOST: ${{ secrets.DEPL0Y_HOST }}
           REMOTE_USER: ${{ secrets.DEPL0Y_USER }}
