@@ -67,8 +67,16 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
-    const { auth, categories = [], locations = [], regionLabel = 'All' } = page.props;
+    const { auth, categories = [], locations = [], regionLabel: regionLabelProp = 'All' } = page.props;
+    const regionLabel = String(regionLabelProp ?? 'All');
     const searchQuery = (page.props as { searchQuery?: string }).searchQuery ?? '';
+    const currentLocation = (() => {
+        try {
+            return new URL(page.url, window?.location?.origin).searchParams.get('location') ?? null;
+        } catch {
+            return null;
+        }
+    })();
     const { sortedLocations, getDistanceKm } = useSortedLocations(locations);
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
@@ -135,40 +143,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                                 </Link>
                                                             </li>
                                                         ))}
-                                                    </ul>
-                                                </CollapsibleContent>
-                                            </Collapsible>
-                                        )}
-                                        {/* Shop location dropdown (sorted by GPS distance when available) */}
-                                        {sortedLocations.length > 0 && (
-                                            <Collapsible defaultOpen={false} className="group/loc">
-                                                <CollapsibleTrigger className="flex min-h-[44px] w-full touch-manipulation items-center justify-between rounded-md px-2 py-2 font-semibold text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                                                    <span className="flex items-center gap-2">
-                                                        <MapPin className="h-4 w-4" />
-                                                        Shop location
-                                                    </span>
-                                                    <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]/loc:rotate-180" />
-                                                </CollapsibleTrigger>
-                                                <CollapsibleContent>
-                                                    <ul className="flex flex-col gap-0.5 border-l border-sidebar-border pl-4 py-2 ml-2">
-                                                        {sortedLocations.map((loc) => {
-                                                            const km = getDistanceKm(loc);
-                                                            return (
-                                                                <li key={loc.name}>
-                                                                    <Link
-                                                                        href={dashboard({ query: { location: loc.name } }).url}
-                                                                        className="block min-h-[44px] py-2.5 font-medium hover:underline active:opacity-80"
-                                                                    >
-                                                                        {loc.name}
-                                                                        {km != null && (
-                                                                            <span className="ml-1.5 text-muted-foreground">
-                                                                                · {km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`}
-                                                                            </span>
-                                                                        )}
-                                                                    </Link>
-                                                                </li>
-                                                            );
-                                                        })}
                                                     </ul>
                                                 </CollapsibleContent>
                                             </Collapsible>
@@ -295,45 +269,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                         </NavigationMenuLink>
                                                     </li>
                                                 ))}
-                                            </ul>
-                                        </NavigationMenuContent>
-                                    </NavigationMenuItem>
-                                )}
-                                {sortedLocations.length > 0 && (
-                                    <NavigationMenuItem className="relative flex h-full items-center">
-                                        <NavigationMenuTrigger
-                                            className={cn(
-                                                navigationMenuTriggerStyle(),
-                                                'h-9 cursor-pointer gap-1 px-3',
-                                            )}
-                                        >
-                                            <MapPin className="mr-1.5 h-4 w-4" />
-                                            Shop location
-                                        </NavigationMenuTrigger>
-                                        <NavigationMenuContent>
-                                            <ul className="grid w-[220px] gap-1 p-2">
-                                                {sortedLocations.map((loc) => {
-                                                    const km = getDistanceKm(loc);
-                                                    return (
-                                                        <li key={loc.name}>
-                                                            <NavigationMenuLink asChild>
-                                                                <Link
-                                                                    href={dashboard({
-                                                                        query: { location: loc.name },
-                                                                    }).url}
-                                                                    className="block select-none rounded-md px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                                                                >
-                                                                    {loc.name}
-                                                                    {km != null && (
-                                                                        <span className="ml-1.5 text-muted-foreground">
-                                                                            · {km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`}
-                                                                        </span>
-                                                                    )}
-                                                                </Link>
-                                                            </NavigationMenuLink>
-                                                        </li>
-                                                    );
-                                                })}
                                             </ul>
                                         </NavigationMenuContent>
                                     </NavigationMenuItem>
@@ -505,7 +440,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         e.preventDefault();
                         const form = e.currentTarget;
                         const q = (form.elements.namedItem('q') as HTMLInputElement)?.value ?? '';
-                        router.get('/', { q: q || undefined }, { preserveState: false });
+                        const params: Record<string, string | undefined> = { q: q || undefined };
+                        if (currentLocation) params.location = currentLocation;
+                        router.get('/', params, { preserveState: false });
                     }}
                     className="flex w-full flex-wrap items-center gap-2 border-t border-sidebar-border/60 bg-muted/30 px-3 py-3 sm:px-4 md:mx-auto md:max-w-7xl"
                 >
@@ -520,10 +457,52 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             aria-label="Search"
                         />
                     </div>
-                    <div className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-muted-foreground text-sm">
-                        <MapPin className="size-4 shrink-0" />
-                        <span className="whitespace-nowrap">All of {regionLabel}</span>
-                    </div>
+                    {sortedLocations.length > 0 ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-muted-foreground text-sm hover:bg-accent hover:text-accent-foreground"
+                                >
+                                    <MapPin className="size-4 shrink-0" />
+                                    <span className="whitespace-nowrap">
+                                        {currentLocation ?? `All of ${regionLabel}`}
+                                    </span>
+                                    <ChevronDown className="size-4 shrink-0" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[220px] p-1">
+                                <Link
+                                    href={dashboard().url}
+                                    className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                >
+                                    All of {regionLabel}
+                                </Link>
+                                {sortedLocations.map((loc) => {
+                                    const km = getDistanceKm(loc);
+                                    return (
+                                        <Link
+                                            key={loc.name}
+                                            href={dashboard({ query: { location: loc.name } }).url}
+                                            className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                        >
+                                            {loc.name}
+                                            {km != null && (
+                                                <span className="ml-1.5 text-muted-foreground">
+                                                    · {km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`}
+                                                </span>
+                                            )}
+                                        </Link>
+                                    );
+                                })}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <div className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-muted-foreground text-sm">
+                            <MapPin className="size-4 shrink-0" />
+                            <span className="whitespace-nowrap">All of {regionLabel}</span>
+                        </div>
+                    )}
                     <Button
                         type="submit"
                         size="sm"

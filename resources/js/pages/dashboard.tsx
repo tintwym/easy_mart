@@ -25,7 +25,7 @@ export default function Dashboard({ listings = [] }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="relative flex h-full flex-1 flex-col gap-6 overflow-x-auto sm:gap-8">
+            <div className="relative flex min-w-0 flex-1 flex-col gap-6 sm:gap-8">
                 {/* First row: Carousel (disabled for now) */}
                 {CAROUSEL_ENABLED && (
                     <section aria-label="Carousel" className="w-full">
@@ -42,7 +42,7 @@ export default function Dashboard({ listings = [] }: Props) {
 
                 {/* Product listing grid - Carousell style */}
                 <section aria-label="Listings" className="w-full">
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                         {listings.length === 0 ? (
                             <p className="col-span-full text-center text-muted-foreground">
                                 No listings yet.

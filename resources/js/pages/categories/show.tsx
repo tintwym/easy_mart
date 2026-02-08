@@ -27,7 +27,7 @@ export default function CategoryShow({ category, listings = [] }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={category.name} />
-            <div className="relative flex h-full flex-1 flex-col gap-6 overflow-x-auto">
+            <div className="relative flex min-w-0 flex-1 flex-col gap-6">
                 <div className="flex items-center gap-3 sm:gap-4">
                     <Button
                         variant="ghost"
@@ -43,7 +43,7 @@ export default function CategoryShow({ category, listings = [] }: Props) {
                 </div>
 
                 <section aria-label="Listings">
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                         {listings.length === 0 ? (
                             <p className="col-span-full text-center text-muted-foreground">
                                 No listings in this category yet.
