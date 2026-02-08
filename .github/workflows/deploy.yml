@@ -14,36 +14,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer:v2
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
+      - name: Set Heroku buildpacks
         run: |
-          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-          npm ci
-          npm run build
+          curl -sf -X PUT "https://api.heroku.com/apps/${{ secrets.HEROKU_APP_NAME }}/buildpack-installations" \
+            -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}" \
+            -d '{"updates":[{"buildpack":"https://github.com/heroku/heroku-buildpack-nodejs"},{"buildpack":"https://github.com/heroku/heroku-buildpack-php"}]}'
 
-      - name: Deploy via rsync
-        uses: easingthemes/ssh-deploy@v4.1.10
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.14.15
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPL0Y_KEY }}
-          REMOTE_HOST: ${{ secrets.DEPL0Y_HOST }}
-          REMOTE_USER: ${{ secrets.DEPL0Y_USER }}
-          SOURCE: "."
-          TARGET: "/var/www/easymart"
-          ARGS: "-rlgoDzvc -i --delete"
-          EXCLUDE: "/node_modules/, /.git/, /.github/, /storage/logs/, /storage/framework/, /.env"
-          SCRIPT_AFTER: |
-            cd /var/www/easymart
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan storage:link 2>/dev/null || true
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          branch: main

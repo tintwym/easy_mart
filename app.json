@@ -1,0 +1,8 @@
+{
+  "name": "EasyMart",
+  "description": "EasyMart - Laravel marketplace",
+  "buildpacks": [
+    { "url": "heroku/nodejs" },
+    { "url": "heroku/php" }
+  ]
+}
