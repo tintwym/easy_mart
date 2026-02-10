@@ -518,7 +518,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             <DropdownMenuTrigger asChild>
                                 <button
                                     type="button"
-                                    className="flex h-9 min-w-[11rem] max-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                    className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                 >
                                     <MapPin className="size-4 shrink-0" />
                                     <span className="min-w-0 truncate">
@@ -567,7 +567,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
-                        <div className="flex h-9 min-w-[11rem] max-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
+                        <div className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
                             <MapPin className="size-4 shrink-0" />
                             <span className="min-w-0 truncate">
                                 All of {regionLabel}
