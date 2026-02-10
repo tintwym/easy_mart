@@ -9,11 +9,7 @@ type Category = {
     slug: string;
 };
 
-export default function Home({
-    categories = [],
-}: {
-    categories?: Category[];
-}) {
+export default function Home({ categories = [] }: { categories?: Category[] }) {
     const { auth } = usePage<SharedData>().props;
 
     return (
@@ -30,7 +26,10 @@ export default function Home({
                             <Link href={login()} className="text-sm underline">
                                 Log in
                             </Link>
-                            <Link href={register()} className="text-sm underline">
+                            <Link
+                                href={register()}
+                                className="text-sm underline"
+                            >
                                 Register
                             </Link>
                         </>

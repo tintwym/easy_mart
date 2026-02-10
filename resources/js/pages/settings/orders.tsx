@@ -16,7 +16,12 @@ type OrderItem = {
     listing_id: string;
     quantity: number;
     price: number;
-    listing: { id: string; title: string; image_path: string | null; price: number };
+    listing: {
+        id: string;
+        title: string;
+        image_path: string | null;
+        price: number;
+    };
 };
 
 type Order = {
@@ -77,12 +82,14 @@ export default function Orders({ orders = [] }: Props) {
                                         >
                                             {item.listing.image_path ? (
                                                 <img
-                                                    src={item.listing.image_path}
+                                                    src={
+                                                        item.listing.image_path
+                                                    }
                                                     alt=""
                                                     className="size-12 rounded object-cover"
                                                 />
                                             ) : (
-                                                <div className="flex size-12 items-center justify-center rounded bg-muted text-muted-foreground text-xs">
+                                                <div className="flex size-12 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
                                                     —
                                                 </div>
                                             )}
@@ -93,8 +100,8 @@ export default function Orders({ orders = [] }: Props) {
                                                 {item.listing.title}
                                             </Link>
                                             <span className="text-sm font-medium">
-                                                ${Number(item.price).toFixed(2)} ×{' '}
-                                                {item.quantity}
+                                                ${Number(item.price).toFixed(2)}{' '}
+                                                × {item.quantity}
                                             </span>
                                         </li>
                                     ))}
@@ -102,9 +109,9 @@ export default function Orders({ orders = [] }: Props) {
                                 <p className="mt-4 border-t border-border pt-4 font-semibold">
                                     Total: ${Number(order.total).toFixed(2)}
                                 </p>
-                                <p className="mt-1 text-muted-foreground text-xs">
+                                <p className="mt-1 text-xs text-muted-foreground">
                                     {new Date(
-                                        order.created_at
+                                        order.created_at,
                                     ).toLocaleDateString()}
                                 </p>
                             </div>

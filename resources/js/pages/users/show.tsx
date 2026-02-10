@@ -18,22 +18,29 @@ type Props = {
     reviewCount: number;
 };
 
-export default function UserShow({ user, listings, averageRating, reviewCount }: Props) {
+export default function UserShow({
+    user,
+    listings,
+    averageRating,
+    reviewCount,
+}: Props) {
     return (
         <AppLayout breadcrumbs={[]}>
             <Head title={user.name} />
             <div className="mx-auto w-full max-w-6xl px-0 pb-24 sm:px-2">
                 <Link
                     href={dashboard().url}
-                    className="-ml-1 mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                    className="mb-4 -ml-1 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
                     Back
                 </Link>
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold">{user.name}</h1>
-                    <p className="text-muted-foreground text-sm">
-                        {user.seller_type === 'business' ? 'Business seller' : 'Individual seller'}
+                    <p className="text-sm text-muted-foreground">
+                        {user.seller_type === 'business'
+                            ? 'Business seller'
+                            : 'Individual seller'}
                     </p>
                     {reviewCount > 0 && (
                         <p className="mt-1 text-sm">

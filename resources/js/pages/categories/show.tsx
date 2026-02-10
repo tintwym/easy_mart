@@ -32,10 +32,14 @@ export default function CategoryShow({ category, listings = [] }: Props) {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="flex h-11 min-h-[44px] w-11 min-w-[44px] justify-start touch-manipulation"
+                        className="flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation justify-start"
                         asChild
                     >
-                        <Link href={dashboard().url} className="inline-flex" aria-label="Back to dashboard">
+                        <Link
+                            href={dashboard().url}
+                            className="inline-flex"
+                            aria-label="Back to dashboard"
+                        >
                             <ArrowLeft className="size-5" />
                         </Link>
                     </Button>
@@ -50,7 +54,10 @@ export default function CategoryShow({ category, listings = [] }: Props) {
                             </p>
                         ) : (
                             listings.map((listing) => (
-                                <ListingCard key={listing.id} listing={listing} />
+                                <ListingCard
+                                    key={listing.id}
+                                    listing={listing}
+                                />
                             ))
                         )}
                     </div>

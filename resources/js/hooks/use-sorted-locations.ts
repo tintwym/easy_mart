@@ -13,9 +13,7 @@ function haversineKm(
     const dLng = toRad(lng2 - lng1);
     const a =
         Math.sin(dLat / 2) ** 2 +
-        Math.cos(toRad(lat1)) *
-            Math.cos(toRad(lat2)) *
-            Math.sin(dLng / 2) ** 2;
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
@@ -66,10 +64,7 @@ export function useSortedLocations(locations: SharedLocation[]) {
             km: haversineKm(userCoords.lat, userCoords.lng, loc.lat, loc.lng),
         }));
         withDistance.sort((a, b) => a.km - b.km);
-        const sorted = [
-            ...withDistance.map((x) => x.loc),
-            ...withoutCoords,
-        ];
+        const sorted = [...withDistance.map((x) => x.loc), ...withoutCoords];
 
         const kmMap = new Map<string, number>();
         withDistance.forEach(({ loc, km }) => kmMap.set(loc.name, km));

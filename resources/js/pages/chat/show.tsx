@@ -53,7 +53,12 @@ type ConversationItem = {
     };
     buyer: { id: string; name: string };
     messages_count: number;
-    messages: Array<{ id: string; body: string; created_at: string; user_id: string }>;
+    messages: Array<{
+        id: string;
+        body: string;
+        created_at: string;
+        user_id: string;
+    }>;
     updated_at: string;
 };
 
@@ -108,19 +113,18 @@ export default function ChatShow({
     };
 
     // Group messages by date for timestamps
-    const messageGroups = messages.reduce<Array<{ date: string; msgs: Message[] }>>(
-        (groups, msg) => {
-            const date = msg.created_at.split('T')[0];
-            const last = groups[groups.length - 1];
-            if (last && last.date === date) {
-                last.msgs.push(msg);
-            } else {
-                groups.push({ date, msgs: [msg] });
-            }
-            return groups;
-        },
-        [],
-    );
+    const messageGroups = messages.reduce<
+        Array<{ date: string; msgs: Message[] }>
+    >((groups, msg) => {
+        const date = msg.created_at.split('T')[0];
+        const last = groups[groups.length - 1];
+        if (last && last.date === date) {
+            last.msgs.push(msg);
+        } else {
+            groups.push({ date, msgs: [msg] });
+        }
+        return groups;
+    }, []);
 
     return (
         <AppLayout breadcrumbs={[]}>
@@ -140,7 +144,7 @@ export default function ChatShow({
                     </div>
                     <div className="flex-1 overflow-y-auto">
                         <div className="px-2 py-2">
-                            <p className="mb-2 px-2 text-muted-foreground text-sm font-medium">
+                            <p className="mb-2 px-2 text-sm font-medium text-muted-foreground">
                                 Chats
                             </p>
                             <ul className="space-y-0.5">
@@ -150,7 +154,8 @@ export default function ChatShow({
                                             ? conv.listing.user
                                             : conv.buyer;
                                     const lastMessage = conv.messages[0];
-                                    const isActive = conv.id === conversation.id;
+                                    const isActive =
+                                        conv.id === conversation.id;
                                     return (
                                         <li key={conv.id}>
                                             <Link
@@ -172,7 +177,7 @@ export default function ChatShow({
                                                             className="size-full object-cover"
                                                         />
                                                     ) : (
-                                                        <div className="flex size-full items-center justify-center text-muted-foreground text-xs">
+                                                        <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
                                                             —
                                                         </div>
                                                     )}
@@ -181,11 +186,11 @@ export default function ChatShow({
                                                     <p className="truncate font-medium">
                                                         {other.name}
                                                     </p>
-                                                    <p className="truncate text-muted-foreground text-sm">
+                                                    <p className="truncate text-sm text-muted-foreground">
                                                         {conv.listing.title}
                                                     </p>
                                                     {lastMessage && (
-                                                        <p className="mt-0.5 truncate text-muted-foreground text-xs">
+                                                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
                                                             {lastMessage.body}
                                                         </p>
                                                     )}
@@ -201,7 +206,7 @@ export default function ChatShow({
                                                             className="size-12 object-cover"
                                                         />
                                                     ) : (
-                                                        <div className="flex size-12 items-center justify-center text-muted-foreground text-xs">
+                                                        <div className="flex size-12 items-center justify-center text-xs text-muted-foreground">
                                                             —
                                                         </div>
                                                     )}
@@ -212,7 +217,7 @@ export default function ChatShow({
                                 })}
                             </ul>
                         </div>
-                        <p className="border-t border-border/50 px-4 py-6 text-center text-muted-foreground text-xs">
+                        <p className="border-t border-border/50 px-4 py-6 text-center text-xs text-muted-foreground">
                             That&apos;s all for your chats
                         </p>
                     </div>
@@ -242,7 +247,7 @@ export default function ChatShow({
                                 <p className="font-semibold">
                                     {otherUser.name}
                                 </p>
-                                <p className="text-muted-foreground text-xs">
+                                <p className="text-xs text-muted-foreground">
                                     Online
                                 </p>
                             </div>
@@ -263,7 +268,7 @@ export default function ChatShow({
                                         className="size-full object-cover"
                                     />
                                 ) : (
-                                    <div className="flex size-full items-center justify-center text-muted-foreground text-xs">
+                                    <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
                                         —
                                     </div>
                                 )}
@@ -272,20 +277,22 @@ export default function ChatShow({
                                 <p className="truncate font-medium">
                                     {conversation.listing.title}
                                 </p>
-                                <p className="text-muted-foreground text-sm">
+                                <p className="text-sm text-muted-foreground">
                                     $
-                                    {Number(
-                                        conversation.listing.price,
-                                    ).toFixed(2)}
+                                    {Number(conversation.listing.price).toFixed(
+                                        2,
+                                    )}
                                 </p>
                             </div>
                             <Button size="sm" asChild>
-                                <Link href={`/listings/${conversation.listing.id}`}>
+                                <Link
+                                    href={`/listings/${conversation.listing.id}`}
+                                >
                                     Make offer
                                 </Link>
                             </Button>
                         </Link>
-                        <p className="mt-1 text-muted-foreground text-xs">
+                        <p className="mt-1 text-xs text-muted-foreground">
                             Only you can see this
                         </p>
                     </div>
@@ -293,14 +300,14 @@ export default function ChatShow({
                     {/* Messages */}
                     <div className="flex-1 overflow-y-auto p-4">
                         {messages.length === 0 ? (
-                            <p className="py-8 text-center text-muted-foreground text-sm">
+                            <p className="py-8 text-center text-sm text-muted-foreground">
                                 No messages yet. Say hello!
                             </p>
                         ) : (
                             <div className="space-y-4">
                                 {messageGroups.map((group) => (
                                     <div key={group.date}>
-                                        <p className="mb-3 text-center text-muted-foreground text-xs">
+                                        <p className="mb-3 text-center text-xs text-muted-foreground">
                                             {formatChatDate(
                                                 group.msgs[0].created_at,
                                             )}
@@ -344,7 +351,7 @@ export default function ChatShow({
                                                                 <p className="text-sm">
                                                                     {msg.body}
                                                                 </p>
-                                                                <p className="mt-0.5 text-muted-foreground text-xs">
+                                                                <p className="mt-0.5 text-xs text-muted-foreground">
                                                                     {formatMessageTime(
                                                                         msg.created_at,
                                                                     )}

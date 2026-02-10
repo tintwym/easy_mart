@@ -50,11 +50,14 @@ function formatRelativeTime(dateString: string): string {
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    if (diffMins < 60)
+        return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+    if (diffHours < 24)
+        return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
     if (diffDays === 1) return '1 day ago';
     if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) === 1 ? '' : 's'} ago`;
+    if (diffDays < 30)
+        return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) === 1 ? '' : 's'} ago`;
     return formatDate(dateString);
 }
 
@@ -102,7 +105,9 @@ export default function ShowListing({
     trendDurationDays,
 }: Props) {
     const { auth } = usePage<SharedData>().props;
-    const userReview = listing.reviews.find((r) => r.user?.id === auth?.user?.id);
+    const userReview = listing.reviews.find(
+        (r) => r.user?.id === auth?.user?.id,
+    );
     const { data, setData, post, processing, errors } = useForm({
         rating: userReview?.rating ?? 5,
         comment: userReview?.comment ?? '',
@@ -111,8 +116,7 @@ export default function ShowListing({
     const canReview = auth?.user && auth.user.id !== listing.user?.id;
     const isOwner = auth?.user && auth.user.id === listing.user?.id;
     const isTrending =
-        listing.trending_until &&
-        new Date(listing.trending_until) > new Date();
+        listing.trending_until && new Date(listing.trending_until) > new Date();
     const isBuyer = auth?.user && auth.user.id !== listing.user?.id;
     const isGuest = !auth?.user;
     const showBuyerActions = !isOwner && (isBuyer || isGuest);
@@ -129,13 +133,19 @@ export default function ShowListing({
             {auth?.cartListingIds?.includes(listing.id) ? (
                 <>
                     <Button className="w-full" asChild>
-                        <Link href="/cart" className="inline-flex items-center gap-2">
+                        <Link
+                            href="/cart"
+                            className="inline-flex items-center gap-2"
+                        >
                             <ShoppingBag className="mr-2 size-4" />
                             Buy
                         </Link>
                     </Button>
                     <Button variant="outline" className="w-full" asChild>
-                        <Link href="/cart" className="inline-flex items-center gap-2">
+                        <Link
+                            href="/cart"
+                            className="inline-flex items-center gap-2"
+                        >
                             <ShoppingCart className="mr-2 size-4" />
                             In cart
                         </Link>
@@ -157,7 +167,9 @@ export default function ShowListing({
                     <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => router.post(`/listings/${listing.id}/cart`)}
+                        onClick={() =>
+                            router.post(`/listings/${listing.id}/cart`)
+                        }
                     >
                         <ShoppingCart className="mr-2 size-4" />
                         Add to cart
@@ -199,10 +211,13 @@ export default function ShowListing({
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="-ml-1 mb-4 flex min-h-[44px] justify-start touch-manipulation sm:min-h-8"
+                    className="mb-4 -ml-1 flex min-h-[44px] touch-manipulation justify-start sm:min-h-8"
                     asChild
                 >
-                    <Link href={dashboard().url} className="inline-flex items-center gap-2">
+                    <Link
+                        href={dashboard().url}
+                        className="inline-flex items-center gap-2"
+                    >
                         <ArrowLeft className="size-4" />
                         Back
                     </Link>
@@ -234,35 +249,35 @@ export default function ShowListing({
                             <p className="mt-2 text-3xl font-bold">
                                 ${Number(listing.price).toFixed(2)}
                             </p>
-                            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-sm">
+                            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                                <span className="inline-flex items-center gap-1.5">
+                                    <Tag className="size-4 shrink-0" />
+                                    {CONDITION_LABELS[listing.condition] ??
+                                        listing.condition}
+                                </span>
+                                <span className="inline-flex items-center gap-1.5">
+                                    <Users className="size-4 shrink-0" />
+                                    {listing.meetup_location
+                                        ? 'Meetup'
+                                        : 'Meet-up'}
+                                </span>
+                                {listing.meetup_location && (
                                     <span className="inline-flex items-center gap-1.5">
-                                        <Tag className="size-4 shrink-0" />
-                                        {CONDITION_LABELS[listing.condition] ??
-                                            listing.condition}
+                                        <MapPin className="size-4 shrink-0" />
+                                        {listing.meetup_location}
                                     </span>
-                                    <span className="inline-flex items-center gap-1.5">
-                                        <Users className="size-4 shrink-0" />
-                                        {listing.meetup_location
-                                            ? 'Meetup'
-                                            : 'Meet-up'}
+                                )}
+                                {listing.category && (
+                                    <span>
+                                        Category{' '}
+                                        <Link
+                                            href={`/categories/${listing.category.slug}`}
+                                            className="font-medium text-foreground hover:underline"
+                                        >
+                                            {listing.category.name}
+                                        </Link>
                                     </span>
-                                    {listing.meetup_location && (
-                                        <span className="inline-flex items-center gap-1.5">
-                                            <MapPin className="size-4 shrink-0" />
-                                            {listing.meetup_location}
-                                        </span>
-                                    )}
-                                    {listing.category && (
-                                        <span>
-                                            Category{' '}
-                                            <Link
-                                                href={`/categories/${listing.category.slug}`}
-                                                className="font-medium text-foreground hover:underline"
-                                            >
-                                                {listing.category.name}
-                                            </Link>
-                                        </span>
-                                    )}
+                                )}
                             </div>
                         </div>
 
@@ -271,7 +286,9 @@ export default function ShowListing({
                             <h2 className="mb-4 font-semibold">Details</h2>
                             <dl className="space-y-4">
                                 <div>
-                                    <dt className="text-muted-foreground text-sm">Listed</dt>
+                                    <dt className="text-sm text-muted-foreground">
+                                        Listed
+                                    </dt>
                                     <dd className="mt-1">
                                         {formatRelativeTime(listing.created_at)}
                                         {listing.user && (
@@ -291,7 +308,8 @@ export default function ShowListing({
                         <section>
                             <h2 className="mb-4 font-semibold">Description</h2>
                             <p className="whitespace-pre-wrap text-muted-foreground">
-                                {listing.description || 'No description provided.'}
+                                {listing.description ||
+                                    'No description provided.'}
                             </p>
                         </section>
 
@@ -312,8 +330,12 @@ export default function ShowListing({
                                     Reviews for {listing.user?.name ?? 'Seller'}
                                     {reviewCount > 0 && (
                                         <span className="ml-2 font-normal text-muted-foreground">
-                                            {averageRating.toFixed(1)}★ ({reviewCount}{' '}
-                                            {reviewCount === 1 ? 'review' : 'reviews'})
+                                            {averageRating.toFixed(1)}★ (
+                                            {reviewCount}{' '}
+                                            {reviewCount === 1
+                                                ? 'review'
+                                                : 'reviews'}
+                                            )
                                         </span>
                                     )}
                                 </h2>
@@ -323,7 +345,8 @@ export default function ShowListing({
                                             <Star
                                                 key={star}
                                                 className={`size-5 ${
-                                                    star <= Math.round(averageRating)
+                                                    star <=
+                                                    Math.round(averageRating)
                                                         ? 'fill-amber-400 text-amber-400'
                                                         : 'text-muted-foreground'
                                                 }`}
@@ -346,20 +369,26 @@ export default function ShowListing({
                                     <div className="space-y-4">
                                         <div>
                                             <Label>Rating</Label>
-                                            <InputError message={errors.rating} />
+                                            <InputError
+                                                message={errors.rating}
+                                            />
                                             <div className="mt-2 flex gap-1">
                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                     <button
                                                         key={star}
                                                         type="button"
                                                         onClick={() =>
-                                                            setData('rating', star)
+                                                            setData(
+                                                                'rating',
+                                                                star,
+                                                            )
                                                         }
                                                         className="focus:outline-none"
                                                     >
                                                         <Star
                                                             className={`size-8 transition-colors ${
-                                                                star <= data.rating
+                                                                star <=
+                                                                data.rating
                                                                     ? 'fill-amber-400 text-amber-400'
                                                                     : 'text-muted-foreground hover:text-amber-400/70'
                                                             }`}
@@ -377,14 +406,22 @@ export default function ShowListing({
                                                 rows={4}
                                                 value={data.comment}
                                                 onChange={(e) =>
-                                                    setData('comment', e.target.value)
+                                                    setData(
+                                                        'comment',
+                                                        e.target.value,
+                                                    )
                                                 }
                                                 placeholder="Share your experience with this product..."
                                                 className="mt-2 flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                             />
-                                            <InputError message={errors.comment} />
+                                            <InputError
+                                                message={errors.comment}
+                                            />
                                         </div>
-                                        <Button type="submit" disabled={processing}>
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                        >
                                             {userReview
                                                 ? 'Update review'
                                                 : 'Submit review'}
@@ -394,7 +431,7 @@ export default function ShowListing({
                             )}
 
                             {!auth?.user && (
-                                <p className="mt-6 text-muted-foreground text-sm">
+                                <p className="mt-6 text-sm text-muted-foreground">
                                     <Link
                                         href="/login"
                                         className="font-medium hover:underline"
@@ -420,19 +457,23 @@ export default function ShowListing({
                                                 <Avatar className="size-10 shrink-0">
                                                     <AvatarFallback className="text-xs font-medium">
                                                         {review.user
-                                                            ? getInitials(review.user.name)
+                                                            ? getInitials(
+                                                                  review.user
+                                                                      .name,
+                                                              )
                                                             : '?'}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                                         <p className="font-medium">
-                                                            {review.user?.name ??
+                                                            {review.user
+                                                                ?.name ??
                                                                 'Anonymous'}
                                                         </p>
-                                                        <p className="text-muted-foreground text-sm">
+                                                        <p className="text-sm text-muted-foreground">
                                                             {formatRelativeTime(
-                                                                review.created_at
+                                                                review.created_at,
                                                             )}
                                                         </p>
                                                     </div>
@@ -448,15 +489,15 @@ export default function ShowListing({
                                                                             : 'text-muted-foreground'
                                                                     }`}
                                                                 />
-                                                            )
+                                                            ),
                                                         )}
                                                     </div>
                                                     {review.comment && (
-                                                        <p className="mt-3 text-muted-foreground text-sm">
+                                                        <p className="mt-3 text-sm text-muted-foreground">
                                                             {review.comment}
                                                         </p>
                                                     )}
-                                                    <p className="mt-2 text-muted-foreground text-xs">
+                                                    <p className="mt-2 text-xs text-muted-foreground">
                                                         {listing.title}
                                                     </p>
                                                 </div>
@@ -469,7 +510,7 @@ export default function ShowListing({
                     </div>
 
                     {/* Sidebar - Meet the seller + Buy/Add to cart (right side, Carousell-style) */}
-                    <aside className="hidden md:block md:sticky md:top-4 md:self-start">
+                    <aside className="hidden md:sticky md:top-4 md:block md:self-start">
                         <div className="space-y-6 rounded-xl border border-border/50 bg-muted/20 p-6">
                             <h2 className="font-semibold">Meet the seller</h2>
                             {listing.user && (
@@ -488,7 +529,7 @@ export default function ShowListing({
                                             {listing.user.name}
                                         </p>
                                         {reviewCount > 0 && (
-                                            <p className="text-muted-foreground text-sm">
+                                            <p className="text-sm text-muted-foreground">
                                                 {averageRating.toFixed(1)}★ (
                                                 {reviewCount}{' '}
                                                 {reviewCount === 1
@@ -503,8 +544,14 @@ export default function ShowListing({
                             <div className="flex flex-col gap-2">
                                 {isOwner ? (
                                     <>
-                                        <Button variant="outline" className="w-full" asChild>
-                                            <Link href={`/listings/${listing.id}/edit`}>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full"
+                                            asChild
+                                        >
+                                            <Link
+                                                href={`/listings/${listing.id}/edit`}
+                                            >
                                                 Edit listing
                                             </Link>
                                         </Button>
@@ -515,7 +562,7 @@ export default function ShowListing({
                                             onClick={() =>
                                                 !isTrending &&
                                                 router.post(
-                                                    `/listings/${listing.id}/promote`
+                                                    `/listings/${listing.id}/promote`,
                                                 )
                                             }
                                         >
@@ -538,14 +585,17 @@ export default function ShowListing({
 
                 {/* Mobile sticky footer - Buy first, Add to cart second. Shown when sidebar hidden (below md). */}
                 {showBuyerActions && isBusinessSeller && auth?.user && (
-                    <div className="fixed bottom-0 left-0 right-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
+                    <div className="fixed right-0 bottom-0 left-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
                         {auth.cartListingIds?.includes(listing.id) ? (
                             <>
                                 <Button
                                     className="min-h-12 flex-1 touch-manipulation"
                                     asChild
                                 >
-                                    <Link href="/cart" className="inline-flex items-center gap-2">
+                                    <Link
+                                        href="/cart"
+                                        className="inline-flex items-center gap-2"
+                                    >
                                         <ShoppingBag className="size-4" />
                                         Buy
                                     </Link>
@@ -555,7 +605,10 @@ export default function ShowListing({
                                     className="min-h-12 flex-1 touch-manipulation"
                                     asChild
                                 >
-                                    <Link href="/cart" className="inline-flex items-center gap-2">
+                                    <Link
+                                        href="/cart"
+                                        className="inline-flex items-center gap-2"
+                                    >
                                         <ShoppingCart className="size-4" />
                                         In cart
                                     </Link>
@@ -568,7 +621,7 @@ export default function ShowListing({
                                     onClick={() =>
                                         router.post(
                                             `/listings/${listing.id}/cart`,
-                                            { intent: 'buy' }
+                                            { intent: 'buy' },
                                         )
                                     }
                                 >
@@ -579,7 +632,9 @@ export default function ShowListing({
                                     variant="outline"
                                     className="min-h-12 flex-1 touch-manipulation"
                                     onClick={() =>
-                                        router.post(`/listings/${listing.id}/cart`)
+                                        router.post(
+                                            `/listings/${listing.id}/cart`,
+                                        )
                                     }
                                 >
                                     <ShoppingCart className="mr-2 size-4" />
@@ -590,7 +645,7 @@ export default function ShowListing({
                     </div>
                 )}
                 {showBuyerActions && !isBusinessSeller && (
-                    <div className="fixed bottom-0 left-0 right-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
+                    <div className="fixed right-0 bottom-0 left-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
                         <Button
                             variant="outline"
                             className="min-h-12 flex-1 touch-manipulation"
@@ -601,12 +656,15 @@ export default function ShowListing({
                     </div>
                 )}
                 {isGuest && isBusinessSeller && (
-                    <div className="fixed bottom-0 left-0 right-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
+                    <div className="fixed right-0 bottom-0 left-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
                         <Button
                             className="min-h-12 flex-1 touch-manipulation"
                             asChild
                         >
-                            <Link href="/login" className="inline-flex items-center gap-2">
+                            <Link
+                                href="/login"
+                                className="inline-flex items-center gap-2"
+                            >
                                 <ShoppingBag className="size-4" />
                                 Sign in to buy
                             </Link>
@@ -616,7 +674,10 @@ export default function ShowListing({
                             className="min-h-12 flex-1 touch-manipulation"
                             asChild
                         >
-                            <Link href="/login" className="inline-flex items-center gap-2">
+                            <Link
+                                href="/login"
+                                className="inline-flex items-center gap-2"
+                            >
                                 <ShoppingCart className="size-4" />
                                 Sign in to add to cart
                             </Link>
@@ -624,7 +685,7 @@ export default function ShowListing({
                     </div>
                 )}
                 {isGuest && !isBusinessSeller && (
-                    <div className="fixed bottom-0 left-0 right-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
+                    <div className="fixed right-0 bottom-0 left-0 z-50 flex gap-3 border-t bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
                         <Button
                             variant="outline"
                             className="min-h-12 flex-1 touch-manipulation"

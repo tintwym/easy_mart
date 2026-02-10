@@ -28,17 +28,21 @@ export default function UpgradesIndex({
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="-ml-1 mb-4 flex min-h-[44px] justify-start touch-manipulation sm:min-h-8"
+                    className="mb-4 -ml-1 flex min-h-[44px] touch-manipulation justify-start sm:min-h-8"
                     asChild
                 >
-                    <Link href={dashboard()} className="inline-flex items-center gap-2">
+                    <Link
+                        href={dashboard()}
+                        className="inline-flex items-center gap-2"
+                    >
                         <ArrowLeft className="size-4" />
                         Back
                     </Link>
                 </Button>
                 <h1 className="text-2xl font-bold">Upgrades</h1>
                 <p className="mt-2 text-muted-foreground">
-                    Get more out of EasyMart with extra listing slots and promotion.
+                    Get more out of EasyMart with extra listing slots and
+                    promotion.
                 </p>
 
                 <div className="mt-8 space-y-6">
@@ -49,14 +53,19 @@ export default function UpgradesIndex({
                                 <Package className="size-6 text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <h2 className="font-semibold">Extra listing slots</h2>
-                                <p className="mt-1 text-muted-foreground text-sm">
-                                    You're using {listingCount} of {maxListingSlots} slots.
-                                    Buy more to list additional items.
+                                <h2 className="font-semibold">
+                                    Extra listing slots
+                                </h2>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    You're using {listingCount} of{' '}
+                                    {maxListingSlots} slots. Buy more to list
+                                    additional items.
                                 </p>
                                 <Button
                                     className="mt-4"
-                                    onClick={() => router.post('/upgrades/slots')}
+                                    onClick={() =>
+                                        router.post('/upgrades/slots')
+                                    }
                                 >
                                     {slotPriceLabel} — Buy 1 slot
                                 </Button>
@@ -72,12 +81,14 @@ export default function UpgradesIndex({
                             </div>
                             <div className="min-w-0 flex-1">
                                 <h2 className="font-semibold">Make it trend</h2>
-                                <p className="mt-1 text-muted-foreground text-sm">
-                                    Promote a listing that isn't selling. Trending items appear
-                                    higher in search for {trendDurationDays} days.
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Promote a listing that isn't selling.
+                                    Trending items appear higher in search for{' '}
+                                    {trendDurationDays} days.
                                 </p>
                                 <p className="mt-2 text-sm">
-                                    Go to your listing and click &quot;Make it trend&quot; to promote.
+                                    Go to your listing and click &quot;Make it
+                                    trend&quot; to promote.
                                 </p>
                             </div>
                         </div>

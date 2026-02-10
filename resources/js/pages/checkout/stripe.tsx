@@ -1,7 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+    Elements,
+    PaymentElement,
+    useStripe,
+    useElements,
+} from '@stripe/react-stripe-js';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -12,7 +17,12 @@ type OrderItem = {
     listing_id: string;
     quantity: number;
     price: number;
-    listing: { id: string; title: string; image_path: string | null; price: number };
+    listing: {
+        id: string;
+        title: string;
+        image_path: string | null;
+        price: number;
+    };
 };
 
 type Order = {
@@ -66,12 +76,14 @@ function CheckoutForm({ order }: { order: Order }) {
                 }}
             />
             {error && (
-                <p className="rounded-md bg-destructive/10 p-3 text-destructive text-sm">{error}</p>
+                <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                    {error}
+                </p>
             )}
             <Button
                 type="submit"
                 disabled={!stripe || processing}
-                className="w-full min-h-12 font-semibold"
+                className="min-h-12 w-full font-semibold"
             >
                 {processing ? (
                     <>
@@ -115,7 +127,11 @@ const lightAppearance = {
     },
 };
 
-export default function CheckoutStripe({ clientSecret, order, stripePublishableKey }: Props) {
+export default function CheckoutStripe({
+    clientSecret,
+    order,
+    stripePublishableKey,
+}: Props) {
     const stripePromise = stripePublishableKey
         ? loadStripe(stripePublishableKey)
         : null;
@@ -126,8 +142,13 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
             <AppLayout breadcrumbs={[]}>
                 <Head title="Checkout" />
                 <div className="mx-auto max-w-2xl px-4 py-8">
-                    <p className="text-destructive">Stripe is not configured.</p>
-                    <Link href="/cart" className="mt-4 inline-block text-primary hover:underline">
+                    <p className="text-destructive">
+                        Stripe is not configured.
+                    </p>
+                    <Link
+                        href="/cart"
+                        className="mt-4 inline-block text-primary hover:underline"
+                    >
                         Back to cart
                     </Link>
                 </div>
@@ -142,10 +163,13 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="-ml-1 mb-6 flex min-h-[44px] justify-start"
+                    className="mb-6 -ml-1 flex min-h-[44px] justify-start"
                     asChild
                 >
-                    <Link href="/cart" className="inline-flex items-center gap-2">
+                    <Link
+                        href="/cart"
+                        className="inline-flex items-center gap-2"
+                    >
                         <ArrowLeft className="size-4" />
                         Back to cart
                     </Link>
@@ -158,7 +182,10 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
                         <h2 className="mb-4 font-semibold">Order summary</h2>
                         <ul className="space-y-3">
                             {order.items.map((item) => (
-                                <li key={item.id} className="flex items-center gap-3">
+                                <li
+                                    key={item.id}
+                                    className="flex items-center gap-3"
+                                >
                                     {item.listing.image_path ? (
                                         <img
                                             src={item.listing.image_path}
@@ -166,7 +193,7 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
                                             className="size-12 shrink-0 rounded object-cover"
                                         />
                                     ) : (
-                                        <div className="flex size-12 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground text-xs">
+                                        <div className="flex size-12 shrink-0 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
                                             —
                                         </div>
                                     )}
@@ -174,8 +201,9 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
                                         <p className="truncate text-sm font-medium">
                                             {item.listing.title}
                                         </p>
-                                        <p className="text-muted-foreground text-xs">
-                                            S${Number(item.price).toFixed(2)} × {item.quantity}
+                                        <p className="text-xs text-muted-foreground">
+                                            S${Number(item.price).toFixed(2)} ×{' '}
+                                            {item.quantity}
                                         </p>
                                     </div>
                                 </li>
@@ -183,8 +211,12 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
                         </ul>
                         <div className="mt-6 border-t border-border pt-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Total</span>
-                                <span className="font-bold">S${Number(order.total).toFixed(2)}</span>
+                                <span className="text-muted-foreground">
+                                    Total
+                                </span>
+                                <span className="font-bold">
+                                    S${Number(order.total).toFixed(2)}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -194,7 +226,7 @@ export default function CheckoutStripe({ clientSecret, order, stripePublishableK
                             <CreditCard className="size-5" />
                             Payment details
                         </h2>
-                        <p className="mb-6 text-muted-foreground text-sm">
+                        <p className="mb-6 text-sm text-muted-foreground">
                             Pay securely with your card.
                         </p>
                         <Elements

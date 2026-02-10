@@ -77,10 +77,13 @@ export default function EditListing({ listing, categories }: Props) {
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="-ml-1 mb-4 flex min-h-[44px] justify-start touch-manipulation sm:min-h-8"
+                    className="mb-4 -ml-1 flex min-h-[44px] touch-manipulation justify-start sm:min-h-8"
                     asChild
                 >
-                    <Link href={dashboard()} className="inline-flex items-center gap-2">
+                    <Link
+                        href={dashboard()}
+                        className="inline-flex items-center gap-2"
+                    >
                         <ArrowLeft className="size-4" />
                         Back
                     </Link>
@@ -89,7 +92,10 @@ export default function EditListing({ listing, categories }: Props) {
                     title="Edit product"
                     description="Update your listing"
                 />
-                <form onSubmit={submit} className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation [&_select]:min-h-[44px] [&_select]:touch-manipulation [&_textarea]:min-h-[88px] sm:[&_input]:min-h-0 sm:[&_select]:min-h-0">
+                <form
+                    onSubmit={submit}
+                    className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation sm:[&_input]:min-h-0 [&_select]:min-h-[44px] [&_select]:touch-manipulation sm:[&_select]:min-h-0 [&_textarea]:min-h-[88px]"
+                >
                     <div className="space-y-2">
                         <Label htmlFor="title">Title</Label>
                         <Input
@@ -130,10 +136,7 @@ export default function EditListing({ listing, categories }: Props) {
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((cat) => (
-                                    <SelectItem
-                                        key={cat.id}
-                                        value={cat.id}
-                                    >
+                                    <SelectItem key={cat.id} value={cat.id}>
                                         {cat.name}
                                     </SelectItem>
                                 ))}
@@ -193,17 +196,25 @@ export default function EditListing({ listing, categories }: Props) {
                             }
                             placeholder="e.g. Commonwealth View (Blks 89-91 Tanglin Halt Road)"
                         />
-                        <p className="text-muted-foreground text-sm">
-                            If you want to meet up for the sale, add the location here.
+                        <p className="text-sm text-muted-foreground">
+                            If you want to meet up for the sale, add the
+                            location here.
                         </p>
                         <InputError message={errors.meetup_location} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="image">Image (optional, leave empty to keep current)</Label>
+                        <Label htmlFor="image">
+                            Image (optional, leave empty to keep current)
+                        </Label>
                         {listing.image_path && (
-                            <p className="text-muted-foreground text-sm">
-                                Current: <img src={listing.image_path} alt="" className="mt-1 h-20 w-20 rounded object-cover" />
+                            <p className="text-sm text-muted-foreground">
+                                Current:{' '}
+                                <img
+                                    src={listing.image_path}
+                                    alt=""
+                                    className="mt-1 h-20 w-20 rounded object-cover"
+                                />
                             </p>
                         )}
                         <Input
@@ -211,10 +222,7 @@ export default function EditListing({ listing, categories }: Props) {
                             type="file"
                             accept="image/*"
                             onChange={(e) =>
-                                setData(
-                                    'image',
-                                    e.target.files?.[0] ?? null,
-                                )
+                                setData('image', e.target.files?.[0] ?? null)
                             }
                         />
                         <InputError message={errors.image} />

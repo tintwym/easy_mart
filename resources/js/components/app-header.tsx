@@ -67,12 +67,22 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
-    const { auth, categories = [], locations = [], regionLabel: regionLabelProp = 'All' } = page.props;
+    const {
+        auth,
+        categories = [],
+        locations = [],
+        regionLabel: regionLabelProp = 'All',
+    } = page.props;
     const regionLabel = String(regionLabelProp ?? 'All');
-    const searchQuery = (page.props as { searchQuery?: string }).searchQuery ?? '';
+    const searchQuery =
+        (page.props as { searchQuery?: string }).searchQuery ?? '';
     const currentLocation = (() => {
         try {
-            return new URL(page.url, window?.location?.origin).searchParams.get('location') ?? null;
+            return (
+                new URL(page.url, window?.location?.origin).searchParams.get(
+                    'location',
+                ) ?? null
+            );
         } catch {
             return null;
         }
@@ -83,8 +93,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     return (
         <>
             <div
-                className="sticky top-0 z-50 border-b border-sidebar-border/80 bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
-                style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 0 }}
+                className="sticky top-0 z-50 border-b border-sidebar-border/80 bg-background pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]"
+                style={{
+                    paddingTop: 'env(safe-area-inset-top)',
+                    paddingBottom: 0,
+                }}
             >
                 <div className="mx-auto flex h-14 min-h-[3.5rem] items-center px-3 sm:px-4 md:max-w-7xl">
                     {/* Mobile Menu - hidden from tablet (md) up */}
@@ -123,7 +136,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         )}
                                         {/* Categories dropdown */}
                                         {categories.length > 0 && (
-                                            <Collapsible defaultOpen={false} className="group/cat">
+                                            <Collapsible
+                                                defaultOpen={false}
+                                                className="group/cat"
+                                            >
                                                 <CollapsibleTrigger className="flex min-h-[44px] w-full touch-manipulation items-center justify-between rounded-md px-2 py-2 font-semibold text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                                                     <span className="flex items-center gap-2">
                                                         <Layers className="h-4 w-4" />
@@ -132,17 +148,23 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]/cat:rotate-180" />
                                                 </CollapsibleTrigger>
                                                 <CollapsibleContent>
-                                                    <ul className="flex flex-col gap-0.5 border-l border-sidebar-border pl-4 py-2 ml-2">
-                                                        {categories.map((cat) => (
-                                                            <li key={cat.id}>
-                                                                <Link
-                                                                    href={`/categories/${cat.slug}`}
-                                                                    className="block min-h-[44px] py-2.5 font-medium hover:underline active:opacity-80"
+                                                    <ul className="ml-2 flex flex-col gap-0.5 border-l border-sidebar-border py-2 pl-4">
+                                                        {categories.map(
+                                                            (cat) => (
+                                                                <li
+                                                                    key={cat.id}
                                                                 >
-                                                                    {cat.name}
-                                                                </Link>
-                                                            </li>
-                                                        ))}
+                                                                    <Link
+                                                                        href={`/categories/${cat.slug}`}
+                                                                        className="block min-h-[44px] py-2.5 font-medium hover:underline active:opacity-80"
+                                                                    >
+                                                                        {
+                                                                            cat.name
+                                                                        }
+                                                                    </Link>
+                                                                </li>
+                                                            ),
+                                                        )}
                                                     </ul>
                                                 </CollapsibleContent>
                                             </Collapsible>
@@ -151,7 +173,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             <Link
                                                 key={item.title}
                                                 href={item.href}
-                                                className="flex min-h-[44px] items-center gap-2 rounded-md px-2 py-2 font-medium touch-manipulation hover:bg-sidebar-accent"
+                                                className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                             >
                                                 {item.icon && (
                                                     <item.icon className="h-5 w-5" />
@@ -169,7 +191,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 href={toUrl(item.href)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex min-h-[44px] items-center gap-2 rounded-md px-2 py-2 font-medium touch-manipulation"
+                                                className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium"
                                             >
                                                 {item.icon && (
                                                     <item.icon className="h-5 w-5" />
@@ -182,11 +204,15 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <div className="flex min-h-[44px] items-center gap-3 rounded-md px-2 py-2">
                                                     <Avatar className="size-9 shrink-0 overflow-hidden rounded-full">
                                                         <AvatarImage
-                                                            src={auth.user.avatar}
+                                                            src={
+                                                                auth.user.avatar
+                                                            }
                                                             alt={auth.user.name}
                                                         />
                                                         <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                                            {getInitials(auth.user.name)}
+                                                            {getInitials(
+                                                                auth.user.name,
+                                                            )}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <span className="truncate text-sm font-medium">
@@ -195,7 +221,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 </div>
                                                 <Link
                                                     href={edit()}
-                                                    className="flex min-h-[44px] items-center gap-2 rounded-md px-2 py-2 font-medium touch-manipulation hover:bg-sidebar-accent"
+                                                    className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                                 >
                                                     <Settings className="h-4 w-4" />
                                                     Settings
@@ -204,7 +230,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     href={logout()}
                                                     method="post"
                                                     as="button"
-                                                    className="flex min-h-[44px] w-full items-center gap-2 rounded-md px-2 py-2 text-left font-medium touch-manipulation hover:bg-sidebar-accent"
+                                                    className="flex min-h-[44px] w-full touch-manipulation items-center gap-2 rounded-md px-2 py-2 text-left font-medium hover:bg-sidebar-accent"
                                                 >
                                                     <LogOut className="h-4 w-4" />
                                                     Log out
@@ -214,13 +240,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             <>
                                                 <Link
                                                     href={login()}
-                                                    className="flex min-h-[44px] items-center gap-2 rounded-md px-2 py-2 font-medium touch-manipulation hover:bg-sidebar-accent"
+                                                    className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                                 >
                                                     Log in
                                                 </Link>
                                                 <Link
                                                     href={register()}
-                                                    className="flex min-h-[44px] items-center gap-2 rounded-md px-2 py-2 font-medium touch-manipulation hover:bg-sidebar-accent"
+                                                    className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                                 >
                                                     Register
                                                 </Link>
@@ -259,10 +285,12 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             <ul className="grid w-[220px] gap-1 p-2">
                                                 {categories.map((cat) => (
                                                     <li key={cat.id}>
-                                                        <NavigationMenuLink asChild>
+                                                        <NavigationMenuLink
+                                                            asChild
+                                                        >
                                                             <Link
                                                                 href={`/categories/${cat.slug}`}
-                                                                className="block select-none rounded-md px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                                                className="block rounded-md px-3 py-2 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground"
                                                             >
                                                                 {cat.name}
                                                             </Link>
@@ -339,13 +367,15 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 >
                                                     <Link href="/cart">
                                                         <ShoppingCart className="!size-5 opacity-80 group-hover:opacity-100" />
-                                                        {(auth.cartCount ?? 0) > 0 && (
-                                                                <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-medium">
-                                                                    {(auth.cartCount ?? 0) > 99
-                                                                        ? '99+'
-                                                                        : auth.cartCount}
-                                                                </span>
-                                                            )}
+                                                        {(auth.cartCount ?? 0) >
+                                                            0 && (
+                                                            <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                                {(auth.cartCount ??
+                                                                    0) > 99
+                                                                    ? '99+'
+                                                                    : auth.cartCount}
+                                                            </span>
+                                                        )}
                                                     </Link>
                                                 </Button>
                                             </TooltipTrigger>
@@ -393,7 +423,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <DropdownMenuTrigger asChild>
                                         <Button
                                             variant="ghost"
-                                            className="flex size-11 min-h-[44px] min-w-[44px] rounded-full p-1 touch-manipulation sm:size-10"
+                                            className="flex size-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-1 sm:size-10"
                                             aria-label="User menu"
                                         >
                                             <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
@@ -402,12 +432,17 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     alt={auth.user.name}
                                                 />
                                                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                                    {getInitials(auth.user.name)}
+                                                    {getInitials(
+                                                        auth.user.name,
+                                                    )}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56" align="end">
+                                    <DropdownMenuContent
+                                        className="w-56"
+                                        align="end"
+                                    >
                                         <UserMenuContent user={auth.user} />
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -439,8 +474,12 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     onSubmit={(e) => {
                         e.preventDefault();
                         const form = e.currentTarget;
-                        const q = (form.elements.namedItem('q') as HTMLInputElement)?.value ?? '';
-                        const params: Record<string, string | undefined> = { q: q || undefined };
+                        const q =
+                            (form.elements.namedItem('q') as HTMLInputElement)
+                                ?.value ?? '';
+                        const params: Record<string, string | undefined> = {
+                            q: q || undefined,
+                        };
                         if (currentLocation) params.location = currentLocation;
                         router.get('/', params, { preserveState: false });
                     }}
@@ -462,16 +501,20 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             <DropdownMenuTrigger asChild>
                                 <button
                                     type="button"
-                                    className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-muted-foreground text-sm hover:bg-accent hover:text-accent-foreground"
+                                    className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                 >
                                     <MapPin className="size-4 shrink-0" />
                                     <span className="whitespace-nowrap">
-                                        {currentLocation ?? `All of ${regionLabel}`}
+                                        {currentLocation ??
+                                            `All of ${regionLabel}`}
                                     </span>
                                     <ChevronDown className="size-4 shrink-0" />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-[220px] p-1">
+                            <DropdownMenuContent
+                                align="end"
+                                className="w-[220px] p-1"
+                            >
                                 <Link
                                     href={dashboard().url}
                                     className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
@@ -483,13 +526,22 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     return (
                                         <Link
                                             key={loc.name}
-                                            href={dashboard({ query: { location: loc.name } }).url}
+                                            href={
+                                                dashboard({
+                                                    query: {
+                                                        location: loc.name,
+                                                    },
+                                                }).url
+                                            }
                                             className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                                         >
                                             {loc.name}
                                             {km != null && (
                                                 <span className="ml-1.5 text-muted-foreground">
-                                                    · {km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`}
+                                                    ·{' '}
+                                                    {km < 1
+                                                        ? `${Math.round(km * 1000)} m`
+                                                        : `${km.toFixed(1)} km`}
                                                 </span>
                                             )}
                                         </Link>
@@ -498,9 +550,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
-                        <div className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-muted-foreground text-sm">
+                        <div className="flex shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
                             <MapPin className="size-4 shrink-0" />
-                            <span className="whitespace-nowrap">All of {regionLabel}</span>
+                            <span className="whitespace-nowrap">
+                                All of {regionLabel}
+                            </span>
                         </div>
                     )}
                     <Button
@@ -513,7 +567,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                 </form>
             </div>
             {breadcrumbs.length > 1 && (
-                <div className="flex w-full border-b border-sidebar-border/70 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+                <div className="flex w-full border-b border-sidebar-border/70 pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
                     <div className="mx-auto flex min-h-11 w-full max-w-7xl items-center justify-start px-3 py-2 text-neutral-500 sm:px-4 sm:py-2.5">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>

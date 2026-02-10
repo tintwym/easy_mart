@@ -49,7 +49,10 @@ export default function Dashboard({ listings = [] }: Props) {
                             </p>
                         ) : (
                             listings.map((listing) => (
-                                <ListingCard key={listing.id} listing={listing} />
+                                <ListingCard
+                                    key={listing.id}
+                                    listing={listing}
+                                />
                             ))
                         )}
                     </div>
@@ -58,7 +61,7 @@ export default function Dashboard({ listings = [] }: Props) {
                 {/* Add product FAB - safe area for mobile notches/home indicator */}
                 <Button
                     size="icon"
-                    className="fixed bottom-6 right-6 z-40 flex size-14 min-h-[56px] min-w-[56px] rounded-full shadow-lg touch-manipulation [bottom:max(1.5rem,env(safe-area-inset-bottom))] [right:max(1.5rem,env(safe-area-inset-right))]"
+                    className="fixed [right:max(1.5rem,env(safe-area-inset-right))] right-6 [bottom:max(1.5rem,env(safe-area-inset-bottom))] bottom-6 z-40 flex size-14 min-h-[56px] min-w-[56px] touch-manipulation rounded-full shadow-lg"
                     asChild
                 >
                     <Link href="/listings/create" aria-label="Add product">

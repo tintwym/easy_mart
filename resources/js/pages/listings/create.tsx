@@ -68,10 +68,13 @@ export default function CreateListing({
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="-ml-1 mb-4 flex min-h-[44px] justify-start touch-manipulation sm:min-h-8"
+                    className="mb-4 -ml-1 flex min-h-[44px] touch-manipulation justify-start sm:min-h-8"
                     asChild
                 >
-                    <Link href={dashboard()} className="inline-flex items-center gap-2">
+                    <Link
+                        href={dashboard()}
+                        className="inline-flex items-center gap-2"
+                    >
                         <ArrowLeft className="size-4" />
                         Back
                     </Link>
@@ -80,13 +83,14 @@ export default function CreateListing({
                     title="Add product"
                     description="Create a new product listing"
                 />
-                <p className="mt-2 text-muted-foreground text-sm">
+                <p className="mt-2 text-sm text-muted-foreground">
                     Your listings: {listingCount} / {maxListingSlots}
                 </p>
                 {!canCreate && (
-                    <Alert className="mt-4 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-500/30">
+                    <Alert className="mt-4 border-amber-500/50 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/20">
                         <AlertDescription>
-                            You&apos;ve reached your listing limit. Purchase more slots to list more items.
+                            You&apos;ve reached your listing limit. Purchase
+                            more slots to list more items.
                             <Link
                                 href="/upgrades"
                                 className="ml-1 font-medium text-amber-700 underline dark:text-amber-400"
@@ -98,7 +102,7 @@ export default function CreateListing({
                 )}
                 <form
                     onSubmit={submit}
-                    className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation [&_select]:min-h-[44px] [&_select]:touch-manipulation [&_textarea]:min-h-[88px] sm:[&_input]:min-h-0 sm:[&_select]:min-h-0"
+                    className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation sm:[&_input]:min-h-0 [&_select]:min-h-[44px] [&_select]:touch-manipulation sm:[&_select]:min-h-0 [&_textarea]:min-h-[88px]"
                 >
                     <div className="space-y-2">
                         <Label htmlFor="title">Title</Label>
@@ -140,10 +144,7 @@ export default function CreateListing({
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((cat) => (
-                                    <SelectItem
-                                        key={cat.id}
-                                        value={cat.id}
-                                    >
+                                    <SelectItem key={cat.id} value={cat.id}>
                                         {cat.name}
                                     </SelectItem>
                                 ))}
@@ -203,8 +204,9 @@ export default function CreateListing({
                             }
                             placeholder="e.g. Commonwealth View (Blks 89-91 Tanglin Halt Road)"
                         />
-                        <p className="text-muted-foreground text-sm">
-                            If you want to meet up for the sale, add the location here.
+                        <p className="text-sm text-muted-foreground">
+                            If you want to meet up for the sale, add the
+                            location here.
                         </p>
                         <InputError message={errors.meetup_location} />
                     </div>
@@ -216,10 +218,7 @@ export default function CreateListing({
                             type="file"
                             accept="image/*"
                             onChange={(e) =>
-                                setData(
-                                    'image',
-                                    e.target.files?.[0] ?? null,
-                                )
+                                setData('image', e.target.files?.[0] ?? null)
                             }
                         />
                         <InputError message={errors.image} />

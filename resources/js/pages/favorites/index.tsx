@@ -16,7 +16,7 @@ export default function FavoritesIndex({ listings = [] }: Props) {
             <div className="mx-auto w-full max-w-6xl px-0 pb-24 sm:px-2">
                 <Link
                     href={dashboard().url}
-                    className="-ml-1 mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                    className="mb-4 -ml-1 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="size-4" />
                     Back
@@ -25,13 +25,15 @@ export default function FavoritesIndex({ listings = [] }: Props) {
                     <Heart className="size-6 fill-red-500 text-red-500" />
                     Favorites
                 </h1>
-                <p className="mb-6 text-muted-foreground text-sm">
-                    {listings.length} {listings.length === 1 ? 'item' : 'items'} saved
+                <p className="mb-6 text-sm text-muted-foreground">
+                    {listings.length} {listings.length === 1 ? 'item' : 'items'}{' '}
+                    saved
                 </p>
                 <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                     {listings.length === 0 ? (
                         <p className="col-span-full text-muted-foreground">
-                            No favorites yet. Browse listings and tap the heart to save.
+                            No favorites yet. Browse listings and tap the heart
+                            to save.
                         </p>
                     ) : (
                         listings.map((l) => (
