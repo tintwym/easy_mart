@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids; // Required for ULIDs
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class Listing extends Model
 {
@@ -33,6 +35,32 @@ class Listing extends Model
             'trending_until' => 'datetime',
         ];
     }
+
+    /**
+     * Public URL for the listing image (works with relative paths and when behind proxy).
+     */
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(function (): ?string {
+            $path = $this->image_path;
+            if (! $path) {
+                return null;
+            }
+            if (str_starts_with($path, 'http')) {
+                return $path;
+            }
+            $path = str_starts_with($path, '/') ? $path : '/storage/'.$path;
+
+            return URL::asset($path);
+        });
+    }
+
+    /**
+     * Append image_url when serializing so the frontend always gets a working URL.
+     *
+     * @var list<string>
+     */
+    protected $appends = ['image_url'];
 
     /**
      * Relationship: A listing belongs to a user.

@@ -43,6 +43,7 @@ export type ListingCardListing = {
     condition: string;
     price: number;
     image_path: string | null;
+    image_url?: string | null;
     created_at?: string;
     category?: { id: string; name: string; slug: string } | null;
     user?: {
@@ -71,9 +72,9 @@ export function ListingCard({ listing }: ListingCardProps) {
                 href={`/listings/${listing.id}`}
                 className="relative block aspect-square w-full overflow-hidden bg-muted"
             >
-                {listing.image_path ? (
+                {(listing.image_url ?? listing.image_path) ? (
                     <img
-                        src={listing.image_path}
+                        src={listing.image_url ?? listing.image_path ?? ''}
                         alt=""
                         className="size-full object-cover transition-opacity hover:opacity-95"
                     />
