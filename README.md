@@ -162,7 +162,7 @@ php artisan migrate --force
    - `APP_KEY` — run `php artisan key:generate --show` locally and paste the value.
    - `APP_ENV` — `production`
    - `APP_DEBUG` — `false`
-   - `APP_URL` — `https://your-app-name.herokuapp.com` (use your app’s URL).
+   - **`APP_URL`** — **Must be your Heroku app URL**, e.g. `https://easymart-db88033013be.herokuapp.com`. If this is wrong or missing, image URLs will point to `localhost` and images will fail to load.
    - `STRIPE_KEY` — your Stripe publishable key.
    - `STRIPE_SECRET` — your Stripe secret key.
    - `DATABASE_URL` (or `DB_URL`) — Aiven MySQL or PostgreSQL connection URI (see step 2).
@@ -170,8 +170,9 @@ php artisan migrate --force
 5. **Deploy**
    - **Deploy** → **Deploy branch** (e.g. `main`). Buildpack order must be **PHP first, then Node** (so `php` is available when Vite runs). The repo’s `app.json` sets this; if you created the app before that change, in **Settings** → **Buildpacks** put **heroku/php** above **heroku/nodejs**. The release phase runs `php artisan migrate --force`.
 
-6. **Optional**
-   - For file uploads (e.g. listing images) to persist, use a store like AWS S3 and set `FILESYSTEM_DISK=s3` and AWS env vars. On Heroku the filesystem is ephemeral.
+6. **Listing images on Heroku**
+   - Heroku’s filesystem is ephemeral: uploaded files are lost on deploy. **Set `APP_URL`** (step 4) so image URLs use your app domain instead of `localhost`.
+   - For images to **persist**, use S3: set `LISTING_FILESYSTEM_DISK=s3` and add `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, and `AWS_BUCKET`. New uploads will be stored in S3 and served from there.
 
 Note: Heroku no longer has a free tier; you’ll need a paid dyno. Aiven may offer a free tier for PostgreSQL depending on region and plan.
 

@@ -38,7 +38,7 @@ type Message = {
     id: string;
     body: string;
     created_at: string;
-    user: { id: string; name: string };
+    user: { id: string; name: string } | null;
     user_id: string;
 };
 
@@ -50,7 +50,7 @@ type ConversationItem = {
         image_path: string | null;
         price: number;
         user_id: string;
-        user: { id: string; name: string; region?: string | null };
+        user: { id: string; name: string; region?: string | null } | null;
     };
     buyer: { id: string; name: string };
     messages_count: number;
@@ -70,7 +70,7 @@ type Conversation = {
         title: string;
         image_path: string | null;
         price: number;
-        user: { id: string; name: string; region?: string | null };
+        user: { id: string; name: string; region?: string | null } | null;
     };
     buyer: { id: string; name: string };
 };
@@ -96,7 +96,7 @@ export default function ChatShow({
 
     const otherUser =
         currentUserId === conversation.buyer.id
-            ? conversation.listing.user
+            ? conversation.listing.user ?? conversation.buyer
             : conversation.buyer;
 
     const scrollToBottom = () => {
@@ -130,7 +130,7 @@ export default function ChatShow({
 
     return (
         <AppLayout breadcrumbs={[]}>
-            <Head title={`Chat with ${otherUser.name}`} />
+            <Head title={`Chat with ${otherUser?.name ?? 'Unknown'}`} />
             <div className="-mx-4 flex h-[calc(100vh-7rem)] overflow-hidden sm:-mx-6 lg:-mx-8">
                 {/* Left panel - Chat list (hidden on mobile when viewing conversation) */}
                 <aside className="hidden w-full flex-col border-r border-border/50 bg-background md:flex md:w-[360px] md:shrink-0">
@@ -153,7 +153,7 @@ export default function ChatShow({
                                 {conversations.map((conv) => {
                                     const other =
                                         currentUserId === conv.buyer.id
-                                            ? conv.listing.user
+                                            ? conv.listing.user ?? conv.buyer
                                             : conv.buyer;
                                     const lastMessage = conv.messages[0];
                                     const isActive =
@@ -190,7 +190,7 @@ export default function ChatShow({
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <p className="truncate font-medium">
-                                                        {other.name}
+                                                        {other?.name ?? 'Unknown'}
                                                     </p>
                                                     <p className="truncate text-sm text-muted-foreground">
                                                         {conv.listing.title}
@@ -250,12 +250,12 @@ export default function ChatShow({
                             </Button>
                             <Avatar className="size-10 shrink-0">
                                 <AvatarFallback className="text-sm font-medium">
-                                    {getInitials(otherUser.name)}
+                                    {getInitials(otherUser?.name ?? '')}
                                 </AvatarFallback>
                             </Avatar>
                             <div>
                                 <p className="font-semibold">
-                                    {otherUser.name}
+                                    {otherUser?.name ?? 'Unknown'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                     Online
@@ -352,7 +352,7 @@ export default function ChatShow({
                                                                 <AvatarFallback className="text-xs">
                                                                     {getInitials(
                                                                         msg.user
-                                                                            .name,
+                                                                            ?.name ?? '',
                                                                     )}
                                                                 </AvatarFallback>
                                                             </Avatar>
