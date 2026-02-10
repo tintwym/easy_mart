@@ -46,7 +46,7 @@ export default function CreateListing({
     canCreate,
     slotPriceLabel,
 }: Props) {
-    const { t } = useTranslations();
+    const { t, categoryName } = useTranslations();
     const { currency } = useCurrency();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
@@ -160,7 +160,7 @@ export default function CreateListing({
                             <SelectContent>
                                 {categories.map((cat) => (
                                     <SelectItem key={cat.id} value={cat.id}>
-                                        {cat.name}
+                                        {categoryName(cat)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

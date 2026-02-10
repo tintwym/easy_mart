@@ -17,6 +17,7 @@ type OrderItem = {
         id: string;
         title: string;
         image_path: string | null;
+        image_url?: string | null;
         price: number;
         user?: { id: string; region?: string | null } | null;
     };
@@ -87,10 +88,13 @@ export default function Orders({ orders = [] }: Props) {
                                             key={item.id}
                                             className="flex items-center gap-3"
                                         >
-                                            {item.listing.image_path ? (
+                                            {(item.listing.image_url ??
+                                                item.listing.image_path) ? (
                                                 <img
                                                     src={
-                                                        item.listing.image_path
+                                                        item.listing.image_url ??
+                                                        item.listing.image_path ??
+                                                        ''
                                                     }
                                                     alt=""
                                                     className="size-12 rounded object-cover"

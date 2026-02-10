@@ -169,11 +169,15 @@ export default function ChatShow({
                                                 }`}
                                             >
                                                 <div className="size-12 shrink-0 overflow-hidden rounded-full bg-muted">
-                                                    {conv.listing.image_path ? (
+                                                    {(conv.listing.image_url ??
+                                                        conv.listing.image_path) ? (
                                                         <img
                                                             src={
                                                                 conv.listing
-                                                                    .image_path
+                                                                    .image_url ??
+                                                                conv.listing
+                                                                    .image_path ??
+                                                                ''
                                                             }
                                                             alt=""
                                                             className="size-full object-cover"
@@ -198,11 +202,15 @@ export default function ChatShow({
                                                     )}
                                                 </div>
                                                 <div className="shrink-0 overflow-hidden rounded-lg bg-muted">
-                                                    {conv.listing.image_path ? (
+                                                    {(conv.listing.image_url ??
+                                                        conv.listing.image_path) ? (
                                                         <img
                                                             src={
                                                                 conv.listing
-                                                                    .image_path
+                                                                    .image_url ??
+                                                                conv.listing
+                                                                    .image_path ??
+                                                                ''
                                                             }
                                                             alt=""
                                                             className="size-12 object-cover"
@@ -263,9 +271,14 @@ export default function ChatShow({
                             className="flex items-center gap-3"
                         >
                             <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
-                                {conversation.listing.image_path ? (
+                                {(conversation.listing.image_url ??
+                                    conversation.listing.image_path) ? (
                                     <img
-                                        src={conversation.listing.image_path}
+                                        src={
+                                            conversation.listing.image_url ??
+                                            conversation.listing.image_path ??
+                                            ''
+                                        }
                                         alt=""
                                         className="size-full object-cover"
                                     />

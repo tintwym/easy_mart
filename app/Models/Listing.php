@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
 class Listing extends Model
@@ -49,9 +50,12 @@ class Listing extends Model
             if (str_starts_with($path, 'http')) {
                 return $path;
             }
-            $path = str_starts_with($path, '/') ? $path : '/storage/'.$path;
+            $relativePath = str_starts_with($path, '/storage/')
+                ? substr($path, 9)
+                : $path;
+            $disk = config('filesystems.listing_disk', 'public');
 
-            return URL::asset($path);
+            return Storage::disk($disk)->url($relativePath);
         });
     }
 

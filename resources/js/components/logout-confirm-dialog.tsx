@@ -35,7 +35,7 @@ export function LogoutConfirmDialog({ open, onOpenChange, onLogout }: Props) {
                     <DialogTitle>{t('logout.title')}</DialogTitle>
                     <DialogDescription>{t('logout.message')}</DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="gap-2 sm:gap-0">
+                <DialogFooter className="gap-3">
                     <Button
                         type="button"
                         variant="outline"

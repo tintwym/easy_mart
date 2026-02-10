@@ -68,8 +68,10 @@ class ListingController extends Controller
         $data = $request->validated();
         $imagePath = null;
 
+        $listingDisk = config('filesystems.listing_disk', 'public');
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('listings', 'public');
+            Storage::disk($listingDisk)->makeDirectory('listings');
+            $imagePath = $request->file('image')->store('listings', $listingDisk);
         }
 
         Listing::create([
@@ -79,7 +81,7 @@ class ListingController extends Controller
             'description' => $data['description'],
             'condition' => $data['condition'],
             'price' => $data['price'],
-            'image_path' => $imagePath ? '/storage/'.$imagePath : null,
+            'image_path' => $imagePath,
             'meetup_location' => $data['meetup_location'] ?? null,
         ]);
 
@@ -101,12 +103,16 @@ class ListingController extends Controller
         $data = $request->validated();
         $imagePath = $listing->image_path;
 
+        $listingDisk = config('filesystems.listing_disk', 'public');
         if ($request->hasFile('image')) {
+            Storage::disk($listingDisk)->makeDirectory('listings');
             if ($listing->image_path) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $listing->image_path));
+                $oldPath = str_starts_with($listing->image_path, '/storage/')
+                    ? substr($listing->image_path, 9)
+                    : $listing->image_path;
+                Storage::disk($listingDisk)->delete($oldPath);
             }
-            $stored = $request->file('image')->store('listings', 'public');
-            $imagePath = '/storage/'.$stored;
+            $imagePath = $request->file('image')->store('listings', $listingDisk);
         }
 
         $listing->update([
@@ -127,7 +133,11 @@ class ListingController extends Controller
         $this->authorize('delete', $listing);
 
         if ($listing->image_path) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $listing->image_path));
+            $listingDisk = config('filesystems.listing_disk', 'public');
+            $path = str_starts_with($listing->image_path, '/storage/')
+                ? substr($listing->image_path, 9)
+                : $listing->image_path;
+            Storage::disk($listingDisk)->delete($path);
         }
         $listing->delete();
 

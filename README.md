@@ -127,12 +127,16 @@ php artisan view:cache
    - Generate `APP_KEY` with `php artisan key:generate`
    - Set correct `APP_URL`
 
-4. **Run migrations:**
+4. **Image storage (production):**
+   - **Local disk (default):** Images are stored under `storage/app/public/listings/` and served via `public/storage` (run `php artisan storage:link`). This is fine for a single server with a persistent filesystem.
+   - **Heroku / ephemeral filesystems:** The app filesystem is wiped on deploy, so uploads would be lost. Set `LISTING_FILESYSTEM_DISK=s3`, then set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, and `AWS_BUCKET` (and optionally `AWS_URL` for a custom bucket URL). Listing images will then be stored in S3 and persist across deploys.
+
+5. **Run migrations:**
 ```bash
 php artisan migrate --force
 ```
 
-5. **Configure web server:**
+6. **Configure web server:**
    - Point document root to `/public` directory
    - Configure URL rewriting (Laravel includes `.htaccess` for Apache)
    - Set proper file permissions (storage and bootstrap/cache should be writable)

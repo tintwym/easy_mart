@@ -103,12 +103,17 @@ export default function ChatIndex({ conversations }: Props) {
                                                     className="flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted/50"
                                                 >
                                                     <div className="size-12 shrink-0 overflow-hidden rounded-full bg-muted">
-                                                        {conv.listing
-                                                            .image_path ? (
+                                                        {(conv.listing
+                                                            .image_url ??
+                                                            conv.listing
+                                                                .image_path) ? (
                                                             <img
                                                                 src={
                                                                     conv.listing
-                                                                        .image_path
+                                                                        .image_url ??
+                                                                    conv.listing
+                                                                        .image_path ??
+                                                                    ''
                                                                 }
                                                                 alt=""
                                                                 className="size-full object-cover"
@@ -142,12 +147,17 @@ export default function ChatIndex({ conversations }: Props) {
                                                         )}
                                                     </div>
                                                     <div className="shrink-0 overflow-hidden rounded-lg bg-muted">
-                                                        {conv.listing
-                                                            .image_path ? (
+                                                        {(conv.listing
+                                                            .image_url ??
+                                                            conv.listing
+                                                                .image_path) ? (
                                                             <img
                                                                 src={
                                                                     conv.listing
-                                                                        .image_path
+                                                                        .image_url ??
+                                                                    conv.listing
+                                                                        .image_path ??
+                                                                    ''
                                                                 }
                                                                 alt=""
                                                                 className="size-12 object-cover"

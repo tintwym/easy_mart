@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
+import { useTranslations } from '@/hooks/use-translations';
 import { dashboard, login, register } from '@/routes';
 import type { SharedData } from '@/types';
 
@@ -11,6 +12,7 @@ type Category = {
 
 export default function Home({ categories = [] }: { categories?: Category[] }) {
     const { auth } = usePage<SharedData>().props;
+    const { categoryName } = useTranslations();
 
     return (
         <>
@@ -47,7 +49,7 @@ export default function Home({ categories = [] }: { categories?: Category[] }) {
                                         href={`/categories/${category.slug}`}
                                         className="block rounded-lg border p-4 hover:bg-muted"
                                     >
-                                        {category.name}
+                                        {categoryName(category)}
                                     </Link>
                                 </li>
                             ))}

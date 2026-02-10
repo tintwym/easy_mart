@@ -22,6 +22,7 @@ type OrderItem = {
         id: string;
         title: string;
         image_path: string | null;
+        image_url?: string | null;
         price: number;
     };
 };
@@ -188,9 +189,14 @@ export default function CheckoutStripe({
                                     key={item.id}
                                     className="flex items-center gap-3"
                                 >
-                                    {item.listing.image_path ? (
+                                    {(item.listing.image_url ??
+                                        item.listing.image_path) ? (
                                         <img
-                                            src={item.listing.image_path}
+                                            src={
+                                                item.listing.image_url ??
+                                                item.listing.image_path ??
+                                                ''
+                                            }
                                             alt=""
                                             className="size-12 shrink-0 rounded object-cover"
                                         />

@@ -65,7 +65,7 @@ type Props = {
 };
 
 export default function EditListing({ listing, categories }: Props) {
-    const { t } = useTranslations();
+    const { t, categoryName } = useTranslations();
     const { currency } = useCurrency();
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
@@ -170,7 +170,7 @@ export default function EditListing({ listing, categories }: Props) {
                             <SelectContent>
                                 {categories.map((cat) => (
                                     <SelectItem key={cat.id} value={cat.id}>
-                                        {cat.name}
+                                        {categoryName(cat)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

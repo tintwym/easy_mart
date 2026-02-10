@@ -35,6 +35,7 @@ type CartItem = {
         id: string;
         title: string;
         image_path: string | null;
+        image_url?: string | null;
         price: number;
         condition?: string;
         user: { id: string; name: string; region?: string | null };
@@ -139,11 +140,15 @@ export default function CartIndex({ items }: Props) {
                                                     href={`/listings/${item.listing.id}`}
                                                     className="shrink-0 overflow-hidden rounded-lg bg-muted"
                                                 >
-                                                    {item.listing.image_path ? (
+                                                    {(item.listing.image_url ??
+                                                        item.listing.image_path) ? (
                                                         <img
                                                             src={
                                                                 item.listing
-                                                                    .image_path
+                                                                    .image_url ??
+                                                                item.listing
+                                                                    .image_path ??
+                                                                ''
                                                             }
                                                             alt=""
                                                             className="size-20 object-cover sm:size-24"

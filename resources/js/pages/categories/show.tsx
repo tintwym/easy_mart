@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { ListingCard } from '@/components/listing-card';
 import type { ListingCardListing } from '@/components/listing-card';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
@@ -19,14 +20,16 @@ type Props = {
 };
 
 export default function CategoryShow({ category, listings = [] }: Props) {
+    const { t, categoryName } = useTranslations();
+    const name = categoryName(category);
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Dashboard', href: dashboard().url },
-        { title: category.name, href: `/categories/${category.slug}` },
+        { title: t('dashboard.title'), href: dashboard().url },
+        { title: name, href: `/categories/${category.slug}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={category.name} />
+            <Head title={name} />
             <div className="relative flex min-w-0 flex-1 flex-col gap-6">
                 <div className="flex items-center gap-3 sm:gap-4">
                     <Button
@@ -43,7 +46,7 @@ export default function CategoryShow({ category, listings = [] }: Props) {
                             <ArrowLeft className="size-5" />
                         </Link>
                     </Button>
-                    <h1 className="text-xl font-semibold">{category.name}</h1>
+                    <h1 className="text-xl font-semibold">{name}</h1>
                 </div>
 
                 <section aria-label="Listings">

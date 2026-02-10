@@ -72,7 +72,7 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
-    const { t } = useTranslations();
+    const { t, categoryName } = useTranslations();
     const [sidebarLogoutOpen, setSidebarLogoutOpen] = useState(false);
     const {
         auth,
@@ -168,7 +168,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                                         className="block min-h-[44px] py-2.5 font-medium hover:underline active:opacity-80"
                                                                     >
                                                                         {
-                                                                            cat.name
+                                                                            categoryName(
+                                                                                cat,
+                                                                            )
                                                                         }
                                                                     </Link>
                                                                 </li>
@@ -314,7 +316,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                                 href={`/categories/${cat.slug}`}
                                                                 className="block rounded-md px-3 py-2 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground"
                                                             >
-                                                                {cat.name}
+                                                                {categoryName(
+                                                                    cat,
+                                                                )}
                                                             </Link>
                                                         </NavigationMenuLink>
                                                     </li>

@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useCurrency } from '@/hooks/use-currency';
+import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { SharedData } from '@/types';
@@ -83,6 +84,7 @@ type Listing = {
     condition: string;
     price: number;
     image_path: string | null;
+    image_url?: string | null;
     meetup_location: string | null;
     created_at: string;
     category?: Category | null;
@@ -111,6 +113,7 @@ export default function ShowListing({
 }: Props) {
     const { auth } = usePage<SharedData>().props;
     const { formatPrice } = useCurrency();
+    const { t, categoryName } = useTranslations();
     const userReview = listing.reviews.find(
         (r) => r.user?.id === auth?.user?.id,
     );
@@ -184,8 +187,12 @@ export default function ShowListing({
             )}
         </div>
     ) : (
-        <Button variant="outline" className="w-full" asChild>
-            <Link href="#">Make Offer</Link>
+        <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => router.post(`/listings/${listing.id}/chat`)}
+        >
+            Make Offer
         </Button>
     );
 
@@ -231,9 +238,13 @@ export default function ShowListing({
 
                 {/* Large product image at top (Carousell-style) */}
                 <div className="mb-8 aspect-square w-full overflow-hidden rounded-xl bg-muted sm:aspect-[4/3]">
-                    {listing.image_path ? (
+                    {(listing.image_url ?? listing.image_path) ? (
                         <img
-                            src={listing.image_path}
+                            src={
+                                listing.image_url ??
+                                listing.image_path ??
+                                ''
+                            }
                             alt={listing.title}
                             className="size-full object-contain"
                         />
@@ -278,12 +289,14 @@ export default function ShowListing({
                                 )}
                                 {listing.category && (
                                     <span>
-                                        Category{' '}
+                                        {t('listing.category')}{' '}
                                         <Link
                                             href={`/categories/${listing.category.slug}`}
                                             className="font-medium text-foreground hover:underline"
                                         >
-                                            {listing.category.name}
+                                            {categoryName(
+                                                listing.category,
+                                            )}
                                         </Link>
                                     </span>
                                 )}
@@ -658,9 +671,11 @@ export default function ShowListing({
                         <Button
                             variant="outline"
                             className="min-h-12 flex-1 touch-manipulation"
-                            asChild
+                            onClick={() =>
+                                router.post(`/listings/${listing.id}/chat`)
+                            }
                         >
-                            <Link href="#">Make Offer</Link>
+                            Make Offer
                         </Button>
                     </div>
                 )}

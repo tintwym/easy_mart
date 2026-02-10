@@ -18,5 +18,11 @@ export function useTranslations() {
         return value;
     }
 
-    return { t, locale, translations };
+    /** Translated category name by slug; falls back to DB name if no key. */
+    function categoryName(cat: { name: string; slug: string }): string {
+        const key = 'category.' + cat.slug;
+        return translations[key] ?? cat.name;
+    }
+
+    return { t, categoryName, locale, translations };
 }
