@@ -7,11 +7,11 @@ import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-// Register service worker for PWA (install to home screen, asset caching)
+// Register service worker for PWA when built with PWA plugin (BUILD_PWA=1)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-    import('virtual:pwa-register').then(({ registerSW }) => {
-        registerSW({ immediate: true });
-    });
+    import('virtual:pwa-register')
+        .then(({ registerSW }) => registerSW({ immediate: true }))
+        .catch(() => {});
 }
 
 createInertiaApp({

@@ -30,6 +30,8 @@
         "vite-plugin-pwa": "^1.2.0"
     },
     "dependencies": {
+        "@stripe/react-stripe-js": "^2.8.0",
+        "@stripe/stripe-js": "^4.8.0",
         "@headlessui/react": "^2.2.0",
         "@inertiajs/react": "^2.3.7",
         "@radix-ui/react-avatar": "^1.1.3",
