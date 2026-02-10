@@ -1,4 +1,4 @@
-import { Link, usePage, useRouter } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     LogOut,
@@ -93,7 +93,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { sortedLocations, getDistanceKm } = useSortedLocations(locations);
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
-    const router = useRouter();
     return (
         <>
             <div
