@@ -36,7 +36,7 @@ return [
     ],
 
     'stripe' => [
-        'key' => env('STRIPE_KEY'),
+        'key' => env('STRIPE_KEY') ?: env('STRIPE_PUBLISHABLE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
 
