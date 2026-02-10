@@ -6,6 +6,7 @@ use App\Http\Requests\StoreListingRequest;
 use App\Http\Requests\UpdateListingRequest;
 use App\Models\Category;
 use App\Models\Listing;
+use App\Services\CloudinaryService;
 use App\Services\RegionFromIp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,8 +71,12 @@ class ListingController extends Controller
 
         $listingDisk = config('filesystems.listing_disk', 'public');
         if ($request->hasFile('image')) {
-            Storage::disk($listingDisk)->makeDirectory('listings');
-            $imagePath = $request->file('image')->store('listings', $listingDisk);
+            if ($listingDisk === 'cloudinary') {
+                $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
+            } else {
+                Storage::disk($listingDisk)->makeDirectory('listings');
+                $imagePath = $request->file('image')->store('listings', $listingDisk);
+            }
         }
 
         Listing::create([
@@ -105,14 +110,20 @@ class ListingController extends Controller
 
         $listingDisk = config('filesystems.listing_disk', 'public');
         if ($request->hasFile('image')) {
-            Storage::disk($listingDisk)->makeDirectory('listings');
-            if ($listing->image_path) {
+            if ($listing->image_path && str_contains($listing->image_path, 'res.cloudinary.com')) {
+                CloudinaryService::deleteByUrl($listing->image_path);
+            } elseif ($listing->image_path && $listingDisk !== 'cloudinary') {
                 $oldPath = str_starts_with($listing->image_path, '/storage/')
                     ? substr($listing->image_path, 9)
                     : $listing->image_path;
                 Storage::disk($listingDisk)->delete($oldPath);
             }
-            $imagePath = $request->file('image')->store('listings', $listingDisk);
+            if ($listingDisk === 'cloudinary') {
+                $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
+            } else {
+                Storage::disk($listingDisk)->makeDirectory('listings');
+                $imagePath = $request->file('image')->store('listings', $listingDisk);
+            }
         }
 
         $listing->update([
@@ -133,11 +144,15 @@ class ListingController extends Controller
         $this->authorize('delete', $listing);
 
         if ($listing->image_path) {
-            $listingDisk = config('filesystems.listing_disk', 'public');
-            $path = str_starts_with($listing->image_path, '/storage/')
-                ? substr($listing->image_path, 9)
-                : $listing->image_path;
-            Storage::disk($listingDisk)->delete($path);
+            if (str_contains($listing->image_path, 'res.cloudinary.com')) {
+                CloudinaryService::deleteByUrl($listing->image_path);
+            } else {
+                $listingDisk = config('filesystems.listing_disk', 'public');
+                $path = str_starts_with($listing->image_path, '/storage/')
+                    ? substr($listing->image_path, 9)
+                    : $listing->image_path;
+                Storage::disk($listingDisk)->delete($path);
+            }
         }
         $listing->delete();
 

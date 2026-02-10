@@ -96,7 +96,7 @@ export default function ChatShow({
 
     const otherUser =
         currentUserId === conversation.buyer.id
-            ? conversation.listing.user ?? conversation.buyer
+            ? (conversation.listing.user ?? conversation.buyer)
             : conversation.buyer;
 
     const scrollToBottom = () => {
@@ -153,7 +153,7 @@ export default function ChatShow({
                                 {conversations.map((conv) => {
                                     const other =
                                         currentUserId === conv.buyer.id
-                                            ? conv.listing.user ?? conv.buyer
+                                            ? (conv.listing.user ?? conv.buyer)
                                             : conv.buyer;
                                     const lastMessage = conv.messages[0];
                                     const isActive =
@@ -190,7 +190,8 @@ export default function ChatShow({
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <p className="truncate font-medium">
-                                                        {other?.name ?? 'Unknown'}
+                                                        {other?.name ??
+                                                            'Unknown'}
                                                     </p>
                                                     <p className="truncate text-sm text-muted-foreground">
                                                         {conv.listing.title}
@@ -352,7 +353,8 @@ export default function ChatShow({
                                                                 <AvatarFallback className="text-xs">
                                                                     {getInitials(
                                                                         msg.user
-                                                                            ?.name ?? '',
+                                                                            ?.name ??
+                                                                            '',
                                                                     )}
                                                                 </AvatarFallback>
                                                             </Avatar>

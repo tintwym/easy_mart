@@ -82,9 +82,8 @@ return [
     | Listing images disk (production)
     |--------------------------------------------------------------------------
     |
-    | Use 'public' for local storage (storage/app/public/listings). In
-    | production on Heroku or multi-server, set to 's3' and configure
-    | AWS_* so images are stored in S3 and persist across deploys.
+    | 'public' = local (storage/app/public/listings). 's3' = AWS (configure
+    | AWS_*). 'cloudinary' = Cloudinary (configure CLOUDINARY_* in .env).
     |
     */
 
