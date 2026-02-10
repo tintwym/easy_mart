@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\PaymentController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
@@ -38,11 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
 
-    Route::get('settings/payment', function (\Illuminate\Http\Request $request) {
-        $region = \App\Services\RegionFromIp::detect($request);
-
-        return Inertia::render('settings/payment', [
-            'region' => $region,
-        ]);
-    })->name('payment.index');
+    Route::get('settings/payment', [PaymentController::class, 'index'])->name('payment.index');
+    Route::post('settings/payment', [PaymentController::class, 'store'])->name('payment.store');
+    Route::post('settings/payment/setup-intent', [PaymentController::class, 'createSetupIntent'])->name('payment.setup-intent');
+    Route::post('settings/payment/default', [PaymentController::class, 'setDefault'])->name('payment.set-default');
+    Route::delete('settings/payment/{paymentMethodId}', [PaymentController::class, 'destroy'])->name('payment.destroy');
 });

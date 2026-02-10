@@ -27,6 +27,7 @@ class User extends Authenticatable
         'password',
         'seller_type',
         'extra_listing_slots',
+        'stripe_customer_id',
     ];
 
     /**
@@ -73,6 +74,11 @@ class User extends Authenticatable
     public function listings()
     {
         return $this->hasMany(Listing::class);
+    }
+
+    public function localPaymentMethods()
+    {
+        return $this->hasMany(LocalPaymentMethod::class);
     }
 
     /**
