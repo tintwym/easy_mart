@@ -45,11 +45,12 @@ class CheckoutTest extends TestCase
 
         $order = \App\Models\Order::where('user_id', $user->id)->first();
         $this->assertNotNull($order);
-        $this->assertSame('pending', $order->status);
+        // When Stripe is not configured (e.g. in CI), controller marks order completed and redirects to orders
+        $this->assertSame('completed', $order->status);
         $this->assertSame('99.99', (string) $order->total);
         $this->assertCount(1, $order->items);
         $this->assertSame(0, $user->cartItems()->count());
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('orders.index'));
     }
 }
