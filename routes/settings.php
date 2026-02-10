@@ -37,4 +37,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
+
+    Route::get('settings/payment', function (\Illuminate\Http\Request $request) {
+        $region = \App\Services\RegionFromIp::detect($request);
+
+        return Inertia::render('settings/payment', [
+            'region' => $region,
+        ]);
+    })->name('payment.index');
 });

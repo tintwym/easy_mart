@@ -39,8 +39,8 @@ export default function Profile({
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title="Profile information"
-                        description="Update your name and email address"
+                        title="Personal details"
+                        description="Update your name, email, phone and address"
                     />
 
                     <Form
@@ -93,16 +93,43 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>Account type</Label>
-                                    <p className="text-sm text-muted-foreground">
-                                        Personal account (buyers make offers).
-                                    </p>
-                                    <input
-                                        type="hidden"
-                                        name="seller_type"
-                                        value="individual"
+                                    <Label htmlFor="phone">Phone number</Label>
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        className="mt-1 block w-full"
+                                        defaultValue={auth.user?.phone ?? ''}
+                                        name="phone"
+                                        autoComplete="tel"
+                                        placeholder="Phone number"
+                                    />
+                                    <InputError
+                                        className="mt-2"
+                                        message={errors.phone}
                                     />
                                 </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="address">Address</Label>
+                                    <Input
+                                        id="address"
+                                        className="mt-1 block w-full"
+                                        defaultValue={auth.user?.address ?? ''}
+                                        name="address"
+                                        autoComplete="street-address"
+                                        placeholder="Address"
+                                    />
+                                    <InputError
+                                        className="mt-2"
+                                        message={errors.address}
+                                    />
+                                </div>
+
+                                <input
+                                    type="hidden"
+                                    name="seller_type"
+                                    value="individual"
+                                />
 
                                 {mustVerifyEmail &&
                                     auth.user?.email_verified_at === null && (

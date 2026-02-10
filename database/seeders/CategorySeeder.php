@@ -21,7 +21,7 @@ class CategorySeeder extends Seeder
             'Wardrobes',
             'Coffee Tables',
             'Bookshelves',
-            'Outdoor Seating'
+            'Outdoor Seating',
         ];
 
         foreach ($furniture as $item) {

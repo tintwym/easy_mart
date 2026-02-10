@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
+import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,7 +13,6 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { UserInfo } from '@/components/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';

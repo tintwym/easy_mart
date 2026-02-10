@@ -1,4 +1,5 @@
 import { router } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -7,7 +8,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { logout } from '@/routes';
 
 type Props = {

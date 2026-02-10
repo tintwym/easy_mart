@@ -10,7 +10,7 @@ class HomeController extends Controller
     public function index()
     {
         return Inertia::render('home', [
-            'categories' => Category::all() // Sends your ULID categories to React
+            'categories' => Category::all(), // Sends your ULID categories to React
         ]);
     }
 }

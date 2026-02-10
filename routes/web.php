@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ReviewController;
@@ -19,8 +19,8 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 
     if ($q = $request->query('q')) {
         $query->where(function ($qry) use ($q) {
-            $qry->where('title', 'like', '%' . $q . '%')
-                ->orWhere('description', 'like', '%' . $q . '%');
+            $qry->where('title', 'like', '%'.$q.'%')
+                ->orWhere('description', 'like', '%'.$q.'%');
         });
     }
 

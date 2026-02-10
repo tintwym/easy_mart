@@ -57,7 +57,7 @@ class HandleInertiaRequests extends Middleware
                     return array_map(fn ($loc) => is_array($loc)
                         ? $loc
                         : ['name' => $loc, 'lat' => null, 'lng' => null],
-                    $locations);
+                        $locations);
                 }
                 $region = RegionFromIp::detect(request());
                 $regions = config('shop.regions', []);

@@ -1,5 +1,4 @@
 import { Link, usePage, router } from '@inertiajs/react';
-import { useState } from 'react';
 import {
     LogOut,
     Menu,
@@ -9,7 +8,9 @@ import {
     ShoppingCart,
 } from 'lucide-react';
 import { ChevronDown, Layers, MapPin } from 'lucide-react';
+import { useState } from 'react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,11 +45,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useInitials } from '@/hooks/use-initials';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useSortedLocations } from '@/hooks/use-sorted-locations';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard, login, register } from '@/routes';

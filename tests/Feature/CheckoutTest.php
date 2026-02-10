@@ -41,6 +41,9 @@ class CheckoutTest extends TestCase
 
         $this->actingAs($user);
 
+        // Ensure Stripe is not configured so controller marks order completed (no redirect to Stripe)
+        config(['services.stripe.secret' => null]);
+
         $response = $this->post(route('checkout.store'));
 
         $order = \App\Models\Order::where('user_id', $user->id)->first();

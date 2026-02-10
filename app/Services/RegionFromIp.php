@@ -62,7 +62,7 @@ class RegionFromIp
             return config('shop.default_region', 'MM');
         }
 
-        $cacheKey = 'region_from_ip:' . $ip;
+        $cacheKey = 'region_from_ip:'.$ip;
 
         return Cache::remember($cacheKey, now()->addDay(), function () use ($ip) {
             $countryCode = self::fetchCountryCode($ip);
@@ -74,7 +74,7 @@ class RegionFromIp
     protected static function fetchCountryCode(string $ip): ?string
     {
         try {
-            $response = Http::timeout(3)->get('http://ip-api.com/json/' . $ip, [
+            $response = Http::timeout(3)->get('http://ip-api.com/json/'.$ip, [
                 'fields' => 'countryCode',
             ]);
 

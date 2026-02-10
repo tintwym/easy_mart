@@ -22,6 +22,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Payment method',
+        href: '/settings/payment',
+        icon: null,
+    },
+    {
         title: 'Two-Factor Auth',
         href: AppTwoFactorController.show.url(),
         icon: null,

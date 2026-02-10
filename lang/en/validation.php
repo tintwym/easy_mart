@@ -153,4 +153,4 @@ return [
         'current_password' => 'current password',
     ],
 
-    ];
+];

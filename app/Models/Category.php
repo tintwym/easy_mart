@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasUlids; // Required for string-based IDs
+
     protected $fillable = ['name', 'slug'];
 }

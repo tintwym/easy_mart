@@ -22,6 +22,7 @@ return [
             // Production (e.g. Heroku) has no SQLite driver; require DATABASE_URL and use mysql/pgsql.
             return env('APP_ENV') === 'production' ? 'mysql' : 'sqlite';
         }
+
         return str_starts_with($url, 'mysql') ? 'mysql' : 'pgsql';
     })()),
 
@@ -93,6 +94,7 @@ return [
                 if ($sslCa !== null && $sslCa !== '') {
                     $opts[(PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA)] = $sslCa;
                 }
+
                 return $opts;
             })() : [],
         ],
