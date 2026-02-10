@@ -164,7 +164,7 @@ php artisan migrate --force
    - `DATABASE_URL` (or `DB_URL`) — Aiven MySQL or PostgreSQL connection URI (see step 2).
 
 5. **Deploy**
-   - **Deploy** → **Deploy branch** (e.g. `main`). Heroku runs the Node buildpack (`npm run build`), then the PHP buildpack; the release phase runs `php artisan migrate --force`.
+   - **Deploy** → **Deploy branch** (e.g. `main`). Buildpack order must be **PHP first, then Node** (so `php` is available when Vite runs). The repo’s `app.json` sets this; if you created the app before that change, in **Settings** → **Buildpacks** put **heroku/php** above **heroku/nodejs**. The release phase runs `php artisan migrate --force`.
 
 6. **Optional**
    - For file uploads (e.g. listing images) to persist, use a store like AWS S3 and set `FILESYSTEM_DISK=s3` and AWS env vars. On Heroku the filesystem is ephemeral.
