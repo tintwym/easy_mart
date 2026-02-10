@@ -1,4 +1,5 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import {
     LogOut,
     Menu,
@@ -43,12 +44,13 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { useSortedLocations } from '@/hooks/use-sorted-locations';
 import { cn, toUrl } from '@/lib/utils';
-import { dashboard, login, logout, register } from '@/routes';
+import { dashboard, login, register } from '@/routes';
 import { edit } from '@/routes/profile';
 import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
@@ -67,6 +69,7 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
+    const [sidebarLogoutOpen, setSidebarLogoutOpen] = useState(false);
     const {
         auth,
         categories = [],
@@ -226,15 +229,18 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     <Settings className="h-4 w-4" />
                                                     Settings
                                                 </Link>
-                                                <Link
-                                                    href={logout()}
-                                                    method="post"
-                                                    as="button"
+                                                <button
+                                                    type="button"
                                                     className="flex min-h-[44px] w-full touch-manipulation items-center gap-2 rounded-md px-2 py-2 text-left font-medium hover:bg-sidebar-accent"
+                                                    onClick={() => setSidebarLogoutOpen(true)}
                                                 >
                                                     <LogOut className="h-4 w-4" />
                                                     Log out
-                                                </Link>
+                                                </button>
+                                                <LogoutConfirmDialog
+                                                    open={sidebarLogoutOpen}
+                                                    onOpenChange={setSidebarLogoutOpen}
+                                                />
                                             </>
                                         ) : (
                                             <>

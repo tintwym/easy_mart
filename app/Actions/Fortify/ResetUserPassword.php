@@ -20,6 +20,8 @@ class ResetUserPassword implements ResetsUserPasswords
     {
         Validator::make($input, [
             'password' => $this->passwordRules(),
+        ], [
+            'password.regex' => __('Password must be at least 8 characters and include both letters and numbers.'),
         ])->validate();
 
         $user->forceFill([

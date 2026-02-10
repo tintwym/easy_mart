@@ -22,4 +22,16 @@ class PasswordUpdateRequest extends FormRequest
             'password' => $this->passwordRules(),
         ];
     }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'password.regex' => __('Password must be at least 8 characters and include both letters and numbers.'),
+        ];
+    }
 }

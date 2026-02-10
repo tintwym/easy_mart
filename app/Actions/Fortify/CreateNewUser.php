@@ -23,6 +23,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $this->nameRules(),
             'email' => $this->emailRules(null),
             'password' => $this->passwordRules(),
+        ], [
+            'password.regex' => __('Password must be at least 8 characters and include both letters and numbers.'),
         ])->validate();
 
         return User::create([
