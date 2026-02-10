@@ -141,7 +141,7 @@ export default function CartIndex({ items }: Props) {
                                                     className="shrink-0 overflow-hidden rounded-lg bg-muted"
                                                 >
                                                     {(item.listing.image_url ??
-                                                        item.listing.image_path) ? (
+                                                    item.listing.image_path) ? (
                                                         <img
                                                             src={
                                                                 item.listing

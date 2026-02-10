@@ -190,7 +190,7 @@ export default function CheckoutStripe({
                                     className="flex items-center gap-3"
                                 >
                                     {(item.listing.image_url ??
-                                        item.listing.image_path) ? (
+                                    item.listing.image_path) ? (
                                         <img
                                             src={
                                                 item.listing.image_url ??

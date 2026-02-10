@@ -167,11 +167,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                                         href={`/categories/${cat.slug}`}
                                                                         className="block min-h-[44px] py-2.5 font-medium hover:underline active:opacity-80"
                                                                     >
-                                                                        {
-                                                                            categoryName(
-                                                                                cat,
-                                                                            )
-                                                                        }
+                                                                        {categoryName(
+                                                                            cat,
+                                                                        )}
                                                                     </Link>
                                                                 </li>
                                                             ),

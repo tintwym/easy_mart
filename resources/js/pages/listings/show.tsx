@@ -240,11 +240,7 @@ export default function ShowListing({
                 <div className="mb-8 aspect-square w-full overflow-hidden rounded-xl bg-muted sm:aspect-[4/3]">
                     {(listing.image_url ?? listing.image_path) ? (
                         <img
-                            src={
-                                listing.image_url ??
-                                listing.image_path ??
-                                ''
-                            }
+                            src={listing.image_url ?? listing.image_path ?? ''}
                             alt={listing.title}
                             className="size-full object-contain"
                         />
@@ -294,9 +290,7 @@ export default function ShowListing({
                                             href={`/categories/${listing.category.slug}`}
                                             className="font-medium text-foreground hover:underline"
                                         >
-                                            {categoryName(
-                                                listing.category,
-                                            )}
+                                            {categoryName(listing.category)}
                                         </Link>
                                     </span>
                                 )}
