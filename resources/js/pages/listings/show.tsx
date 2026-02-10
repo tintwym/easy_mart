@@ -102,7 +102,6 @@ export default function ShowListing({
     averageRating,
     reviewCount,
     trendPriceLabel,
-    trendDurationDays,
 }: Props) {
     const { auth } = usePage<SharedData>().props;
     const userReview = listing.reviews.find(

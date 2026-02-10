@@ -1,16 +1,16 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import {
     Elements,
     PaymentElement,
     useStripe,
     useElements,
 } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
 import { useAppearance } from '@/hooks/use-appearance';
+import AppLayout from '@/layouts/app-layout';
 
 type OrderItem = {
     id: string;

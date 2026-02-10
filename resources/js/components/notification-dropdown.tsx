@@ -1,7 +1,7 @@
 import { Link, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Bell, Heart, MessageCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { SharedData } from '@/types';
 

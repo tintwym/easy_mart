@@ -1,7 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Package, Sparkles } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 
 type Props = {
@@ -18,7 +18,6 @@ export default function UpgradesIndex({
     listingCount,
     maxListingSlots,
     slotPriceLabel,
-    trendPriceLabel,
     trendDurationDays,
 }: Props) {
     return (
