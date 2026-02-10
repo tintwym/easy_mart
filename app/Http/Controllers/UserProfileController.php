@@ -12,7 +12,7 @@ class UserProfileController extends Controller
     public function show(Request $request, User $user): Response
     {
         $listings = $user->listings()
-            ->with(['category', 'user:id,name,seller_type'])
+            ->with(['category', 'user:id,name,seller_type,region'])
             ->latest()
             ->get();
 
@@ -21,7 +21,7 @@ class UserProfileController extends Controller
         $averageRating = (float) \App\Models\Review::whereIn('listing_id', $listingIds)->whereNull('parent_id')->avg('rating');
 
         return Inertia::render('users/show', [
-            'user' => $user->only(['id', 'name', 'seller_type']),
+            'user' => $user->only(['id', 'name', 'seller_type', 'region']),
             'listings' => $listings,
             'averageRating' => round($averageRating, 1),
             'reviewCount' => $reviewCount,

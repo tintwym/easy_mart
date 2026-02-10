@@ -10,6 +10,14 @@ class ProfileUpdateRequest extends FormRequest
 {
     use ProfileValidationRules;
 
+    protected function prepareForValidation(): void
+    {
+        $region = $this->input('region');
+        if ($region === '') {
+            $this->merge(['region' => null]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

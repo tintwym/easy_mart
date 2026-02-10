@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/hooks/use-currency';
 import AppLayout from '@/layouts/app-layout';
 
 function getInitials(name: string): string {
@@ -49,7 +50,7 @@ type ConversationItem = {
         image_path: string | null;
         price: number;
         user_id: string;
-        user: { id: string; name: string };
+        user: { id: string; name: string; region?: string | null };
     };
     buyer: { id: string; name: string };
     messages_count: number;
@@ -69,7 +70,7 @@ type Conversation = {
         title: string;
         image_path: string | null;
         price: number;
-        user: { id: string; name: string };
+        user: { id: string; name: string; region?: string | null };
     };
     buyer: { id: string; name: string };
 };
@@ -86,6 +87,7 @@ export default function ChatShow({
     messages,
 }: Props) {
     const { auth } = usePage<{ auth: { user?: { id: string } } }>().props;
+    const { formatPrice } = useCurrency();
     const currentUserId = auth?.user?.id;
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -278,9 +280,9 @@ export default function ChatShow({
                                     {conversation.listing.title}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    $
-                                    {Number(conversation.listing.price).toFixed(
-                                        2,
+                                    {formatPrice(
+                                        conversation.listing.price,
+                                        conversation.listing.user?.region,
                                     )}
                                 </p>
                             </div>

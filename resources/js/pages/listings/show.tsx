@@ -13,6 +13,7 @@ import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useCurrency } from '@/hooks/use-currency';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { SharedData } from '@/types';
@@ -85,7 +86,7 @@ type Listing = {
     meetup_location: string | null;
     created_at: string;
     category?: Category | null;
-    user?: { id: string; name: string; seller_type?: string } | null;
+    user?: { id: string; name: string; seller_type?: string; region?: string | null } | null;
     reviews: Review[];
 };
 
@@ -104,6 +105,7 @@ export default function ShowListing({
     trendPriceLabel,
 }: Props) {
     const { auth } = usePage<SharedData>().props;
+    const { formatPrice } = useCurrency();
     const userReview = listing.reviews.find(
         (r) => r.user?.id === auth?.user?.id,
     );
@@ -246,7 +248,10 @@ export default function ShowListing({
                                 {listing.title}
                             </h1>
                             <p className="mt-2 text-3xl font-bold">
-                                ${Number(listing.price).toFixed(2)}
+                                {formatPrice(
+                                    listing.price,
+                                    listing.user?.region,
+                                )}
                             </p>
                             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                                 <span className="inline-flex items-center gap-1.5">

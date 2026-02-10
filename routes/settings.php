@@ -27,7 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $orders = $request->user()
             ->orders()
             ->where('status', 'paid')
-            ->with(['items.listing:id,title,image_path,price'])
+            ->with(['items.listing:id,title,image_path,price,user_id', 'items.listing.user:id,region'])
             ->latest()
             ->get();
 

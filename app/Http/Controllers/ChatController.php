@@ -22,7 +22,7 @@ class ChatController extends Controller
 
     protected function getConversationsForUser(string $userId)
     {
-        return Conversation::with(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name'])
+        return Conversation::with(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name,region'])
             ->where(function ($q) use ($userId) {
                 $q->where('buyer_id', $userId)
                     ->orWhereHas('listing', fn ($lq) => $lq->where('user_id', $userId));
@@ -41,7 +41,7 @@ class ChatController extends Controller
             abort(403);
         }
 
-        $conversation->load(['listing:id,title,image_path,price', 'buyer:id,name', 'listing.user:id,name']);
+        $conversation->load(['listing:id,title,image_path,price', 'buyer:id,name', 'listing.user:id,name,region']);
         $messages = $conversation->messages()->with('user:id,name')->oldest()->get();
         $conversations = $this->getConversationsForUser($user->id);
 

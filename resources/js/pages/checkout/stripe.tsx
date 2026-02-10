@@ -10,6 +10,7 @@ import { ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAppearance } from '@/hooks/use-appearance';
+import { useCurrency } from '@/hooks/use-currency';
 import AppLayout from '@/layouts/app-layout';
 
 type OrderItem = {
@@ -40,6 +41,7 @@ type Props = {
 function CheckoutForm({ order }: { order: Order }) {
     const stripe = useStripe();
     const elements = useElements();
+    const { formatPrice } = useCurrency();
     const [error, setError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
 
@@ -93,7 +95,7 @@ function CheckoutForm({ order }: { order: Order }) {
                 ) : (
                     <>
                         <CreditCard className="mr-2 size-5" />
-                        Pay S${Number(order.total).toFixed(2)}
+                        Pay {formatPrice(order.total)}
                     </>
                 )}
             </Button>
@@ -202,7 +204,7 @@ export default function CheckoutStripe({
                                             {item.listing.title}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            S${Number(item.price).toFixed(2)} ×{' '}
+                                            {formatPrice(item.price)} ×{' '}
                                             {item.quantity}
                                         </p>
                                     </div>
@@ -215,7 +217,7 @@ export default function CheckoutStripe({
                                     Total
                                 </span>
                                 <span className="font-bold">
-                                    S${Number(order.total).toFixed(2)}
+                                    {formatPrice(order.total)}
                                 </span>
                             </div>
                         </div>

@@ -15,7 +15,7 @@ class FavoriteController extends Controller
     {
         $listings = $request->user()
             ->favorites()
-            ->with(['category', 'user:id,name,seller_type'])
+            ->with(['category', 'user:id,name,seller_type,region'])
             ->latest('favorites.created_at')
             ->get();
 

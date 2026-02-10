@@ -18,16 +18,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Payment method',
-        href: '/settings/payment',
-    },
-];
 
 type PaymentMethodItem = {
     id: string;
@@ -62,6 +56,7 @@ function AddCardForm({
     onSuccess: () => void;
     onCancel: () => void;
 }) {
+    const { t } = useTranslations();
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState<string | null>(null);
@@ -74,7 +69,7 @@ function AddCardForm({
 
             const cardEl = elements.getElement(CardElement);
             if (!cardEl) {
-                setError('Card field not ready.');
+                setError(t('payment.card_not_ready'));
                 return;
             }
 
@@ -89,14 +84,14 @@ function AddCardForm({
             );
 
             if (confirmError) {
-                setError(confirmError.message ?? 'Failed to add card.');
+                setError(confirmError.message ?? t('payment.add_card_failed'));
                 setProcessing(false);
                 return;
             }
 
             onSuccess();
         },
-        [stripe, elements, clientSecret, onSuccess],
+        [stripe, elements, clientSecret, onSuccess, t],
     );
 
     return (
@@ -116,16 +111,16 @@ function AddCardForm({
             {error && <p className="text-sm text-destructive">{error}</p>}
             <DialogFooter className="gap-2 sm:gap-0">
                 <Button type="button" variant="outline" onClick={onCancel}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={processing}>
                     {processing ? (
                         <>
                             <Loader2 className="mr-2 size-4 animate-spin" />
-                            Adding…
+                            {t('payment.adding')}
                         </>
                     ) : (
-                        'Add card'
+                        t('payment.add_card')
                     )}
                 </Button>
             </DialogFooter>
@@ -148,11 +143,19 @@ export default function PaymentSettings({
     myanmarMethods = [],
     myanmarTypes = {},
 }: Props) {
+    const { t } = useTranslations();
     const isSingapore = region === 'SG';
     const isMyanmar = region === 'MM';
     const canManageCards = isSingapore && !!stripePublishableKey;
     const canManageMyanmar = isMyanmar;
     const [addCardOpen, setAddCardOpen] = useState(false);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.payment'),
+            href: '/settings/payment',
+        },
+    ];
     const [addMyanmarOpen, setAddMyanmarOpen] = useState(false);
     const [myanmarType, setMyanmarType] = useState<string>('mpu');
     const [myanmarIdentifier, setMyanmarIdentifier] = useState('');
@@ -160,11 +163,10 @@ export default function PaymentSettings({
         null,
     );
     const [loadingSetup, setLoadingSetup] = useState(false);
-    const pageProps = usePage<SharedData>().props as SharedData &
-        Props & {
-            flash?: { status?: string; error?: string };
-        };
-    const flash = pageProps.flash;
+    const pageProps = usePage<SharedData>().props as Record<string, unknown>;
+    const flash = pageProps.flash as
+        | { status?: string; error?: string }
+        | undefined;
 
     const handleOpenAddCard = useCallback(async () => {
         setLoadingSetup(true);
@@ -208,15 +210,15 @@ export default function PaymentSettings({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Payment method" />
+            <Head title={t('settings.payment')} />
 
-            <h1 className="sr-only">Payment method</h1>
+            <h1 className="sr-only">{t('settings.payment')}</h1>
 
             <SettingsLayout>
                 <Heading
                     variant="small"
-                    title="Payment method"
-                    description="Manage how you pay and get paid"
+                    title={t('settings.payment')}
+                    description={t('settings.payment_description')}
                 />
 
                 {flash?.status && (
@@ -234,7 +236,7 @@ export default function PaymentSettings({
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-semibold">
-                                Myanmar payment methods
+                                {t('payment.myanmar_heading')}
                             </h2>
                             <Button
                                 type="button"
@@ -246,17 +248,16 @@ export default function PaymentSettings({
                                 className="bg-orange-500 hover:bg-orange-600"
                             >
                                 <Plus className="mr-2 size-4" />
-                                Add payment method
+                                {t('payment.add_method')}
                             </Button>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                            MPU Debit Card, KBZ Pay, AYA Pay, Wave Pay, CB Pay
+                            {t('payment.add_myanmar')}
                         </p>
                         <div className="divide-y divide-border rounded-lg border border-border bg-card">
                             {myanmarMethods.length === 0 ? (
                                 <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-                                    No payment methods saved. Add one to use at
-                                    checkout.
+                                    {t('payment.no_methods')}
                                 </div>
                             ) : (
                                 myanmarMethods.map((m) => (
@@ -275,7 +276,7 @@ export default function PaymentSettings({
                                             </span>
                                             {m.is_default && (
                                                 <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                                                    Default
+                                                    {t('payment.default')}
                                                 </span>
                                             )}
                                         </div>
@@ -286,7 +287,7 @@ export default function PaymentSettings({
                                                 as="button"
                                                 className="text-sm text-destructive underline hover:no-underline"
                                             >
-                                                Delete
+                                                {t('common.delete')}
                                             </Link>
                                             {!m.is_default && (
                                                 <Button
@@ -303,7 +304,7 @@ export default function PaymentSettings({
                                                         )
                                                     }
                                                 >
-                                                    Set As Default
+                                                    {t('payment.set_default')}
                                                 </Button>
                                             )}
                                         </div>
@@ -322,13 +323,11 @@ export default function PaymentSettings({
                     <div className="rounded-lg border border-border bg-card p-4">
                         {isSingapore ? (
                             <p className="text-sm text-muted-foreground">
-                                Add STRIPE_KEY and STRIPE_SECRET to .env to
-                                enable card management for Singapore.
+                                {t('payment.stripe_env_hint')}
                             </p>
                         ) : (
                             <p className="text-sm text-muted-foreground">
-                                Payment method is not configured for your region
-                                yet.
+                                {t('payment.region_not_configured')}
                             </p>
                         )}
                     </div>
@@ -336,7 +335,7 @@ export default function PaymentSettings({
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-semibold">
-                                Credit / Debit Card
+                                {t('payment.credit_debit_card')}
                             </h2>
                             <Button
                                 type="button"
@@ -349,15 +348,14 @@ export default function PaymentSettings({
                                 ) : (
                                     <Plus className="mr-2 size-4" />
                                 )}
-                                Add New Card
+                                {t('payment.add_card')}
                             </Button>
                         </div>
 
                         <div className="divide-y divide-border rounded-lg border border-border bg-card">
                             {paymentMethods.length === 0 ? (
                                 <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-                                    No cards saved. Add a card to use at
-                                    checkout.
+                                    {t('payment.no_cards')}
                                 </div>
                             ) : (
                                 paymentMethods.map((pm) => (
@@ -376,7 +374,7 @@ export default function PaymentSettings({
                                             </span>
                                             {pm.is_default && (
                                                 <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                                                    Default
+                                                    {t('payment.default')}
                                                 </span>
                                             )}
                                         </div>
@@ -387,7 +385,7 @@ export default function PaymentSettings({
                                                 as="button"
                                                 className="text-sm text-destructive underline hover:no-underline"
                                             >
-                                                Delete
+                                                {t('common.delete')}
                                             </Link>
                                             {!pm.is_default && (
                                                 <Button
@@ -404,7 +402,7 @@ export default function PaymentSettings({
                                                         )
                                                     }
                                                 >
-                                                    Set As Default
+                                                    {t('payment.set_default')}
                                                 </Button>
                                             )}
                                         </div>
@@ -424,10 +422,9 @@ export default function PaymentSettings({
                 >
                     <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                            <DialogTitle>Add payment method</DialogTitle>
+                            <DialogTitle>{t('payment.add_method')}</DialogTitle>
                             <DialogDescription>
-                                Add MPU Debit Card, KBZ Pay, AYA Pay, Wave Pay
-                                or CB Pay for use at checkout in Myanmar.
+                                {t('payment.add_myanmar')}
                             </DialogDescription>
                         </DialogHeader>
                         <form
@@ -497,9 +494,11 @@ export default function PaymentSettings({
                                     variant="outline"
                                     onClick={() => setAddMyanmarOpen(false)}
                                 >
-                                    Cancel
+                                    {t('common.cancel')}
                                 </Button>
-                                <Button type="submit">Add</Button>
+                                <Button type="submit">
+                                    {t('payment.add')}
+                                </Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -508,7 +507,7 @@ export default function PaymentSettings({
                 <Dialog open={addCardOpen} onOpenChange={setAddCardOpen}>
                     <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                            <DialogTitle>Add New Card</DialogTitle>
+                            <DialogTitle>{t('payment.add_card')}</DialogTitle>
                             <DialogDescription>
                                 Enter your card details below. Your card will be
                                 saved for future checkouts.

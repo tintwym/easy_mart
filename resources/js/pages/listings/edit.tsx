@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useCurrency } from '@/hooks/use-currency';
 import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
@@ -65,6 +66,7 @@ type Props = {
 
 export default function EditListing({ listing, categories }: Props) {
     const { t } = useTranslations();
+    const { currency } = useCurrency();
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
         title: listing.title,
@@ -202,7 +204,11 @@ export default function EditListing({ listing, categories }: Props) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="price">{t('listing.price')}</Label>
+                        <Label htmlFor="price">
+                            {t('listing.price', {
+                                symbol: currency.symbol,
+                            })}
+                        </Label>
                         <Input
                             id="price"
                             type="number"

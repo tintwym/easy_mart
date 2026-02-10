@@ -17,6 +17,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Currency by region
+    |--------------------------------------------------------------------------
+    |
+    | Used for displaying prices. code = ISO 4217, symbol = display symbol,
+    | decimals = number of decimal places (MMK typically uses 0).
+    |
+    */
+
+    'currencies' => [
+        'SG' => ['code' => 'SGD', 'symbol' => 'S$', 'decimals' => 2],
+        'MM' => ['code' => 'MMK', 'symbol' => 'K', 'decimals' => 0],
+        'US' => ['code' => 'USD', 'symbol' => '$', 'decimals' => 2],
+    ],
+
+    'default_currency' => ['code' => 'USD', 'symbol' => '$', 'decimals' => 2],
+
+    /*
+    |--------------------------------------------------------------------------
     | Shop locations by region (with GPS coordinates)
     |--------------------------------------------------------------------------
     |

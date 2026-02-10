@@ -14,7 +14,7 @@ class CartController extends Controller
     {
         $items = $request->user()
             ->cartItems()
-            ->with(['listing:id,title,image_path,price,user_id,condition', 'listing.user:id,name'])
+            ->with(['listing:id,title,image_path,price,user_id,condition', 'listing.user:id,name,region'])
             ->latest()
             ->get();
 

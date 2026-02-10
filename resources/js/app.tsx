@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'EasyMart';
 
 // Register service worker for PWA when built with PWA plugin (BUILD_PWA=1)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {

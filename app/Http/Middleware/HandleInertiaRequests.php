@@ -78,6 +78,17 @@ class HandleInertiaRequests extends Middleware
 
                 return $labels[$region] ?? 'All';
             },
+            'region' => function () {
+                return RegionFromIp::detect(request());
+            },
+            'currency' => function () {
+                $region = RegionFromIp::detect(request());
+                $currencies = config('shop.currencies', []);
+                $default = config('shop.default_currency', ['code' => 'USD', 'symbol' => '$', 'decimals' => 2]);
+
+                return $currencies[$region] ?? $default;
+            },
+            'currencies' => fn () => config('shop.currencies', []),
         ];
     }
 }

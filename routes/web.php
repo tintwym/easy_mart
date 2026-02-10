@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\CartController;
-use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
@@ -11,6 +10,7 @@ use App\Http\Controllers\UpgradeController;
 use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 // Locale switcher (store in session, redirect back)
@@ -25,7 +25,7 @@ Route::post('/locale', function (\Illuminate\Http\Request $request) {
 
 // Dashboard is the default page (public; login/register in navbar for guests)
 Route::get('/', function (\Illuminate\Http\Request $request) {
-    $query = Listing::with(['category', 'user:id,name,seller_type'])
+    $query = Listing::with(['category', 'user:id,name,seller_type,region'])
         ->orderByTrendingFirst();
 
     if ($q = $request->query('q')) {
@@ -50,7 +50,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 // Category page: browse listings by category
 Route::get('/categories/{slug}', function (string $slug) {
     $category = Category::where('slug', $slug)->firstOrFail();
-    $listings = Listing::with(['category', 'user:id,name,seller_type'])
+    $listings = Listing::with(['category', 'user:id,name,seller_type,region'])
         ->where('category_id', $category->id)
         ->orderByTrendingFirst()
         ->get();

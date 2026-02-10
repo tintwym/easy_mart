@@ -6,6 +6,7 @@ use App\Http\Requests\StoreListingRequest;
 use App\Http\Requests\UpdateListingRequest;
 use App\Models\Category;
 use App\Models\Listing;
+use App\Services\RegionFromIp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,20 +17,24 @@ class ListingController extends Controller
 {
     public function show(Listing $listing): Response
     {
-        $listing->load(['category', 'user:id,name,seller_type', 'reviews' => fn ($q) => $q->with('user:id,name')->latest()]);
+        $listing->load(['category', 'user:id,name,seller_type,region', 'reviews' => fn ($q) => $q->with('user:id,name')->latest()]);
+
+        $currency = $this->currencyForRequest(request());
+        $trendPrice = config('shop.trend_price', 10);
+        $trendDays = config('shop.trend_duration_days', 7);
 
         return Inertia::render('listings/show', [
             'listing' => $listing,
             'averageRating' => round($listing->reviews()->avg('rating') ?? 0, 1),
             'reviewCount' => $listing->reviews()->count(),
-            'trendPriceLabel' => config('shop.trend_price_label', '$10 for 7 days'),
-            'trendDurationDays' => config('shop.trend_duration_days', 7),
+            'trendPriceLabel' => $currency['symbol'].$trendPrice.' for '.$trendDays.' days',
+            'trendDurationDays' => $trendDays,
         ]);
     }
 
     public function index(Request $request): Response
     {
-        $listings = Listing::with('category')
+        $listings = Listing::with(['category', 'user:id,name,seller_type,region'])
             ->latest()
             ->paginate(12);
 
@@ -43,14 +48,16 @@ class ListingController extends Controller
         $user = request()->user();
         $listingCount = $user->listingCount();
         $maxSlots = $user->maxListingSlots();
+        $currency = $this->currencyForRequest(request());
+        $slotPrice = config('shop.slot_price', 5);
 
         return Inertia::render('listings/create', [
             'categories' => Category::orderBy('name')->get(),
             'listingCount' => $listingCount,
             'maxListingSlots' => $maxSlots,
             'canCreate' => $user->canCreateListing(),
-            'slotPrice' => config('shop.slot_price', 5),
-            'slotPriceLabel' => config('shop.slot_price_label', '$5 per slot'),
+            'slotPrice' => $slotPrice,
+            'slotPriceLabel' => $currency['symbol'].$slotPrice.' per slot',
         ]);
     }
 
@@ -139,5 +146,15 @@ class ListingController extends Controller
         return redirect()
             ->route('listings.show', $listing)
             ->with('status', "Listing promoted for {$days} days. It will appear higher in search.");
+    }
+
+    /** @return array{code: string, symbol: string, decimals: int} */
+    private function currencyForRequest(Request $request): array
+    {
+        $region = RegionFromIp::detect($request);
+        $currencies = config('shop.currencies', []);
+        $default = config('shop.default_currency', ['code' => 'USD', 'symbol' => '$', 'decimals' => 2]);
+
+        return $currencies[$region] ?? $default;
     }
 }

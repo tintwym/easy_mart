@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/input-otp';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
+import { useTranslations } from '@/hooks/use-translations';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import AlertError from './alert-error';
 import { Spinner } from './ui/spinner';
@@ -62,6 +63,7 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
+    const { t } = useTranslations();
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
@@ -104,7 +106,7 @@ function TwoFactorSetupStep({
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
                         <span className="relative bg-card px-2 py-1">
-                            or, enter the code manually
+                            {t('twofa.enter_manually')}
                         </span>
                     </div>
 
@@ -145,6 +147,7 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
+    const { t } = useTranslations();
     const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
@@ -210,7 +213,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                {t('common.back')}
                             </Button>
                             <Button
                                 type="submit"
@@ -219,7 +222,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirm
+                                {t('twofa.confirm')}
                             </Button>
                         </div>
                     </div>
@@ -252,6 +255,7 @@ export default function TwoFactorSetupModal({
     fetchSetupData,
     errors,
 }: Props) {
+    const { t } = useTranslations();
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 
@@ -262,29 +266,26 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-Factor Authentication Enabled',
-                description:
-                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-                buttonText: 'Close',
+                title: t('twofa.enabled_modal_title'),
+                description: t('twofa.enabled_modal_description'),
+                buttonText: t('twofa.close'),
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: 'Verify Authentication Code',
-                description:
-                    'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                title: t('twofa.verify_title'),
+                description: t('twofa.verify_description'),
+                buttonText: t('twofa.continue'),
             };
         }
 
         return {
-            title: 'Enable Two-Factor Authentication',
-            description:
-                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+            title: t('twofa.enable_modal_title'),
+            description: t('twofa.enable_modal_description'),
+            buttonText: t('twofa.continue'),
         };
-    }, [twoFactorEnabled, showVerificationStep]);
+    }, [twoFactorEnabled, showVerificationStep, t]);
 
     const handleModalNextStep = useCallback(() => {
         if (requiresConfirmation) {

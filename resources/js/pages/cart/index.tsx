@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/hooks/use-currency';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 
@@ -36,7 +37,7 @@ type CartItem = {
         image_path: string | null;
         price: number;
         condition?: string;
-        user: { id: string; name: string };
+        user: { id: string; name: string; region?: string | null };
     };
 };
 
@@ -46,6 +47,7 @@ type Props = {
 
 export default function CartIndex({ items }: Props) {
     const { post, processing } = useForm();
+    const { formatPrice } = useCurrency();
     const total = items.reduce(
         (sum, item) => sum + Number(item.listing.price),
         0,
@@ -175,10 +177,11 @@ export default function CartIndex({ items }: Props) {
                                                 </div>
                                                 <div className="flex shrink-0 items-center gap-2">
                                                     <p className="text-sm font-semibold">
-                                                        $
-                                                        {Number(
+                                                        {formatPrice(
                                                             item.listing.price,
-                                                        ).toFixed(2)}
+                                                            item.listing.user
+                                                                ?.region,
+                                                        )}
                                                     </p>
                                                     <Button
                                                         variant="ghost"
@@ -205,8 +208,8 @@ export default function CartIndex({ items }: Props) {
                         <div className="mt-6 flex items-center justify-between border-t border-border/50 pt-5">
                             <p className="text-sm text-muted-foreground">
                                 {items.length}{' '}
-                                {items.length === 1 ? 'item' : 'items'} • $
-                                {total.toFixed(2)}
+                                {items.length === 1 ? 'item' : 'items'} •{' '}
+                                {formatPrice(total)}
                             </p>
                             <Button
                                 type="button"

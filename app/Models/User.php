@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'phone',
         'address',
+        'region',
         'password',
         'seller_type',
         'extra_listing_slots',

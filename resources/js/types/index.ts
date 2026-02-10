@@ -16,6 +16,14 @@ export type SharedLocation = {
     lng: number | null;
 };
 
+export type SharedCurrency = {
+    code: string;
+    symbol: string;
+    decimals: number;
+};
+
+export type SharedCurrenciesMap = Record<string, SharedCurrency>;
+
 export type SharedData = {
     name: string;
     auth: Auth;
@@ -23,6 +31,9 @@ export type SharedData = {
     categories: SharedCategory[];
     locations: SharedLocation[];
     regionLabel?: string;
+    region?: string;
+    currency?: SharedCurrency;
+    currencies?: SharedCurrenciesMap;
     searchQuery?: string;
     locale?: string;
     translations?: Record<string, string>;

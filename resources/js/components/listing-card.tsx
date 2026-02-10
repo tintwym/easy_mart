@@ -7,6 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useCurrency } from '@/hooks/use-currency';
 import { useTranslations } from '@/hooks/use-translations';
 import type { SharedData } from '@/types';
 
@@ -52,6 +53,7 @@ export type ListingCardListing = {
         name: string;
         avatar?: string;
         seller_type?: string;
+        region?: string | null;
     } | null;
     trending_until?: string | null;
 };
@@ -63,6 +65,7 @@ type ListingCardProps = {
 export function ListingCard({ listing }: ListingCardProps) {
     const { auth } = usePage<SharedData>().props;
     const { t } = useTranslations();
+    const { formatPrice } = useCurrency();
     const canEdit = auth?.user && listing.user_id === auth.user.id;
     const isTrending =
         listing.trending_until && new Date(listing.trending_until) > new Date();
@@ -158,7 +161,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                 </Link>
                 <Link href={`/listings/${listing.id}`} className="inline-block">
                     <p className="text-base font-bold text-foreground hover:underline sm:text-lg">
-                        ${Number(listing.price).toFixed(2)}
+                        {formatPrice(listing.price, listing.user?.region)}
                     </p>
                 </Link>
                 <p className="text-xs text-muted-foreground">

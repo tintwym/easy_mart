@@ -19,6 +19,7 @@ trait ProfileValidationRules
             'email' => $this->emailRules($userId),
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:500'],
+            'region' => ['nullable', 'string', 'in:SG,MM,US'],
             'seller_type' => ['required', 'string', 'in:individual'],
         ];
     }
