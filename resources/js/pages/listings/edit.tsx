@@ -1,5 +1,6 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { useEffect } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ type Listing = {
     condition: string;
     price: number;
     image_path: string | null;
+    image_url: string | null;
     meetup_location: string | null;
     category_id: string;
     category?: Category | null;
@@ -40,6 +42,21 @@ const CONDITION_OPTIONS = [
     { value: 'fair', label: 'Fair' },
 ];
 
+function NewImagePreview({ file }: { file: File }) {
+    const url = URL.createObjectURL(file);
+    useEffect(() => () => URL.revokeObjectURL(url), [url]);
+    return (
+        <p className="text-sm text-muted-foreground">
+            New:{' '}
+            <img
+                src={url}
+                alt=""
+                className="mt-1 h-20 w-20 rounded object-cover"
+            />
+        </p>
+    );
+}
+
 type Props = {
     listing: Listing;
     categories: Category[];
@@ -47,6 +64,7 @@ type Props = {
 
 export default function EditListing({ listing, categories }: Props) {
     const { data, setData, post, processing, errors } = useForm({
+        _method: 'PUT',
         title: listing.title,
         description: listing.description,
         category_id: listing.category_id,
@@ -207,15 +225,22 @@ export default function EditListing({ listing, categories }: Props) {
                         <Label htmlFor="image">
                             Image (optional, leave empty to keep current)
                         </Label>
-                        {listing.image_path && (
+                        {(listing.image_url ?? listing.image_path) && (
                             <p className="text-sm text-muted-foreground">
                                 Current:{' '}
                                 <img
-                                    src={listing.image_path}
+                                    src={
+                                        listing.image_url ??
+                                        listing.image_path ??
+                                        ''
+                                    }
                                     alt=""
                                     className="mt-1 h-20 w-20 rounded object-cover"
                                 />
                             </p>
+                        )}
+                        {data.image && (
+                            <NewImagePreview file={data.image} />
                         )}
                         <Input
                             id="image"

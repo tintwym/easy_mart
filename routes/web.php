@@ -50,9 +50,10 @@ Route::get('/categories/{slug}', function (string $slug) {
     ]);
 })->name('categories.show');
 
-// Listings CRUD - define /create before /{listing} so "create" isn't matched as listing ID
+// Listings CRUD - define /create and /{listing}/edit before /{listing} so they aren't matched as listing ID
 Route::middleware(['auth'])->group(function () {
     Route::get('listings/create', [ListingController::class, 'create'])->name('listings.create');
+    Route::get('listings/{listing}/edit', [ListingController::class, 'edit'])->name('listings.edit');
 });
 
 Route::get('listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
@@ -71,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::post('listings/{listing}/cart', [CartController::class, 'store'])->name('listings.cart.store');
     Route::delete('listings/{listing}/cart', [CartController::class, 'destroy'])->name('listings.cart.destroy');
-    Route::resource('listings', ListingController::class)->except(['index', 'show', 'create']);
+    Route::resource('listings', ListingController::class)->except(['index', 'show', 'create', 'edit']);
 });
 
 require __DIR__.'/settings.php';
