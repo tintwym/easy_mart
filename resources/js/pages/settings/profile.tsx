@@ -142,10 +142,8 @@ export default function Profile({
                                     <select
                                         id="region"
                                         name="region"
-                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                        defaultValue={
-                                            auth.user?.region ?? ''
-                                        }
+                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                        defaultValue={auth.user?.region ?? ''}
                                         aria-describedby={
                                             errors.region
                                                 ? 'region-error'

@@ -19,14 +19,22 @@ export function useCurrency() {
      * Format price. Use sellerRegion when displaying a listing/seller price so
      * Singapore seller shows SGD, etc. Omit for viewer-scoped amounts (e.g. slot/trend labels).
      */
-    function formatPrice(amount: number | string, sellerRegion?: string | null): string {
+    function formatPrice(
+        amount: number | string,
+        sellerRegion?: string | null,
+    ): string {
         const num = typeof amount === 'string' ? parseFloat(amount) : amount;
         if (Number.isNaN(num)) {
-            const c = sellerRegion && currencies[sellerRegion] ? currencies[sellerRegion]! : currency;
+            const c =
+                sellerRegion && currencies[sellerRegion]
+                    ? currencies[sellerRegion]!
+                    : currency;
             return `${c.symbol}0`;
         }
         const c =
-            sellerRegion && currencies[sellerRegion] ? currencies[sellerRegion]! : currency;
+            sellerRegion && currencies[sellerRegion]
+                ? currencies[sellerRegion]!
+                : currency;
         const decimals = c.decimals ?? 2;
         const formatted = num.toLocaleString('en-US', {
             minimumFractionDigits: decimals,

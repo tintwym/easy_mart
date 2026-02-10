@@ -86,7 +86,12 @@ type Listing = {
     meetup_location: string | null;
     created_at: string;
     category?: Category | null;
-    user?: { id: string; name: string; seller_type?: string; region?: string | null } | null;
+    user?: {
+        id: string;
+        name: string;
+        seller_type?: string;
+        region?: string | null;
+    } | null;
     reviews: Review[];
 };
 
