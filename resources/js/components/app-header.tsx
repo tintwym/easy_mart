@@ -521,7 +521,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                 >
                                     <MapPin className="size-4 shrink-0" />
-                                    <span className="min-w-0 truncate">
+                                    <span className="min-w-0 flex-1 truncate">
                                         {currentLocation ??
                                             `All of ${regionLabel}`}
                                     </span>
