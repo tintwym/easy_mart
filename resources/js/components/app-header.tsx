@@ -232,14 +232,20 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <button
                                                     type="button"
                                                     className="flex min-h-[44px] w-full touch-manipulation items-center gap-2 rounded-md px-2 py-2 text-left font-medium hover:bg-sidebar-accent"
-                                                    onClick={() => setSidebarLogoutOpen(true)}
+                                                    onClick={() =>
+                                                        setSidebarLogoutOpen(
+                                                            true,
+                                                        )
+                                                    }
                                                 >
                                                     <LogOut className="h-4 w-4" />
                                                     Log out
                                                 </button>
                                                 <LogoutConfirmDialog
                                                     open={sidebarLogoutOpen}
-                                                    onOpenChange={setSidebarLogoutOpen}
+                                                    onOpenChange={
+                                                        setSidebarLogoutOpen
+                                                    }
                                                 />
                                             </>
                                         ) : (

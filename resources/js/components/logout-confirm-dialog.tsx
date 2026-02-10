@@ -16,11 +16,7 @@ type Props = {
     onLogout?: () => void;
 };
 
-export function LogoutConfirmDialog({
-    open,
-    onOpenChange,
-    onLogout,
-}: Props) {
+export function LogoutConfirmDialog({ open, onOpenChange, onLogout }: Props) {
     const handleLogout = () => {
         onLogout?.();
         onOpenChange(false);
@@ -29,12 +25,15 @@ export function LogoutConfirmDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
+            <DialogContent
+                className="sm:max-w-md"
+                onPointerDownOutside={(e) => e.preventDefault()}
+            >
                 <DialogHeader>
                     <DialogTitle>Log out</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to log out? You will need to sign in again to access
-                        your account.
+                        Are you sure you want to log out? You will need to sign
+                        in again to access your account.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-2 sm:gap-0">
@@ -45,7 +44,11 @@ export function LogoutConfirmDialog({
                     >
                         Cancel
                     </Button>
-                    <Button type="button" onClick={handleLogout} data-test="logout-confirm-button">
+                    <Button
+                        type="button"
+                        onClick={handleLogout}
+                        data-test="logout-confirm-button"
+                    >
                         Log out
                     </Button>
                 </DialogFooter>
