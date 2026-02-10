@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
     Footprints,
     Shirt,
@@ -45,6 +45,7 @@ type Props = {
 };
 
 export default function CartIndex({ items }: Props) {
+    const { post, processing } = useForm();
     const total = items.reduce(
         (sum, item) => sum + Number(item.listing.price),
         0,
@@ -180,10 +181,12 @@ export default function CartIndex({ items }: Props) {
                                 {total.toFixed(2)}
                             </p>
                             <Button
-                                asChild
+                                type="button"
                                 className="min-h-11 px-6 font-semibold"
+                                disabled={processing}
+                                onClick={() => post('/checkout')}
                             >
-                                <Link href="#">Checkout</Link>
+                                Checkout
                             </Button>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
@@ -66,6 +67,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('chat/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.messages.store');
     Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::post('listings/{listing}/cart', [CartController::class, 'store'])->name('listings.cart.store');
     Route::delete('listings/{listing}/cart', [CartController::class, 'destroy'])->name('listings.cart.destroy');
     Route::resource('listings', ListingController::class)->except(['index', 'show', 'create']);

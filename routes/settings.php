@@ -22,8 +22,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('throttle:6,1')
         ->name('user-password.update');
 
-    Route::get('settings/orders', function () {
-        return Inertia::render('settings/orders');
+    Route::get('settings/orders', function (\Illuminate\Http\Request $request) {
+        $orders = $request->user()
+            ->orders()
+            ->where('status', 'paid')
+            ->with(['items.listing:id,title,image_path,price'])
+            ->latest()
+            ->get();
+
+        return Inertia::render('settings/orders', [
+            'orders' => $orders,
+        ]);
     })->name('orders.index');
 
     Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])

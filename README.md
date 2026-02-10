@@ -2,6 +2,25 @@
 
 A modern e-commerce application built with Laravel and React.
 
+## Pushing to GitHub
+
+Your `.env` file is in `.gitignore`, so **it will not be pushed** — only `.env.example` (no secrets) is committed.
+
+1. Create a new repository on GitHub (do **not** add a README or .gitignore).
+2. From your project folder:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit: EasyMart e-commerce"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git push -u origin main
+```
+
+Replace `YOUR_USERNAME` and `YOUR_REPO_NAME` with your GitHub username and repo name.  
+Anyone who clones the repo will copy `.env.example` to `.env` and add their own keys (database, Stripe, etc.).
+
 ## Tech Stack
 
 - **Backend**: Laravel 12 (PHP 8.2+)
