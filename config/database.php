@@ -19,7 +19,8 @@ return [
     'default' => env('DB_CONNECTION', (function () {
         $url = env('DATABASE_URL') ?: env('DB_URL');
         if (! $url) {
-            return 'sqlite';
+            // Production (e.g. Heroku) has no SQLite driver; require DATABASE_URL and use mysql/pgsql.
+            return env('APP_ENV') === 'production' ? 'mysql' : 'sqlite';
         }
         return str_starts_with($url, 'mysql') ? 'mysql' : 'pgsql';
     })()),
