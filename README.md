@@ -171,6 +171,8 @@ php artisan migrate --force
 
 Note: Heroku no longer has a free tier; you’ll need a paid dyno. Aiven may offer a free tier for PostgreSQL depending on region and plan.
 
+**Troubleshooting:** If you see `could not find driver` with `Connection: sqlite`, the app is using SQLite because `DATABASE_URL` is not set. Heroku's PHP stack does not include the SQLite driver. Set **Config Var** `DATABASE_URL` to your Aiven MySQL or PostgreSQL connection URI (see step 2).
+
 ### Domain Configuration
 
 If deploying to `www.easymart.com.mm`:
