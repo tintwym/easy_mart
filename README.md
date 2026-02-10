@@ -137,6 +137,40 @@ php artisan migrate --force
    - Configure URL rewriting (Laravel includes `.htaccess` for Apache)
    - Set proper file permissions (storage and bootstrap/cache should be writable)
 
+### Deploy to Heroku
+
+1. **Create app**
+   - [Heroku Dashboard](https://dashboard.heroku.com) → New app (or CLI: `heroku create your-app-name`).
+   - Do **not** add Heroku Postgres; you’ll use Aiven for the database.
+
+2. **Database: Aiven (MySQL or PostgreSQL)**
+   - Create a [MySQL](https://aiven.io/mysql) or [PostgreSQL](https://aiven.io/postgresql) service on Aiven.
+   - In the Aiven console, open your service → **Overview** → copy the **Connection URI** (e.g. `mysql://avnadmin:PASSWORD@xxx.aivencloud.com:PORT/defaultdb?ssl-mode=REQUIRED` or `postgres://...?sslmode=require`).
+   - **Aiven MySQL (SSL):** Download the **CA Certificate** from the same Overview page and save it as `storage/app/ca.pem` in the project (or set `MYSQL_ATTR_SSL_CA` to its path). The app uses it to connect over SSL.
+   - In Heroku: **Settings** → **Config Vars** → add:
+     - `DATABASE_URL` = paste the Aiven connection URI (or use `DB_URL`; the app auto-detects MySQL vs PostgreSQL from the URL).
+
+3. **Connect GitHub**
+   - **Deploy** → Deployment method → **GitHub** → connect repo (e.g. `YOUR_USERNAME/easy_mart`).
+   - Enable **Automatic deploys** from `main` if you want.
+
+4. **Config vars** (Settings → Config Vars)
+   - `APP_KEY` — run `php artisan key:generate --show` locally and paste the value.
+   - `APP_ENV` — `production`
+   - `APP_DEBUG` — `false`
+   - `APP_URL` — `https://your-app-name.herokuapp.com` (use your app’s URL).
+   - `STRIPE_KEY` — your Stripe publishable key.
+   - `STRIPE_SECRET` — your Stripe secret key.
+   - `DATABASE_URL` (or `DB_URL`) — Aiven MySQL or PostgreSQL connection URI (see step 2).
+
+5. **Deploy**
+   - **Deploy** → **Deploy branch** (e.g. `main`). Heroku runs the Node buildpack (`npm run build`), then the PHP buildpack; the release phase runs `php artisan migrate --force`.
+
+6. **Optional**
+   - For file uploads (e.g. listing images) to persist, use a store like AWS S3 and set `FILESYSTEM_DISK=s3` and AWS env vars. On Heroku the filesystem is ephemeral.
+
+Note: Heroku no longer has a free tier; you’ll need a paid dyno. Aiven may offer a free tier for PostgreSQL depending on region and plan.
+
 ### Domain Configuration
 
 If deploying to `www.easymart.com.mm`:

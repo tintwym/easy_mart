@@ -4,6 +4,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
+        "heroku-postbuild": "npm run build",
         "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
         "serve": "concurrently \"php artisan serve\" \"npm run dev\"",

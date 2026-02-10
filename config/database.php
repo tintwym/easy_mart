@@ -16,7 +16,13 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', (function () {
+        $url = env('DATABASE_URL') ?: env('DB_URL');
+        if (! $url) {
+            return 'sqlite';
+        }
+        return str_starts_with($url, 'mysql') ? 'mysql' : 'pgsql';
+    })()),
 
     /*
     |--------------------------------------------------------------------------
@@ -45,7 +51,7 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'url' => env('DB_URL'),
+            'url' => env('DATABASE_URL', env('DB_URL')),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -58,9 +64,36 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => extension_loaded('pdo_mysql') ? (function () {
+                $sslCa = env('MYSQL_ATTR_SSL_CA');
+                if (! $sslCa && file_exists(base_path('storage/app/ca.pem'))) {
+                    $sslCa = base_path('storage/app/ca.pem');
+                }
+                if (! $sslCa && PHP_OS_FAMILY !== 'Windows') {
+                    $paths = [
+                        '/etc/ssl/certs/ca-certificates.crt',
+                        '/etc/ssl/cert.pem',
+                        '/etc/pki/tls/certs/ca-bundle.crt',
+                        '/usr/local/etc/openssl/cert.pem',
+                        '/opt/homebrew/etc/openssl@3/cert.pem',
+                        '/opt/homebrew/etc/openssl/cert.pem',
+                    ];
+                    foreach ($paths as $p) {
+                        if (@is_readable($p)) {
+                            $sslCa = $p;
+                            break;
+                        }
+                    }
+                }
+                $verifyCert = (bool) (env('MYSQL_ATTR_SSL_CA') || file_exists(base_path('storage/app/ca.pem')));
+                $opts = [
+                    (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => $verifyCert,
+                ];
+                if ($sslCa !== null && $sslCa !== '') {
+                    $opts[(PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA)] = $sslCa;
+                }
+                return $opts;
+            })() : [],
         ],
 
         'mariadb' => [
@@ -85,7 +118,7 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
+            'url' => env('DATABASE_URL', env('DB_URL')),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
