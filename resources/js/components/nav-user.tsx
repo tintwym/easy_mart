@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,9 +12,11 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
+import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { UserInfo } from '@/components/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { login, register } from '@/routes';
 import type { SharedData } from '@/types';
 
@@ -21,6 +24,8 @@ export function NavUser() {
     const { auth } = usePage<SharedData>().props;
     const { state } = useSidebar();
     const isMobile = useIsMobile();
+    const mobileNavCleanup = useMobileNavigation();
+    const [sidebarLogoutOpen, setSidebarLogoutOpen] = useState(false);
 
     if (!auth.user) {
         return (
@@ -64,9 +69,17 @@ export function NavUser() {
                                   : 'bottom'
                         }
                     >
-                        <UserMenuContent user={auth.user} />
+                        <UserMenuContent
+                            user={auth.user}
+                            onOpenLogout={() => setSidebarLogoutOpen(true)}
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <LogoutConfirmDialog
+                    open={sidebarLogoutOpen}
+                    onOpenChange={setSidebarLogoutOpen}
+                    onLogout={mobileNavCleanup}
+                />
             </SidebarMenuItem>
         </SidebarMenu>
     );

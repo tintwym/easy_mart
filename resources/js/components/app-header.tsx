@@ -47,6 +47,7 @@ import {
 import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useInitials } from '@/hooks/use-initials';
 import { useSortedLocations } from '@/hooks/use-sorted-locations';
 import { cn, toUrl } from '@/lib/utils';
@@ -93,6 +94,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { sortedLocations, getDistanceKm } = useSortedLocations(locations);
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+    const mobileNavCleanup = useMobileNavigation();
+    const [headerLogoutOpen, setHeaderLogoutOpen] = useState(false);
     return (
         <>
             <div
@@ -431,33 +434,45 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         {/* Profile / Auth - hidden on mobile (in sidebar instead), visible from tablet */}
                         <div className="hidden md:block">
                             {auth?.user ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            className="flex size-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-1 sm:size-10"
-                                            aria-label="User menu"
+                                <>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className="flex size-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-1 sm:size-10"
+                                                aria-label="User menu"
+                                            >
+                                                <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
+                                                    <AvatarImage
+                                                        src={auth.user.avatar}
+                                                        alt={auth.user.name}
+                                                    />
+                                                    <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                        {getInitials(
+                                                            auth.user.name,
+                                                        )}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            className="w-56"
+                                            align="end"
                                         >
-                                            <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
-                                                <AvatarImage
-                                                    src={auth.user.avatar}
-                                                    alt={auth.user.name}
-                                                />
-                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                                    {getInitials(
-                                                        auth.user.name,
-                                                    )}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        className="w-56"
-                                        align="end"
-                                    >
-                                        <UserMenuContent user={auth.user} />
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                            <UserMenuContent
+                                                user={auth.user}
+                                                onOpenLogout={() =>
+                                                    setHeaderLogoutOpen(true)
+                                                }
+                                            />
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    <LogoutConfirmDialog
+                                        open={headerLogoutOpen}
+                                        onOpenChange={setHeaderLogoutOpen}
+                                        onLogout={mobileNavCleanup}
+                                    />
+                                </>
                             ) : (
                                 <div className="flex items-center gap-2">
                                     <Button

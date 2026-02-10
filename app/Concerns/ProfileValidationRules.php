@@ -17,7 +17,7 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
-            'seller_type' => ['required', 'string', 'in:individual,business'],
+            'seller_type' => ['required', 'string', 'in:individual'],
         ];
     }
 

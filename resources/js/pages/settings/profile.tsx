@@ -93,36 +93,14 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="seller_type">
-                                        Seller type
-                                    </Label>
-                                    <select
-                                        id="seller_type"
-                                        name="seller_type"
-                                        className="mt-1 flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                                        defaultValue={
-                                            (
-                                                auth.user as {
-                                                    seller_type?: string;
-                                                }
-                                            )?.seller_type ?? 'individual'
-                                        }
-                                    >
-                                        <option value="individual">
-                                            Individual seller (Make Offer)
-                                        </option>
-                                        <option value="business">
-                                            Business shop (Buy + Add to Cart)
-                                        </option>
-                                    </select>
+                                    <Label>Account type</Label>
                                     <p className="text-sm text-muted-foreground">
-                                        Individual: buyers make offers.
-                                        Business: buyers can buy or add to cart
-                                        directly.
+                                        Personal account (buyers make offers).
                                     </p>
-                                    <InputError
-                                        className="mt-2"
-                                        message={errors.seller_type}
+                                    <input
+                                        type="hidden"
+                                        name="seller_type"
+                                        value="individual"
                                     />
                                 </div>
 
