@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { useTranslations } from '@/hooks/use-translations';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
 
@@ -18,6 +19,7 @@ type Props = {
 
 export function UserMenuContent({ user, onOpenLogout }: Props) {
     const cleanup = useMobileNavigation();
+    const { t } = useTranslations();
 
     return (
         <>
@@ -36,7 +38,7 @@ export function UserMenuContent({ user, onOpenLogout }: Props) {
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />
-                        Settings
+                        {t('nav.settings')}
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -49,7 +51,7 @@ export function UserMenuContent({ user, onOpenLogout }: Props) {
                     data-test="logout-button"
                 >
                     <LogOut className="mr-2" />
-                    Log out
+                    {t('nav.log_out')}
                 </button>
             </DropdownMenuItem>
         </>

@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useTranslations } from '@/hooks/use-translations';
 import { logout } from '@/routes';
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function LogoutConfirmDialog({ open, onOpenChange, onLogout }: Props) {
+    const { t } = useTranslations();
     const handleLogout = () => {
         onLogout?.();
         onOpenChange(false);
@@ -30,11 +32,8 @@ export function LogoutConfirmDialog({ open, onOpenChange, onLogout }: Props) {
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
                 <DialogHeader>
-                    <DialogTitle>Log out</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to log out? You will need to sign
-                        in again to access your account.
-                    </DialogDescription>
+                    <DialogTitle>{t('logout.title')}</DialogTitle>
+                    <DialogDescription>{t('logout.message')}</DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-2 sm:gap-0">
                     <Button
@@ -42,14 +41,14 @@ export function LogoutConfirmDialog({ open, onOpenChange, onLogout }: Props) {
                         variant="outline"
                         onClick={() => onOpenChange(false)}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button
                         type="button"
                         onClick={handleLogout}
                         data-test="logout-confirm-button"
                     >
-                        Log out
+                        {t('logout.log_out')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

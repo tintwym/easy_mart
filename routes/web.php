@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
@@ -11,6 +12,16 @@ use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+// Locale switcher (store in session, redirect back)
+Route::post('/locale', function (\Illuminate\Http\Request $request) {
+    $locale = $request->input('locale');
+    if (in_array($locale, ['en', 'zh', 'my'], true)) {
+        Session::put('locale', $locale);
+    }
+
+    return redirect()->back();
+})->name('locale');
 
 // Dashboard is the default page (public; login/register in navbar for guests)
 Route::get('/', function (\Illuminate\Http\Request $request) {

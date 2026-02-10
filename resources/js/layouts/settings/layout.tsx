@@ -5,41 +5,27 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useTranslations } from '@/hooks/use-translations';
 import { cn, toUrl } from '@/lib/utils';
 import { edit } from '@/routes/profile';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: editPassword(),
-        icon: null,
-    },
-    {
-        title: 'Payment method',
-        href: '/settings/payment',
-        icon: null,
-    },
-    {
-        title: 'Two-Factor Auth',
-        href: AppTwoFactorController.show.url(),
-        icon: null,
-    },
-    {
-        title: 'My Orders',
-        href: '/settings/orders',
-        icon: null,
-    },
-];
-
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentUrl } = useCurrentUrl();
+    const { t } = useTranslations();
+
+    const sidebarNavItems: NavItem[] = [
+        { title: t('settings.profile'), href: edit(), icon: null },
+        { title: t('settings.password'), href: editPassword(), icon: null },
+        { title: t('settings.payment'), href: '/settings/payment', icon: null },
+        {
+            title: t('settings.two_factor'),
+            href: AppTwoFactorController.show.url(),
+            icon: null,
+        },
+        { title: t('settings.orders'), href: '/settings/orders', icon: null },
+    ];
 
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
@@ -49,15 +35,15 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     return (
         <div className="px-4 py-6">
             <Heading
-                title="Settings"
-                description="Manage your profile and account settings"
+                title={t('settings.title')}
+                description={t('settings.description')}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav
                         className="flex flex-col space-y-1 space-x-0"
-                        aria-label="Settings"
+                        aria-label={t('settings.aria')}
                     >
                         {sidebarNavItems.map((item, index) => (
                             <Button

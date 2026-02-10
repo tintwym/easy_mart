@@ -7,6 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslations } from '@/hooks/use-translations';
 import type { SharedData } from '@/types';
 
 const CONDITION_LABELS: Record<string, string> = {
@@ -61,6 +62,7 @@ type ListingCardProps = {
 
 export function ListingCard({ listing }: ListingCardProps) {
     const { auth } = usePage<SharedData>().props;
+    const { t } = useTranslations();
     const canEdit = auth?.user && listing.user_id === auth.user.id;
     const isTrending =
         listing.trending_until && new Date(listing.trending_until) > new Date();
@@ -103,7 +105,9 @@ export function ListingCard({ listing }: ListingCardProps) {
                                         variant="ghost"
                                         size="icon"
                                         className="size-8 shrink-0 rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white"
-                                        aria-label="Listing options"
+                                        aria-label={t(
+                                            'listing.listing_options',
+                                        )}
                                     >
                                         <MoreVertical className="size-4" />
                                     </Button>
@@ -114,7 +118,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                                             href={`/listings/${listing.id}/edit`}
                                         >
                                             <Pencil className="mr-2 size-4" />
-                                            Edit
+                                            {t('common.edit')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
@@ -123,7 +127,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                                             e.preventDefault();
                                             if (
                                                 window.confirm(
-                                                    'Delete this listing?',
+                                                    t('listing.delete_confirm'),
                                                 )
                                             ) {
                                                 router.delete(
@@ -133,7 +137,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                                         }}
                                     >
                                         <Trash2 className="mr-2 size-4" />
-                                        Delete
+                                        {t('common.delete')}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -173,7 +177,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                                 >
                                     <ShoppingCart className="size-4" />
-                                    In cart
+                                    {t('listing.in_cart')}
                                 </Link>
                             ) : (
                                 <Button
@@ -185,10 +189,10 @@ export function ListingCard({ listing }: ListingCardProps) {
                                             `/listings/${listing.id}/cart`,
                                         )
                                     }
-                                    aria-label="Add to cart"
+                                    aria-label={t('listing.add_to_cart')}
                                 >
                                     <ShoppingCart className="mr-1 size-4" />
-                                    Add to cart
+                                    {t('listing.add_to_cart')}
                                 </Button>
                             )}
                         </div>

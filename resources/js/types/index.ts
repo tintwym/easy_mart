@@ -24,5 +24,7 @@ export type SharedData = {
     locations: SharedLocation[];
     regionLabel?: string;
     searchQuery?: string;
+    locale?: string;
+    translations?: Record<string, string>;
     [key: string]: unknown;
 };

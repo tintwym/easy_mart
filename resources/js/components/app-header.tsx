@@ -10,6 +10,7 @@ import {
 import { ChevronDown, Layers, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useSortedLocations } from '@/hooks/use-sorted-locations';
+import { useTranslations } from '@/hooks/use-translations';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard, login, register } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -70,6 +72,7 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
+    const { t } = useTranslations();
     const [sidebarLogoutOpen, setSidebarLogoutOpen] = useState(false);
     const {
         auth,
@@ -114,7 +117,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     variant="ghost"
                                     size="icon"
                                     className="mr-1 flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation sm:mr-2 sm:h-10 sm:w-10"
-                                    aria-label="Open menu"
+                                    aria-label={t('nav.open_menu')}
                                 >
                                     <Menu className="h-5 w-5" />
                                 </Button>
@@ -124,7 +127,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 className="flex h-full w-[min(20rem,85vw)] flex-col items-stretch justify-between bg-sidebar pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)]"
                             >
                                 <SheetTitle className="sr-only">
-                                    Navigation Menu
+                                    {t('nav.navigation_menu')}
                                 </SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
                                     <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
@@ -137,7 +140,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                             >
                                                 <MessageCircle className="h-4 w-4" />
-                                                Chat
+                                                {t('nav.chat')}
                                             </Link>
                                         )}
                                         {/* Categories dropdown */}
@@ -149,7 +152,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <CollapsibleTrigger className="flex min-h-[44px] w-full touch-manipulation items-center justify-between rounded-md px-2 py-2 font-semibold text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                                                     <span className="flex items-center gap-2">
                                                         <Layers className="h-4 w-4" />
-                                                        Categories
+                                                        {t('nav.categories')}
                                                     </span>
                                                     <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]/cat:rotate-180" />
                                                 </CollapsibleTrigger>
@@ -187,6 +190,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <span>{item.title}</span>
                                             </Link>
                                         ))}
+                                    </div>
+
+                                    <div className="py-2">
+                                        <LanguageSwitcher />
                                     </div>
 
                                     {/* Profile / Auth at bottom of sidebar */}
@@ -230,7 +237,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                                 >
                                                     <Settings className="h-4 w-4" />
-                                                    Settings
+                                                    {t('nav.settings')}
                                                 </Link>
                                                 <button
                                                     type="button"
@@ -242,7 +249,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     }
                                                 >
                                                     <LogOut className="h-4 w-4" />
-                                                    Log out
+                                                    {t('nav.log_out')}
                                                 </button>
                                                 <LogoutConfirmDialog
                                                     open={sidebarLogoutOpen}
@@ -257,13 +264,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     href={login()}
                                                     className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                                 >
-                                                    Log in
+                                                    {t('nav.log_in')}
                                                 </Link>
                                                 <Link
                                                     href={register()}
                                                     className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
                                                 >
-                                                    Register
+                                                    {t('nav.register')}
                                                 </Link>
                                             </>
                                         )}
@@ -294,7 +301,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             )}
                                         >
                                             <Layers className="mr-1.5 h-4 w-4" />
-                                            Categories
+                                            {t('nav.categories')}
                                         </NavigationMenuTrigger>
                                         <NavigationMenuContent>
                                             <ul className="grid w-[220px] gap-1 p-2">
@@ -350,6 +357,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <div className="relative flex items-center space-x-1">
                             {auth?.user && (
                                 <>
+                                    <LanguageSwitcher />
                                     <TooltipProvider delayDuration={0}>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -366,7 +374,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>Chat</p>
+                                                <p>{t('nav.chat')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -395,7 +403,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>Cart</p>
+                                                <p>{t('nav.cart')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -440,7 +448,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             <Button
                                                 variant="ghost"
                                                 className="flex size-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-1 sm:size-10"
-                                                aria-label="User menu"
+                                                aria-label={t('nav.user_menu')}
                                             >
                                                 <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
                                                     <AvatarImage
@@ -475,20 +483,25 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 </>
                             ) : (
                                 <div className="flex items-center gap-2">
+                                    <LanguageSwitcher />
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         className="min-h-[44px] touch-manipulation sm:min-h-0"
                                         asChild
                                     >
-                                        <Link href={login()}>Log in</Link>
+                                        <Link href={login()}>
+                                            {t('nav.log_in')}
+                                        </Link>
                                     </Button>
                                     <Button
                                         size="sm"
                                         className="min-h-[44px] touch-manipulation sm:min-h-0"
                                         asChild
                                     >
-                                        <Link href={register()}>Register</Link>
+                                        <Link href={register()}>
+                                            {t('nav.register')}
+                                        </Link>
                                     </Button>
                                 </div>
                             )}
@@ -523,9 +536,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             type="search"
                             name="q"
                             defaultValue={searchQuery}
-                            placeholder="Search for an item"
+                            placeholder={t('search.placeholder')}
                             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                            aria-label="Search"
+                            aria-label={t('search.aria')}
                         />
                     </div>
                     {sortedLocations.length > 0 ? (
@@ -538,7 +551,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <MapPin className="size-4 shrink-0" />
                                     <span className="min-w-0 flex-1 truncate">
                                         {currentLocation ??
-                                            `All of ${regionLabel}`}
+                                            t('location.all_of', {
+                                                region: regionLabel,
+                                            })}
                                     </span>
                                     <ChevronDown className="size-4 shrink-0" />
                                 </button>
@@ -551,7 +566,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     href={dashboard().url}
                                     className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                                 >
-                                    All of {regionLabel}
+                                    {t('location.all_of', {
+                                        region: regionLabel,
+                                    })}
                                 </Link>
                                 {sortedLocations.map((loc) => {
                                     const km = getDistanceKm(loc);
@@ -585,7 +602,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <div className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
                             <MapPin className="size-4 shrink-0" />
                             <span className="min-w-0 truncate">
-                                All of {regionLabel}
+                                {t('location.all_of', {
+                                    region: regionLabel,
+                                })}
                             </span>
                         </div>
                     )}
@@ -594,7 +613,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         size="sm"
                         className="shrink-0 bg-green-600 hover:bg-green-700"
                     >
-                        Search
+                        {t('search.button')}
                     </Button>
                 </form>
             </div>

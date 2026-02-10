@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 
@@ -22,12 +23,12 @@ type Category = {
     slug: string;
 };
 
-const CONDITION_OPTIONS = [
-    { value: 'new', label: 'New' },
-    { value: 'like_new', label: 'Like New' },
-    { value: 'good', label: 'Good' },
-    { value: 'fair', label: 'Fair' },
-];
+const CONDITION_KEYS: Record<string, string> = {
+    new: 'listing.condition_new',
+    like_new: 'listing.condition_like_new',
+    good: 'listing.condition_good',
+    fair: 'listing.condition_fair',
+};
 
 type Props = {
     categories: Category[];
@@ -44,6 +45,7 @@ export default function CreateListing({
     canCreate,
     slotPriceLabel,
 }: Props) {
+    const { t } = useTranslations();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -54,6 +56,13 @@ export default function CreateListing({
         image: null as File | null,
     });
 
+    const conditionOptions = [
+        { value: 'new', labelKey: CONDITION_KEYS.new },
+        { value: 'like_new', labelKey: CONDITION_KEYS.like_new },
+        { value: 'good', labelKey: CONDITION_KEYS.good },
+        { value: 'fair', labelKey: CONDITION_KEYS.fair },
+    ];
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/listings', {
@@ -63,7 +72,7 @@ export default function CreateListing({
 
     return (
         <AppLayout breadcrumbs={[]}>
-            <Head title="Add product" />
+            <Head title={t('listing.add_product')} />
             <div className="mx-auto w-full max-w-2xl px-0 sm:px-2">
                 <Button
                     variant="ghost"
@@ -76,26 +85,26 @@ export default function CreateListing({
                         className="inline-flex items-center gap-2"
                     >
                         <ArrowLeft className="size-4" />
-                        Back
+                        {t('common.back')}
                     </Link>
                 </Button>
                 <Heading
-                    title="Add product"
-                    description="Create a new product listing"
+                    title={t('listing.add_product')}
+                    description={t('listing.create_listing')}
                 />
                 <p className="mt-2 text-sm text-muted-foreground">
-                    Your listings: {listingCount} / {maxListingSlots}
+                    {t('listing.your_listings')}: {listingCount} /{' '}
+                    {maxListingSlots}
                 </p>
                 {!canCreate && (
                     <Alert className="mt-4 border-amber-500/50 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/20">
                         <AlertDescription>
-                            You&apos;ve reached your listing limit. Purchase
-                            more slots to list more items.
+                            {t('listing.listing_limit')}{' '}
                             <Link
                                 href="/upgrades"
                                 className="ml-1 font-medium text-amber-700 underline dark:text-amber-400"
                             >
-                                Buy slots ({slotPriceLabel})
+                                {t('listing.buy_slots')} ({slotPriceLabel})
                             </Link>
                         </AlertDescription>
                     </Alert>
@@ -105,19 +114,21 @@ export default function CreateListing({
                     className="mt-6 space-y-6 [&_input]:min-h-[44px] [&_input]:touch-manipulation sm:[&_input]:min-h-0 [&_select]:min-h-[44px] [&_select]:touch-manipulation sm:[&_select]:min-h-0 [&_textarea]:min-h-[88px]"
                 >
                     <div className="space-y-2">
-                        <Label htmlFor="title">Title</Label>
+                        <Label htmlFor="title">{t('listing.title')}</Label>
                         <Input
                             id="title"
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
-                            placeholder="Product title"
+                            placeholder={t('listing.product_title')}
                             className="w-full"
                         />
                         <InputError message={errors.title} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">
+                            {t('listing.description')}
+                        </Label>
                         <textarea
                             id="description"
                             rows={4}
@@ -125,14 +136,14 @@ export default function CreateListing({
                             onChange={(e) =>
                                 setData('description', e.target.value)
                             }
-                            placeholder="Describe your product"
+                            placeholder={t('listing.describe_product')}
                             className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
                         <InputError message={errors.description} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Category</Label>
+                        <Label>{t('listing.category')}</Label>
                         <Select
                             value={data.category_id}
                             onValueChange={(value) =>
@@ -140,7 +151,9 @@ export default function CreateListing({
                             }
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select category" />
+                                <SelectValue
+                                    placeholder={t('listing.select_category')}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((cat) => (
@@ -154,7 +167,7 @@ export default function CreateListing({
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Condition</Label>
+                        <Label>{t('listing.condition')}</Label>
                         <Select
                             value={data.condition}
                             onValueChange={(value) =>
@@ -165,12 +178,12 @@ export default function CreateListing({
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                {CONDITION_OPTIONS.map((opt) => (
+                                {conditionOptions.map((opt) => (
                                     <SelectItem
                                         key={opt.value}
                                         value={opt.value}
                                     >
-                                        {opt.label}
+                                        {t(opt.labelKey)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -179,7 +192,7 @@ export default function CreateListing({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="price">Price ($)</Label>
+                        <Label htmlFor="price">{t('listing.price')}</Label>
                         <Input
                             id="price"
                             type="number"
@@ -187,14 +200,14 @@ export default function CreateListing({
                             min="0"
                             value={data.price}
                             onChange={(e) => setData('price', e.target.value)}
-                            placeholder="0.00"
+                            placeholder={t('listing.price_placeholder')}
                         />
                         <InputError message={errors.price} />
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="meetup_location">
-                            Meetup location (optional)
+                            {t('listing.meetup_location')}
                         </Label>
                         <Input
                             id="meetup_location"
@@ -202,17 +215,18 @@ export default function CreateListing({
                             onChange={(e) =>
                                 setData('meetup_location', e.target.value)
                             }
-                            placeholder="e.g. Commonwealth View (Blks 89-91 Tanglin Halt Road)"
+                            placeholder={t('listing.meetup_placeholder')}
                         />
                         <p className="text-sm text-muted-foreground">
-                            If you want to meet up for the sale, add the
-                            location here.
+                            {t('listing.meetup_help')}
                         </p>
                         <InputError message={errors.meetup_location} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="image">Image (optional)</Label>
+                        <Label htmlFor="image">
+                            {t('listing.image_optional_create')}
+                        </Label>
                         <Input
                             id="image"
                             type="file"
@@ -230,7 +244,9 @@ export default function CreateListing({
                             disabled={processing || !canCreate}
                             className="min-h-[44px] touch-manipulation sm:min-h-0"
                         >
-                            {processing ? 'Creating…' : 'Create listing'}
+                            {processing
+                                ? t('listing.creating')
+                                : t('listing.create_btn')}
                         </Button>
                         <Button
                             type="button"
@@ -238,7 +254,7 @@ export default function CreateListing({
                             className="min-h-[44px] touch-manipulation sm:min-h-0"
                             asChild
                         >
-                            <Link href={dashboard()}>Cancel</Link>
+                            <Link href={dashboard()}>{t('common.cancel')}</Link>
                         </Button>
                     </div>
                 </form>

@@ -3,16 +3,10 @@ import { Plus } from 'lucide-react';
 import { ListingCard } from '@/components/listing-card';
 import type { ListingCardListing } from '@/components/listing-card';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard().url,
-    },
-];
 
 // Set to true when carousel is ready to enable
 const CAROUSEL_ENABLED = false;
@@ -22,9 +16,16 @@ type Props = {
 };
 
 export default function Dashboard({ listings = [] }: Props) {
+    const { t } = useTranslations();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('dashboard.title'),
+            href: dashboard().url,
+        },
+    ];
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title={t('dashboard.title')} />
             <div className="relative flex min-w-0 flex-1 flex-col gap-6 sm:gap-8">
                 {/* First row: Carousel (disabled for now) */}
                 {CAROUSEL_ENABLED && (
@@ -45,7 +46,7 @@ export default function Dashboard({ listings = [] }: Props) {
                     <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                         {listings.length === 0 ? (
                             <p className="col-span-full text-center text-muted-foreground">
-                                No listings yet.
+                                {t('dashboard.no_listings')}
                             </p>
                         ) : (
                             listings.map((listing) => (
@@ -64,7 +65,10 @@ export default function Dashboard({ listings = [] }: Props) {
                     className="fixed [right:max(1.5rem,env(safe-area-inset-right))] right-6 [bottom:max(1.5rem,env(safe-area-inset-bottom))] bottom-6 z-40 flex size-14 min-h-[56px] min-w-[56px] touch-manipulation rounded-full shadow-lg"
                     asChild
                 >
-                    <Link href="/listings/create" aria-label="Add product">
+                    <Link
+                        href="/listings/create"
+                        aria-label={t('dashboard.add_product')}
+                    >
                         <Plus className="size-7" />
                     </Link>
                 </Button>
