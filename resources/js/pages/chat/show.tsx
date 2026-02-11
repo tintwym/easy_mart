@@ -104,8 +104,7 @@ export default function ChatShow({
     });
 
     // Show seller (listing owner) as the other party name
-    const otherUser =
-        conversation.listing.user ?? conversation.buyer;
+    const otherUser = conversation.listing.user ?? conversation.buyer;
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -339,8 +338,7 @@ export default function ChatShow({
                                                 const isOwn =
                                                     msg.user_id ===
                                                     currentUserId;
-                                                const prev =
-                                                    group.msgs[i - 1];
+                                                const prev = group.msgs[i - 1];
                                                 const prevSameSender =
                                                     prev &&
                                                     prev.user_id ===
@@ -366,10 +364,10 @@ export default function ChatShow({
                                                                           prevSameSender
                                                                               ? 'rounded-tl-md'
                                                                               : ''
-                                                                      } bg-background border border-border`
+                                                                      } border border-border bg-background`
                                                             }`}
                                                         >
-                                                            <p className="break-words text-sm">
+                                                            <p className="text-sm break-words">
                                                                 {msg.body}
                                                             </p>
                                                             <div
@@ -432,7 +430,7 @@ export default function ChatShow({
                             value={data.body}
                             onChange={(e) => setData('body', e.target.value)}
                             placeholder="Message"
-                            className="min-w-0 flex-1 rounded-full border border-input bg-muted/50 py-2.5 pl-5 pr-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                            className="min-w-0 flex-1 rounded-full border border-input bg-muted/50 py-2.5 pr-4 pl-5 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                         />
                         <Button
                             type="submit"
