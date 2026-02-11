@@ -97,7 +97,8 @@ return [
                 $opts = [
                     (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => $verifyCert,
                 ];
-                if ($sslCa !== null && $sslCa !== '') {
+                // Only pass CA when verifying; otherwise SSL can still fail with "certificate verify failed"
+                if ($verifyCert && $sslCa !== null && $sslCa !== '') {
                     $opts[(PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA)] = $sslCa;
                 }
 
