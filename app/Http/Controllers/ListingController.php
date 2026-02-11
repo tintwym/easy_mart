@@ -26,8 +26,8 @@ class ListingController extends Controller
 
         return Inertia::render('listings/show', [
             'listing' => $listing,
-            'averageRating' => round($listing->reviews()->avg('rating') ?? 0, 1),
-            'reviewCount' => $listing->reviews()->count(),
+            'averageRating' => round((float) $listing->reviews->avg('rating'), 1),
+            'reviewCount' => $listing->reviews->count(),
             'trendPriceLabel' => $currency['symbol'].$trendPrice.' for '.$trendDays.' days',
             'trendDurationDays' => $trendDays,
         ]);

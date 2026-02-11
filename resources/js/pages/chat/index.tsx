@@ -92,9 +92,7 @@ export default function ChatIndex({ conversations }: Props) {
                                 <ul className="space-y-0.5">
                                     {conversations.map((conv) => {
                                         const otherUser =
-                                            currentUserId === conv.buyer.id
-                                                ? conv.listing.user
-                                                : conv.buyer;
+                                            conv.listing.user ?? conv.buyer;
                                         const lastMessage = conv.messages[0];
                                         return (
                                             <li key={conv.id}>

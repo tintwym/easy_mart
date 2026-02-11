@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Conversation;
+use App\Models\ConversationRead;
 use App\Models\Listing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,13 +37,39 @@ class ChatController extends Controller
     public function show(Conversation $conversation, Request $request): Response|RedirectResponse
     {
         $user = $request->user();
+        $conversation->loadMissing('listing:id,user_id');
         $participants = [$conversation->buyer_id, $conversation->listing->user_id];
         if (! in_array($user->id, $participants)) {
             abort(403);
         }
 
-        $conversation->load(['listing:id,title,image_path,price', 'buyer:id,name', 'listing.user:id,name,region']);
-        $messages = $conversation->messages()->with('user:id,name')->oldest()->get();
+        $otherUserId = $conversation->buyer_id === $user->id
+            ? $conversation->listing->user_id
+            : $conversation->buyer_id;
+
+        ConversationRead::updateOrCreate(
+            ['conversation_id' => $conversation->id, 'user_id' => $user->id],
+            ['last_read_at' => now()]
+        );
+
+        $conversation->messages()
+            ->where('user_id', $otherUserId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $conversation->load(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name,region']);
+        $messagesCollection = $conversation->messages()->with('user:id,name')->oldest()->get();
+        $otherReadAtRaw = ConversationRead::where('conversation_id', $conversation->id)->where('user_id', $otherUserId)->value('last_read_at');
+        $otherReadAt = $otherReadAtRaw ? \Carbon\Carbon::parse($otherReadAtRaw) : null;
+        $messages = $messagesCollection->map(function ($msg) use ($user, $otherReadAt) {
+            $arr = $msg->only(['id', 'body', 'created_at', 'user_id', 'read_at']);
+            $arr['user'] = $msg->user ? $msg->user->only(['id', 'name']) : null;
+            $arr['status'] = $msg->user_id === $user->id
+                ? ($msg->read_at ? 'seen' : ($otherReadAt && $otherReadAt->gte($msg->created_at) ? 'delivered' : 'sent'))
+                : null;
+            return $arr;
+        })->values()->all();
+
         $conversations = $this->getConversationsForUser($user->id);
 
         return Inertia::render('chat/show', [

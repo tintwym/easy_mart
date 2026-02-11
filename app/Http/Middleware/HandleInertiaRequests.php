@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Category;
 use App\Services\RegionFromIp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -38,10 +39,33 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $locale = app()->getLocale();
-        $translationsPath = lang_path($locale.'.json');
-        $translations = file_exists($translationsPath)
-            ? (array) json_decode((string) file_get_contents($translationsPath), true)
-            : [];
+        $translations = Cache::remember(
+            'translations.'.$locale,
+            now()->addHour(),
+            function () use ($locale) {
+                $path = lang_path($locale.'.json');
+                if (! file_exists($path)) {
+                    return [];
+                }
+                return (array) json_decode((string) file_get_contents($path), true);
+            }
+        );
+
+        $user = $request->user();
+        $cartItems = $user ? $user->cartItems()->get(['listing_id']) : null;
+        $cartCount = $cartItems ? $cartItems->count() : 0;
+        $cartListingIds = $cartItems ? $cartItems->pluck('listing_id')->toArray() : [];
+
+        $region = RegionFromIp::detect($request);
+        $currencies = config('shop.currencies', []);
+        $defaultCurrency = config('shop.default_currency', ['code' => 'USD', 'symbol' => '$', 'decimals' => 2]);
+        $currency = $currencies[$region] ?? $defaultCurrency;
+        $regionLabels = ['SG' => 'Singapore', 'MM' => 'Myanmar', 'US' => 'United States'];
+        $regionLabel = $regionLabels[$region] ?? 'All';
+        $locations = config('shop.locations', []);
+        $locationsResolved = ! empty($locations)
+            ? array_map(fn ($loc) => is_array($loc) ? $loc : ['name' => $loc, 'lat' => null, 'lng' => null], $locations)
+            : (config('shop.regions', [])[$region] ?? config('shop.regions', [])[config('shop.default_region', 'MM')] ?? []);
 
         return [
             ...parent::share($request),
@@ -49,46 +73,17 @@ class HandleInertiaRequests extends Middleware
             'locale' => $locale,
             'translations' => $translations,
             'auth' => [
-                'user' => $request->user(),
-                'cartCount' => fn () => request()->user()
-                    ? request()->user()->cartItems()->count()
-                    : 0,
-                'cartListingIds' => fn () => request()->user()
-                    ? request()->user()->cartItems()->pluck('listing_id')->toArray()
-                    : [],
+                'user' => $user,
+                'cartCount' => $cartCount,
+                'cartListingIds' => $cartListingIds,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'categories' => fn () => Category::orderBy('name')->get(['id', 'name', 'slug']),
-            'locations' => function () {
-                $locations = config('shop.locations', []);
-                if (! empty($locations)) {
-                    return array_map(fn ($loc) => is_array($loc)
-                        ? $loc
-                        : ['name' => $loc, 'lat' => null, 'lng' => null],
-                        $locations);
-                }
-                $region = RegionFromIp::detect(request());
-                $regions = config('shop.regions', []);
-
-                return $regions[$region] ?? $regions[config('shop.default_region', 'MM')] ?? [];
-            },
-            'regionLabel' => function () {
-                $labels = ['SG' => 'Singapore', 'MM' => 'Myanmar', 'US' => 'United States'];
-                $region = RegionFromIp::detect(request());
-
-                return $labels[$region] ?? 'All';
-            },
-            'region' => function () {
-                return RegionFromIp::detect(request());
-            },
-            'currency' => function () {
-                $region = RegionFromIp::detect(request());
-                $currencies = config('shop.currencies', []);
-                $default = config('shop.default_currency', ['code' => 'USD', 'symbol' => '$', 'decimals' => 2]);
-
-                return $currencies[$region] ?? $default;
-            },
-            'currencies' => fn () => config('shop.currencies', []),
+            'categories' => Cache::remember('categories.sidebar', now()->addHour(), fn () => Category::orderBy('name')->get(['id', 'name', 'slug'])),
+            'locations' => $locationsResolved,
+            'regionLabel' => $regionLabel,
+            'region' => $region,
+            'currency' => $currency,
+            'currencies' => $currencies,
         ];
     }
 }

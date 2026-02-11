@@ -1,5 +1,12 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, ImagePlus, Search, Send } from 'lucide-react';
+import {
+    ArrowLeft,
+    Check,
+    CheckCheck,
+    ImagePlus,
+    Search,
+    Send,
+} from 'lucide-react';
 import { useRef, useEffect } from 'react';
 import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -40,6 +47,8 @@ type Message = {
     created_at: string;
     user: { id: string; name: string } | null;
     user_id: string;
+    read_at: string | null;
+    status: 'sent' | 'delivered' | 'seen' | null;
 };
 
 type ConversationItem = {
@@ -94,10 +103,9 @@ export default function ChatShow({
         body: '',
     });
 
+    // Show seller (listing owner) as the other party name
     const otherUser =
-        currentUserId === conversation.buyer.id
-            ? (conversation.listing.user ?? conversation.buyer)
-            : conversation.buyer;
+        conversation.listing.user ?? conversation.buyer;
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -152,9 +160,7 @@ export default function ChatShow({
                             <ul className="space-y-0.5">
                                 {conversations.map((conv) => {
                                     const other =
-                                        currentUserId === conv.buyer.id
-                                            ? (conv.listing.user ?? conv.buyer)
-                                            : conv.buyer;
+                                        conv.listing.user ?? conv.buyer;
                                     const lastMessage = conv.messages[0];
                                     const isActive =
                                         conv.id === conversation.id;
@@ -313,8 +319,8 @@ export default function ChatShow({
                         </p>
                     </div>
 
-                    {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-4">
+                    {/* Messages - WhatsApp style */}
+                    <div className="flex-1 overflow-y-auto bg-muted/30 p-4">
                         {messages.length === 0 ? (
                             <p className="py-8 text-center text-sm text-muted-foreground">
                                 No messages yet. Say hello!
@@ -328,11 +334,17 @@ export default function ChatShow({
                                                 group.msgs[0].created_at,
                                             )}
                                         </p>
-                                        <div className="space-y-3">
-                                            {group.msgs.map((msg) => {
+                                        <div className="space-y-0.5">
+                                            {group.msgs.map((msg, i) => {
                                                 const isOwn =
                                                     msg.user_id ===
                                                     currentUserId;
+                                                const prev =
+                                                    group.msgs[i - 1];
+                                                const prevSameSender =
+                                                    prev &&
+                                                    prev.user_id ===
+                                                        msg.user_id;
                                                 return (
                                                     <div
                                                         key={msg.id}
@@ -343,36 +355,53 @@ export default function ChatShow({
                                                         }`}
                                                     >
                                                         <div
-                                                            className={`flex max-w-[75%] gap-2 ${
+                                                            className={`max-w-[85%] rounded-2xl px-3 py-1.5 shadow-sm ${
                                                                 isOwn
-                                                                    ? 'flex-row-reverse'
-                                                                    : ''
+                                                                    ? `rounded-br-md ${
+                                                                          prevSameSender
+                                                                              ? 'rounded-tr-md'
+                                                                              : ''
+                                                                      } bg-[#005c4b] text-[#e9edef]`
+                                                                    : `rounded-bl-md ${
+                                                                          prevSameSender
+                                                                              ? 'rounded-tl-md'
+                                                                              : ''
+                                                                      } bg-background border border-border`
                                                             }`}
                                                         >
-                                                            <Avatar className="size-8 shrink-0">
-                                                                <AvatarFallback className="text-xs">
-                                                                    {getInitials(
-                                                                        msg.user
-                                                                            ?.name ??
-                                                                            '',
-                                                                    )}
-                                                                </AvatarFallback>
-                                                            </Avatar>
+                                                            <p className="break-words text-sm">
+                                                                {msg.body}
+                                                            </p>
                                                             <div
-                                                                className={`rounded-2xl px-4 py-2 ${
+                                                                className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
                                                                     isOwn
-                                                                        ? 'bg-muted'
-                                                                        : 'bg-muted'
+                                                                        ? 'text-[#8696a0]'
+                                                                        : 'text-muted-foreground'
                                                                 }`}
                                                             >
-                                                                <p className="text-sm">
-                                                                    {msg.body}
-                                                                </p>
-                                                                <p className="mt-0.5 text-xs text-muted-foreground">
+                                                                <span>
                                                                     {formatMessageTime(
                                                                         msg.created_at,
                                                                     )}
-                                                                </p>
+                                                                </span>
+                                                                {isOwn &&
+                                                                    msg.status && (
+                                                                        <span
+                                                                            className={
+                                                                                msg.status ===
+                                                                                'seen'
+                                                                                    ? 'text-[#53bdeb]'
+                                                                                    : ''
+                                                                            }
+                                                                        >
+                                                                            {msg.status ===
+                                                                            'sent' ? (
+                                                                                <Check className="size-3.5" />
+                                                                            ) : (
+                                                                                <CheckCheck className="size-3.5" />
+                                                                            )}
+                                                                        </span>
+                                                                    )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -386,32 +415,32 @@ export default function ChatShow({
                         )}
                     </div>
 
-                    {/* Input */}
+                    {/* Input - WhatsApp style */}
                     <form
                         onSubmit={submitMessage}
-                        className="flex items-center gap-2 border-t border-border/50 bg-background p-4"
+                        className="flex items-end gap-2 border-t border-border/50 bg-background px-4 py-3"
                     >
+                        <button
+                            type="button"
+                            className="shrink-0 rounded-full p-2.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                            aria-label="Attach"
+                        >
+                            <ImagePlus className="size-6" />
+                        </button>
                         <input
                             type="text"
                             value={data.body}
                             onChange={(e) => setData('body', e.target.value)}
-                            placeholder="Type here..."
-                            className="flex-1 rounded-full border border-input bg-muted/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                            placeholder="Message"
+                            className="min-w-0 flex-1 rounded-full border border-input bg-muted/50 py-2.5 pl-5 pr-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                         />
-                        <button
-                            type="button"
-                            className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-                            aria-label="Attach"
-                        >
-                            <ImagePlus className="size-5" />
-                        </button>
                         <Button
                             type="submit"
                             size="icon"
-                            className="rounded-full"
+                            className="h-10 w-10 shrink-0 rounded-full bg-[#005c4b] hover:bg-[#004d40]"
                             disabled={processing || !data.body.trim()}
                         >
-                            <Send className="size-4" />
+                            <Send className="size-5" />
                         </Button>
                         <InputError message={errors.body} />
                     </form>
