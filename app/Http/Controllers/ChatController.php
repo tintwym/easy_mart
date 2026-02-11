@@ -67,6 +67,7 @@ class ChatController extends Controller
             $arr['status'] = $msg->user_id === $user->id
                 ? ($msg->read_at ? 'seen' : ($otherReadAt && $otherReadAt->gte($msg->created_at) ? 'delivered' : 'sent'))
                 : null;
+
             return $arr;
         })->values()->all();
 

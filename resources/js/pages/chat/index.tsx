@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { MessageCircle, Search } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
@@ -43,9 +43,6 @@ function formatChatDate(dateString: string): string {
 }
 
 export default function ChatIndex({ conversations }: Props) {
-    const { auth } = usePage<{ auth: { user?: { id: string } } }>().props;
-    const currentUserId = auth?.user?.id;
-
     return (
         <AppLayout breadcrumbs={[]}>
             <Head title="Inbox" />

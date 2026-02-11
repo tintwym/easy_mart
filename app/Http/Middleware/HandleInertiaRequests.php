@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                 if (! file_exists($path)) {
                     return [];
                 }
+
                 return (array) json_decode((string) file_get_contents($path), true);
             }
         );
