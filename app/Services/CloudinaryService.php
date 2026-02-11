@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Configuration\Configuration;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
