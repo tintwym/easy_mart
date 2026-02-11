@@ -71,14 +71,15 @@ class ListingController extends Controller
 
         $listingDisk = config('filesystems.listing_disk', 'public');
         if ($request->hasFile('image')) {
-            if ($listingDisk === 'cloudinary') {
-                $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
-                if (! $imagePath) {
-                    return redirect()->back()->withErrors(['image' => __('Image upload failed. Check Cloudinary credentials in .env.')])->withInput();
+            try {
+                if ($listingDisk === 'cloudinary') {
+                    $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
+                } else {
+                    Storage::disk($listingDisk)->makeDirectory('listings');
+                    $imagePath = $request->file('image')->store('listings', $listingDisk);
                 }
-            } else {
-                Storage::disk($listingDisk)->makeDirectory('listings');
-                $imagePath = $request->file('image')->store('listings', $listingDisk);
+            } catch (\Throwable $e) {
+                return redirect()->back()->withErrors(['image' => $e->getMessage()])->withInput();
             }
         }
 
@@ -121,14 +122,15 @@ class ListingController extends Controller
                     : $listing->image_path;
                 Storage::disk($listingDisk)->delete($oldPath);
             }
-            if ($listingDisk === 'cloudinary') {
-                $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
-                if (! $imagePath) {
-                    return redirect()->back()->withErrors(['image' => __('Image upload failed. Check Cloudinary credentials in .env.')])->withInput();
+            try {
+                if ($listingDisk === 'cloudinary') {
+                    $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
+                } else {
+                    Storage::disk($listingDisk)->makeDirectory('listings');
+                    $imagePath = $request->file('image')->store('listings', $listingDisk);
                 }
-            } else {
-                Storage::disk($listingDisk)->makeDirectory('listings');
-                $imagePath = $request->file('image')->store('listings', $listingDisk);
+            } catch (\Throwable $e) {
+                return redirect()->back()->withErrors(['image' => $e->getMessage()])->withInput();
             }
         }
 

@@ -32,21 +32,21 @@ class CloudinaryService
     }
 
     /**
-     * Upload an image to Cloudinary and return the secure URL, or null if not configured or upload fails.
+     * Upload an image to Cloudinary and return the secure URL.
+     *
+     * @throws \RuntimeException when not configured, file unreadable, or Cloudinary API fails (message is safe to show)
      */
-    public static function upload(UploadedFile $file, string $folder = 'listings'): ?string
+    public static function upload(UploadedFile $file, string $folder = 'listings'): string
     {
         if (! self::configured()) {
-            Log::warning('Cloudinary upload skipped: missing CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, or CLOUDINARY_API_SECRET');
-
-            return null;
+            Log::warning('Cloudinary upload skipped: missing CLOUDINARY_* env vars');
+            throw new \RuntimeException('Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in .env, and LISTING_FILESYSTEM_DISK=cloudinary. Then run: php artisan config:clear');
         }
 
         $path = $file->getRealPath();
         if (! $path || ! is_readable($path)) {
             Log::warning('Cloudinary upload failed: file path not readable');
-
-            return null;
+            throw new \RuntimeException('Uploaded file could not be read. Try another image.');
         }
 
         try {
@@ -61,17 +61,19 @@ class CloudinaryService
 
             if (! $url) {
                 Log::warning('Cloudinary upload returned no secure_url', ['response' => $response]);
+                throw new \RuntimeException('Cloudinary did not return an image URL. Check your Cloudinary dashboard.');
             }
 
             return $url;
+        } catch (\RuntimeException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('Cloudinary upload failed', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-
-            return null;
+            throw new \RuntimeException('Cloudinary upload failed: '.$e->getMessage());
         }
     }
 
