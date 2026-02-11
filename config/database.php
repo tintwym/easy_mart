@@ -67,39 +67,36 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? (function () {
-                $sslCa = env('MYSQL_ATTR_SSL_CA');
-                $caPem = base_path('storage/app/ca.pem');
-                if (! $sslCa && file_exists($caPem)) {
-                    $sslCa = $caPem;
-                }
-                if (! $sslCa && PHP_OS_FAMILY !== 'Windows') {
-                    $paths = [
-                        '/etc/ssl/certs/ca-certificates.crt',
-                        '/etc/ssl/cert.pem',
-                        '/etc/pki/tls/certs/ca-bundle.crt',
-                        '/usr/local/etc/openssl/cert.pem',
-                        '/opt/homebrew/etc/openssl@3/cert.pem',
-                        '/opt/homebrew/etc/openssl/cert.pem',
-                    ];
-                    foreach ($paths as $p) {
-                        if (@is_readable($p)) {
-                            $sslCa = $p;
-                            break;
+                $verifyCert = filter_var(env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', 'true'), FILTER_VALIDATE_BOOLEAN);
+                $sslCa = null;
+                if ($verifyCert) {
+                    $sslCa = env('MYSQL_ATTR_SSL_CA');
+                    $caPem = base_path('storage/app/ca.pem');
+                    if (! $sslCa && file_exists($caPem)) {
+                        $sslCa = $caPem;
+                    }
+                    if (! $sslCa && PHP_OS_FAMILY !== 'Windows') {
+                        $paths = [
+                            '/etc/ssl/certs/ca-certificates.crt',
+                            '/etc/ssl/cert.pem',
+                            '/etc/pki/tls/certs/ca-bundle.crt',
+                            '/usr/local/etc/openssl/cert.pem',
+                            '/opt/homebrew/etc/openssl@3/cert.pem',
+                            '/opt/homebrew/etc/openssl/cert.pem',
+                        ];
+                        foreach ($paths as $p) {
+                            if (@is_readable($p)) {
+                                $sslCa = $p;
+                                break;
+                            }
                         }
                     }
                 }
-                $verifyCert = filter_var(env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', 'true'), FILTER_VALIDATE_BOOLEAN);
-                if ($sslCa && ! $verifyCert) {
-                    $verifyCert = false;
-                } elseif ($sslCa || file_exists($caPem)) {
-                    $verifyCert = true;
-                }
-                $opts = [
-                    (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => $verifyCert,
-                ];
-                // Only pass CA when verifying; otherwise SSL can still fail with "certificate verify failed"
+                $attrVerify = PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
+                $opts = [$attrVerify => $verifyCert];
                 if ($verifyCert && $sslCa !== null && $sslCa !== '') {
-                    $opts[(PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA)] = $sslCa;
+                    $attrCa = PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA;
+                    $opts[$attrCa] = $sslCa;
                 }
 
                 return $opts;
