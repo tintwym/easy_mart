@@ -47,6 +47,7 @@ class Listing extends Model
             if (! $path) {
                 return null;
             }
+            // Full URL (Cloudinary, S3, etc.) – use as-is
             if (str_starts_with($path, 'http')) {
                 return $path;
             }
@@ -54,6 +55,11 @@ class Listing extends Model
                 ? substr($path, 9)
                 : $path;
             $disk = config('filesystems.listing_disk', 'public');
+
+            // Public disk: use relative URL so images load from the same origin (works even if APP_URL is wrong)
+            if ($disk === 'public') {
+                return '/storage/'.ltrim($relativePath, '/');
+            }
 
             return Storage::disk($disk)->url($relativePath);
         });

@@ -1,5 +1,6 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { MoreVertical, Pencil, ShoppingCart, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -69,6 +70,9 @@ export function ListingCard({ listing }: ListingCardProps) {
     const canEdit = auth?.user && listing.user_id === auth.user.id;
     const isTrending =
         listing.trending_until && new Date(listing.trending_until) > new Date();
+    const [imageError, setImageError] = useState(false);
+    const imageSrc = listing.image_url ?? listing.image_path ?? null;
+    const showImage = imageSrc && !imageError;
 
     return (
         <article className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border/50 bg-white shadow-none transition-shadow hover:shadow-md dark:border-border/30 dark:bg-card">
@@ -77,11 +81,12 @@ export function ListingCard({ listing }: ListingCardProps) {
                 href={`/listings/${listing.id}`}
                 className="relative block aspect-square w-full overflow-hidden bg-muted"
             >
-                {(listing.image_url ?? listing.image_path) ? (
+                {showImage ? (
                     <img
-                        src={listing.image_url ?? listing.image_path ?? ''}
+                        src={imageSrc}
                         alt=""
                         className="size-full object-cover transition-opacity hover:opacity-95"
+                        onError={() => setImageError(true)}
                     />
                 ) : (
                     <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
