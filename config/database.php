@@ -68,8 +68,9 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? (function () {
                 $sslCa = env('MYSQL_ATTR_SSL_CA');
-                if (! $sslCa && file_exists(base_path('storage/app/ca.pem'))) {
-                    $sslCa = base_path('storage/app/ca.pem');
+                $caPem = base_path('storage/app/ca.pem');
+                if (! $sslCa && file_exists($caPem)) {
+                    $sslCa = $caPem;
                 }
                 if (! $sslCa && PHP_OS_FAMILY !== 'Windows') {
                     $paths = [
@@ -87,7 +88,12 @@ return [
                         }
                     }
                 }
-                $verifyCert = (bool) (env('MYSQL_ATTR_SSL_CA') || file_exists(base_path('storage/app/ca.pem')));
+                $verifyCert = filter_var(env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', 'true'), FILTER_VALIDATE_BOOLEAN);
+                if ($sslCa && ! $verifyCert) {
+                    $verifyCert = false;
+                } elseif ($sslCa || file_exists($caPem)) {
+                    $verifyCert = true;
+                }
                 $opts = [
                     (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => $verifyCert,
                 ];
