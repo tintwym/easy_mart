@@ -154,6 +154,28 @@ php artisan migrate --force
    - In Heroku: **Settings** → **Config Vars** → add:
      - `DATABASE_URL` = paste the Aiven connection URI (or use `DB_URL`; the app auto-detects MySQL vs PostgreSQL from the URL).
 
+   **Migrate fresh on Aiven** (drops all tables and re-runs migrations; use only when you want a clean DB):
+
+   The app blocks destructive commands in production unless you set `ALLOW_DESTRUCTIVE_DB_COMMANDS=1`. Set it only when running migrate:fresh, then unset or set to `0` after.
+
+   - **From your machine** (recommended): Point `.env` at Aiven and allow the command, then run:
+     ```bash
+     # In .env: DATABASE_URL=<Aiven URI>; for MySQL ensure storage/app/ca.pem exists
+     # Allow destructive command (production blocks them otherwise):
+     export ALLOW_DESTRUCTIVE_DB_COMMANDS=1
+     php artisan migrate:fresh --force
+     # Optional: unset so you don't leave it on
+     unset ALLOW_DESTRUCTIVE_DB_COMMANDS
+     ```
+
+   - **From Heroku** (one-off dyno): Set the config var, run the command, then remove the var:
+     ```bash
+     heroku config:set ALLOW_DESTRUCTIVE_DB_COMMANDS=1 -a easymart
+     heroku run "php artisan migrate:fresh --force" -a easymart
+     heroku config:unset ALLOW_DESTRUCTIVE_DB_COMMANDS -a easymart
+     ```
+     For Aiven MySQL the CA cert must be in the repo at `storage/app/ca.pem` (or set `MYSQL_ATTR_SSL_CA`).
+
 3. **Connect GitHub**
    - **Deploy** → Deployment method → **GitHub** → connect repo (e.g. `YOUR_USERNAME/easy_mart`).
    - Enable **Automatic deploys** from `main` if you want.

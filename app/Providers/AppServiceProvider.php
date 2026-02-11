@@ -35,8 +35,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
+        // In production, destructive commands (migrate:fresh, db:wipe, etc.) are blocked unless
+        // ALLOW_DESTRUCTIVE_DB_COMMANDS=1 (set only when intentionally running e.g. migrate:fresh on Aiven).
         DB::prohibitDestructiveCommands(
-            app()->isProduction(),
+            app()->isProduction() && ! config('app.allow_destructive_db_commands', false),
         );
 
         Password::defaults(fn (): ?Password => app()->isProduction()

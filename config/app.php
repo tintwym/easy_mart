@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allow Destructive DB Commands in Production
+    |--------------------------------------------------------------------------
+    |
+    | When true, migrate:fresh, db:wipe, etc. can run in production. Set
+    | ALLOW_DESTRUCTIVE_DB_COMMANDS=1 only when intentionally running
+    | e.g. migrate:fresh (e.g. against Aiven), then unset or set to 0.
+    |
+    */
+
+    'allow_destructive_db_commands' => (bool) env('ALLOW_DESTRUCTIVE_DB_COMMANDS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
