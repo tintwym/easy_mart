@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 class CloudinaryService
 {
@@ -13,7 +15,20 @@ class CloudinaryService
         $key = config('services.cloudinary.api_key');
         $secret = config('services.cloudinary.api_secret');
 
-        return $cloud && $key && $secret;
+        return ! empty(trim((string) $cloud)) && ! empty(trim((string) $key)) && ! empty(trim((string) $secret));
+    }
+
+    /**
+     * Build Cloudinary URL for SDK (cloudinary://api_key:api_secret@cloud_name).
+     * Key and secret are URL-encoded in case they contain special characters.
+     */
+    protected static function cloudinaryUrl(): string
+    {
+        $cloud = trim((string) config('services.cloudinary.cloud_name'));
+        $key = trim((string) config('services.cloudinary.api_key'));
+        $secret = trim((string) config('services.cloudinary.api_secret'));
+
+        return 'cloudinary://'.rawurlencode($key).':'.rawurlencode($secret).'@'.$cloud;
     }
 
     /**
@@ -22,26 +37,40 @@ class CloudinaryService
     public static function upload(UploadedFile $file, string $folder = 'listings'): ?string
     {
         if (! self::configured()) {
+            Log::warning('Cloudinary upload skipped: missing CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, or CLOUDINARY_API_SECRET');
+
             return null;
         }
 
-        $config = [
-            'cloud' => [
-                'cloud_name' => config('services.cloudinary.cloud_name'),
-                'api_key' => config('services.cloudinary.api_key'),
-                'api_secret' => config('services.cloudinary.api_secret'),
-            ],
-        ];
+        $path = $file->getRealPath();
+        if (! $path || ! is_readable($path)) {
+            Log::warning('Cloudinary upload failed: file path not readable');
+
+            return null;
+        }
 
         try {
+            $config = Configuration::fromCloudinaryUrl(self::cloudinaryUrl());
             $api = new UploadApi($config);
-            $result = $api->upload($file->getRealPath(), [
+            $result = $api->upload($path, [
                 'folder' => $folder,
+                'resource_type' => 'image',
             ]);
             $response = $result->getArrayCopy();
+            $url = $response['secure_url'] ?? null;
 
-            return $response['secure_url'] ?? null;
-        } catch (\Throwable) {
+            if (! $url) {
+                Log::warning('Cloudinary upload returned no secure_url', ['response' => $response]);
+            }
+
+            return $url;
+        } catch (\Throwable $e) {
+            Log::error('Cloudinary upload failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
             return null;
         }
     }
@@ -60,15 +89,8 @@ class CloudinaryService
             return false;
         }
 
-        $config = [
-            'cloud' => [
-                'cloud_name' => config('services.cloudinary.cloud_name'),
-                'api_key' => config('services.cloudinary.api_key'),
-                'api_secret' => config('services.cloudinary.api_secret'),
-            ],
-        ];
-
         try {
+            $config = \Cloudinary\Configuration\Configuration::fromCloudinaryUrl(self::cloudinaryUrl());
             $api = new \Cloudinary\Api\Admin\AdminApi($config);
             $api->deleteAssets($publicId);
 

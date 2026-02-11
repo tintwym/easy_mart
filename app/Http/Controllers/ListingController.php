@@ -73,6 +73,9 @@ class ListingController extends Controller
         if ($request->hasFile('image')) {
             if ($listingDisk === 'cloudinary') {
                 $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
+                if (! $imagePath) {
+                    return redirect()->back()->withErrors(['image' => __('Image upload failed. Check Cloudinary credentials in .env.')])->withInput();
+                }
             } else {
                 Storage::disk($listingDisk)->makeDirectory('listings');
                 $imagePath = $request->file('image')->store('listings', $listingDisk);
@@ -120,6 +123,9 @@ class ListingController extends Controller
             }
             if ($listingDisk === 'cloudinary') {
                 $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
+                if (! $imagePath) {
+                    return redirect()->back()->withErrors(['image' => __('Image upload failed. Check Cloudinary credentials in .env.')])->withInput();
+                }
             } else {
                 Storage::disk($listingDisk)->makeDirectory('listings');
                 $imagePath = $request->file('image')->store('listings', $listingDisk);

@@ -11,7 +11,23 @@ use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+
+// Serve listing images from storage when public disk is used (works without storage:link)
+Route::get('/storage/listings/{path}', function (string $path) {
+    $path = 'listings/'.ltrim($path, '/');
+    if (str_contains($path, '..') || config('filesystems.listing_disk') !== 'public') {
+        abort(404);
+    }
+    if (! Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file(Storage::disk('public')->path($path), [
+        'Content-Type' => Storage::disk('public')->mimeType($path) ?: 'application/octet-stream',
+    ]);
+})->where('path', '.*')->name('storage.listings');
 
 // Locale switcher (store in session, redirect back)
 Route::post('/locale', function (\Illuminate\Http\Request $request) {
