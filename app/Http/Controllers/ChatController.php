@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Conversation;
 use App\Models\ConversationRead;
 use App\Models\Listing;
+use App\Models\Message;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +26,7 @@ class ChatController extends Controller
 
     protected function getConversationsForUser(string $userId, int $limit = 30)
     {
-        return Conversation::with(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name,region'])
+        $conversations = Conversation::with(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name,region'])
             ->where(function ($q) use ($userId) {
                 $q->where('buyer_id', $userId)
                     ->orWhereHas('listing', fn ($lq) => $lq->where('user_id', $userId));
@@ -34,6 +36,24 @@ class ChatController extends Controller
             ->latest('updated_at')
             ->limit($limit)
             ->get();
+
+        $conversationIds = $conversations->pluck('id')->all();
+        $unreadCounts = [];
+        if ($conversationIds !== []) {
+            $unreadCounts = Message::query()
+                ->whereIn('conversation_id', $conversationIds)
+                ->whereNull('read_at')
+                ->where('user_id', '!=', $userId)
+                ->selectRaw('conversation_id, count(*) as unread_count')
+                ->groupBy('conversation_id')
+                ->pluck('unread_count', 'conversation_id')
+                ->all();
+        }
+        foreach ($conversations as $conv) {
+            $conv->unread_count = (int) ($unreadCounts[$conv->id] ?? 0);
+        }
+
+        return $conversations;
     }
 
     public function show(Conversation $conversation, Request $request): Response|RedirectResponse
@@ -53,6 +73,7 @@ class ChatController extends Controller
             ['conversation_id' => $conversation->id, 'user_id' => $user->id],
             ['last_read_at' => now()]
         );
+        Cache::forget("chat.unread.{$user->id}");
 
         $conversation->messages()
             ->where('user_id', $otherUserId)
@@ -136,7 +157,85 @@ class ChatController extends Controller
         $conversation->touch();
 
         Cache::forget("chat.sidebar.{$user->id}");
+        $otherUserId = $conversation->buyer_id === $user->id
+            ? $conversation->loadMissing('listing')->listing->user_id
+            : $conversation->buyer_id;
+        Cache::forget("chat.unread.{$otherUserId}");
 
         return back();
+    }
+
+    /**
+     * Get new messages since a timestamp (for polling, Messenger-style).
+     */
+    public function messagesSince(Conversation $conversation, Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $conversation->loadMissing('listing:id,user_id');
+        $participants = [$conversation->buyer_id, $conversation->listing->user_id];
+        if (! in_array($user->id, $participants)) {
+            abort(403);
+        }
+        $after = $request->query('after');
+        if (! $after) {
+            return response()->json(['messages' => []]);
+        }
+        $otherUserId = $conversation->buyer_id === $user->id
+            ? $conversation->listing->user_id
+            : $conversation->buyer_id;
+        $otherReadAt = ConversationRead::where('conversation_id', $conversation->id)->where('user_id', $otherUserId)->value('last_read_at');
+        $otherReadAtParsed = $otherReadAt ? \Carbon\Carbon::parse($otherReadAt) : null;
+        $messages = $conversation->messages()
+            ->with('user:id,name')
+            ->where('created_at', '>', $after)
+            ->orderBy('created_at')
+            ->get();
+        $list = $messages->map(function ($msg) use ($user, $otherReadAtParsed) {
+            $arr = $msg->only(['id', 'body', 'created_at', 'user_id', 'read_at']);
+            $arr['user'] = $msg->user ? $msg->user->only(['id', 'name']) : null;
+            $arr['status'] = $msg->user_id === $user->id
+                ? ($msg->read_at ? 'seen' : ($otherReadAtParsed && $otherReadAtParsed->gte($msg->created_at) ? 'delivered' : 'sent'))
+                : null;
+
+            return $arr;
+        })->values()->all();
+
+        return response()->json(['messages' => $list]);
+    }
+
+    /**
+     * Report that the current user is typing (for typing indicator).
+     */
+    public function typing(Conversation $conversation, Request $request): \Illuminate\Http\Response
+    {
+        $user = $request->user();
+        $conversation->loadMissing('listing:id,user_id');
+        $participants = [$conversation->buyer_id, $conversation->listing->user_id];
+        if (! in_array($user->id, $participants)) {
+            abort(403);
+        }
+        $key = "chat.typing.{$conversation->id}.{$user->id}";
+        Cache::put($key, ['name' => $user->name], now()->addSeconds(5));
+
+        return response()->noContent();
+    }
+
+    /**
+     * Check if the other participant is typing (for polling).
+     */
+    public function typingStatus(Conversation $conversation, Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $conversation->loadMissing('listing:id,user_id');
+        $otherUserId = $conversation->buyer_id === $user->id
+            ? $conversation->listing->user_id
+            : $conversation->buyer_id;
+        $key = "chat.typing.{$conversation->id}.{$otherUserId}";
+        $cached = Cache::get($key);
+
+        return response()->json([
+            'typing' => (bool) $cached,
+            'user_name' => $cached['name'] ?? null,
+        ]);
     }
 }

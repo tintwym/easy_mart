@@ -16,6 +16,7 @@ type Conversation = {
     };
     buyer: { id: string; name: string };
     messages_count: number;
+    unread_count: number;
     messages: Array<{
         id: string;
         body: string;
@@ -125,7 +126,16 @@ export default function ChatIndex({ conversations }: Props) {
                                                             <p className="truncate font-medium">
                                                                 {otherUser.name}
                                                             </p>
-                                                            <span className="shrink-0 text-xs text-muted-foreground">
+                                                            <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+                                                                {(conv.unread_count ??
+                                                                    0) > 0 && (
+                                                                    <span className="flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                                        {conv.unread_count >
+                                                                        99
+                                                                            ? '99+'
+                                                                            : conv.unread_count}
+                                                                    </span>
+                                                                )}
                                                                 {formatChatDate(
                                                                     conv.updated_at,
                                                                 )}
@@ -135,14 +145,16 @@ export default function ChatIndex({ conversations }: Props) {
                                                             {conv.listing.title}
                                                         </p>
                                                         {lastMessage && (
-                                                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                                                            <p
+                                                                className={`mt-0.5 truncate text-xs ${(conv.unread_count ?? 0) > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'}`}
+                                                            >
                                                                 {
                                                                     lastMessage.body
                                                                 }
                                                             </p>
                                                         )}
                                                     </div>
-                                                    <div className="shrink-0 overflow-hidden rounded-lg bg-muted">
+                                                    <div className="relative shrink-0 overflow-hidden rounded-lg bg-muted">
                                                         {(conv.listing
                                                             .image_url ??
                                                         conv.listing

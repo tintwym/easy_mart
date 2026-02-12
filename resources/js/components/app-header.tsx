@@ -165,8 +165,20 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     aria-label="Chat"
                                                     asChild
                                                 >
-                                                    <Link href="/chat">
+                                                    <Link
+                                                        href="/chat"
+                                                        className="relative"
+                                                    >
                                                         <MessageCircle className="!size-5 opacity-80 group-hover:opacity-100" />
+                                                        {(auth.chatUnreadCount ??
+                                                            0) > 0 && (
+                                                            <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                                {(auth.chatUnreadCount ??
+                                                                    0) > 99
+                                                                    ? '99+'
+                                                                    : auth.chatUnreadCount}
+                                                            </span>
+                                                        )}
                                                     </Link>
                                                 </Button>
                                             </TooltipTrigger>
@@ -349,10 +361,17 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             {auth?.user && (
                                 <Link
                                     href="/chat"
-                                    className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                    className="relative flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                 >
                                     <MessageCircle className="h-4 w-4" />
                                     {t('nav.chat')}
+                                    {(auth.chatUnreadCount ?? 0) > 0 && (
+                                        <span className="flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                            {(auth.chatUnreadCount ?? 0) > 99
+                                                ? '99+'
+                                                : auth.chatUnreadCount}
+                                        </span>
+                                    )}
                                 </Link>
                             )}
                             {categories.length > 0 && (

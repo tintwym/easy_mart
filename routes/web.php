@@ -94,7 +94,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('checkout/promote/success', [ListingController::class, 'promoteSuccess'])->name('listings.promote.success');
     Route::get('chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
+    Route::get('chat/{conversation}/messages/since', [ChatController::class, 'messagesSince'])->name('chat.messages.since');
+    Route::get('chat/{conversation}/typing', [ChatController::class, 'typingStatus'])->name('chat.typing.status');
     Route::post('chat/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.messages.store');
+    Route::post('chat/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
     Route::get('cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');

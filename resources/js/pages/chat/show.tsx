@@ -7,7 +7,7 @@ import {
     Search,
     Send,
 } from 'lucide-react';
-import { useRef, useEffect, useState } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -75,6 +75,7 @@ type ConversationItem = {
     };
     buyer: { id: string; name: string };
     messages_count: number;
+    unread_count: number;
     messages: Array<{
         id: string;
         body: string;
@@ -104,10 +105,18 @@ type Props = {
     messages_has_more?: boolean;
 };
 
+function getCsrfToken(): string {
+    return (
+        document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content') ?? ''
+    );
+}
+
 export default function ChatShow({
     conversations,
     conversation,
-    messages,
+    messages: initialMessages,
 }: Props) {
     const { auth } = usePage<{ auth: { user?: { id: string } } }>().props;
     const { formatPrice, currency } = useCurrency();
@@ -119,9 +128,106 @@ export default function ChatShow({
     const [loadingConversationId, setLoadingConversationId] = useState<
         string | null
     >(null);
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [otherTypingName, setOtherTypingName] = useState<string | null>(null);
+    const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         body: '',
     });
+
+    // Keep messages in sync with Inertia props when conversation or initial data changes
+    useEffect(() => {
+        setMessages(initialMessages);
+    }, [conversation.id, initialMessages]);
+
+    const lastMessageCreatedRef = useRef<string | null>(null);
+    useEffect(() => {
+        if (messages.length > 0 && messages[messages.length - 1]?.created_at) {
+            lastMessageCreatedRef.current =
+                messages[messages.length - 1].created_at;
+        }
+    }, [messages]);
+
+    // Poll for new messages (Messenger-style)
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            const after = lastMessageCreatedRef.current;
+            if (!after) return;
+            try {
+                const res = await fetch(
+                    `/chat/${conversation.id}/messages/since?after=${encodeURIComponent(after)}`,
+                    {
+                        credentials: 'include',
+                        headers: { Accept: 'application/json' },
+                    },
+                );
+                if (!res.ok) return;
+                const { messages: newMsgs } = (await res.json()) as {
+                    messages: Message[];
+                };
+                if (newMsgs.length > 0) {
+                    setMessages((prev) => {
+                        const ids = new Set(prev.map((m) => m.id));
+                        const added = newMsgs.filter((m) => !ids.has(m.id));
+                        if (added.length === 0) return prev;
+                        const next = [...prev, ...added];
+                        const last = next[next.length - 1]?.created_at;
+                        if (last) lastMessageCreatedRef.current = last;
+                        return next;
+                    });
+                }
+            } catch {
+                // ignore
+            }
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [conversation.id]);
+
+    // Typing: notify server when user types (throttled)
+    const notifyTyping = useCallback(() => {
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+            fetch(`/chat/${conversation.id}/typing`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+            }).catch(() => {});
+            typingTimeoutRef.current = null;
+        }, 400);
+    }, [conversation.id]);
+
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current)
+                clearTimeout(typingTimeoutRef.current);
+        };
+    }, []);
+
+    // Poll for other user typing
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch(`/chat/${conversation.id}/typing`, {
+                    credentials: 'include',
+                    headers: { Accept: 'application/json' },
+                });
+                if (!res.ok) return;
+                const { typing: isTyping, user_name: name } =
+                    (await res.json()) as {
+                        typing: boolean;
+                        user_name?: string | null;
+                    };
+                setOtherTypingName(isTyping && name ? name : null);
+            } catch {
+                setOtherTypingName(null);
+            }
+        }, 2000);
+        return () => clearInterval(interval);
+    }, [conversation.id]);
 
     // Show seller (listing owner) as the other party name
     const otherUser = conversation.listing.user ?? conversation.buyer;
@@ -261,15 +367,28 @@ export default function ChatShow({
                                                     )}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="truncate font-medium">
-                                                        {other?.name ??
-                                                            'Unknown'}
-                                                    </p>
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <p className="truncate font-medium">
+                                                            {other?.name ??
+                                                                'Unknown'}
+                                                        </p>
+                                                        {(conv.unread_count ??
+                                                            0) > 0 && (
+                                                            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                                {conv.unread_count >
+                                                                99
+                                                                    ? '99+'
+                                                                    : conv.unread_count}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className="truncate text-sm text-muted-foreground">
                                                         {conv.listing.title}
                                                     </p>
                                                     {lastMessage && (
-                                                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                                                        <p
+                                                            className={`mt-0.5 truncate text-xs ${(conv.unread_count ?? 0) > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'}`}
+                                                        >
                                                             {lastMessage.body}
                                                         </p>
                                                     )}
@@ -597,6 +716,11 @@ export default function ChatShow({
                                         <div ref={messagesEndRef} />
                                     </div>
                                 )}
+                                {otherTypingName && (
+                                    <p className="py-1 text-xs text-muted-foreground italic">
+                                        {otherTypingName} is typing…
+                                    </p>
+                                )}
                             </div>
 
                             {/* Input - WhatsApp style */}
@@ -614,9 +738,10 @@ export default function ChatShow({
                                 <input
                                     type="text"
                                     value={data.body}
-                                    onChange={(e) =>
-                                        setData('body', e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        setData('body', e.target.value);
+                                        notifyTyping();
+                                    }}
                                     placeholder="Message"
                                     className="min-w-0 flex-1 rounded-full border border-input bg-muted/50 py-2.5 pr-4 pl-5 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                                 />

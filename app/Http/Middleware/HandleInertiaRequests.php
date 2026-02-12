@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Category;
+use App\Models\Message;
 use App\Services\RegionFromIp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -56,6 +57,18 @@ class HandleInertiaRequests extends Middleware
         $cartItems = $user ? $user->cartItems()->get(['listing_id']) : null;
         $cartCount = $cartItems ? $cartItems->count() : 0;
         $cartListingIds = $cartItems ? $cartItems->pluck('listing_id')->toArray() : [];
+        $chatUnreadCount = $user ? (int) Cache::remember(
+            "chat.unread.{$user->id}",
+            now()->addSeconds(15),
+            fn () => Message::query()
+                ->whereNull('read_at')
+                ->where('user_id', '!=', $user->id)
+                ->whereHas('conversation', function ($q) use ($user) {
+                    $q->where('buyer_id', $user->id)
+                        ->orWhereHas('listing', fn ($lq) => $lq->where('user_id', $user->id));
+                })
+                ->count()
+        ) : 0;
 
         $region = RegionFromIp::detect($request);
         $currencies = config('shop.currencies', []);
@@ -81,6 +94,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
                 'cartCount' => $cartCount,
                 'cartListingIds' => $cartListingIds,
+                'chatUnreadCount' => $chatUnreadCount,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'categories' => Cache::remember('categories.sidebar', now()->addHour(), fn () => Category::orderBy('name')->get(['id', 'name', 'slug'])),
