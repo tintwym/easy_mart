@@ -10,7 +10,7 @@ export default function AppLogo() {
             <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-md">
                 <AppLogoIcon className="size-full" />
             </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
+            <div className="ml-1 grid hidden flex-1 text-left text-sm sm:grid">
                 <span className="mb-0.5 truncate leading-tight font-semibold">
                     {name}
                 </span>

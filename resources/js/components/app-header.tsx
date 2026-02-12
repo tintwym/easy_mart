@@ -104,8 +104,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     paddingBottom: 0,
                 }}
             >
-                {/* Row 1: Logo, search (full), icons, profile */}
-                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-wrap items-center gap-2 px-3 sm:px-4 md:max-w-7xl md:gap-3">
+                {/* Row 1: Logo, search (full), icons, profile — no wrap on mobile so icons stay in one row */}
+                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-nowrap items-center gap-2 px-3 sm:flex-wrap sm:px-4 md:max-w-7xl md:gap-3">
                     <div className="md:hidden">
                         <Button
                             variant="ghost"
@@ -118,26 +118,27 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         </Button>
                     </div>
 
+                    {/* Logo: hidden on mobile (branding is in sidebar); visible from sm up */}
                     <Link
                         href={dashboard()}
                         prefetch
-                        className="flex shrink-0 items-center space-x-2"
+                        className="hidden shrink-0 items-center space-x-2 sm:flex"
                     >
                         <AppLogo />
                     </Link>
 
-                    {/* Search: single bar (input + amber search button), rounded on all sides */}
+                    {/* Search: single bar — min width so placeholder isn't truncated on mobile */}
                     <form
                         onSubmit={searchFormSubmit}
-                        className="flex min-w-0 flex-1 items-center md:min-w-[200px]"
+                        className="flex min-w-[7rem] flex-1 items-center sm:min-w-0 md:min-w-[200px]"
                     >
-                        <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-input bg-background md:min-w-[180px]">
+                        <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-input bg-background sm:min-w-[120px] md:min-w-[180px]">
                             <input
                                 type="search"
                                 name="q"
                                 defaultValue={searchQuery}
                                 placeholder={t('search.placeholder')}
-                                className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+                                className="min-w-[4rem] flex-1 border-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground sm:min-w-0"
                                 aria-label={t('search.aria')}
                             />
                             <button
@@ -354,7 +355,24 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         {t('nav.navigation_menu')}
                     </SheetTitle>
                     <SheetHeader className="flex justify-start text-left">
-                        <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                        <Link
+                            href={dashboard()}
+                            prefetch
+                            onClick={() => setSheetOpen(false)}
+                            className="flex items-center gap-3 rounded-md py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                            <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
+                                <AppLogoIcon className="size-full object-contain p-1.5" />
+                            </div>
+                            <div className="flex min-w-0 flex-col text-left">
+                                <span className="text-lg leading-tight font-bold text-foreground">
+                                    EasyMart
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                    {t('nav.tagline')}
+                                </span>
+                            </div>
+                        </Link>
                     </SheetHeader>
                     <div className="flex h-full flex-1 flex-col p-4">
                         <div className="flex flex-1 flex-col gap-1 text-sm">

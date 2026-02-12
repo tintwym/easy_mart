@@ -9,13 +9,14 @@
     "nav.open_menu": "Open menu",
     "nav.user_menu": "User menu",
     "nav.navigation_menu": "Navigation Menu",
+    "nav.tagline": "Everyday Shopping Online",
     "nav.hello_sign_in": "Hello, sign in",
     "nav.account_and_lists": "Account & Lists",
     "nav.returns": "Returns",
     "nav.and_orders": "& Orders",
     "nav.shop_essentials": "Shop Everyday Essentials",
 
-    "search.placeholder": "Search EasyMart",
+    "search.placeholder": "Search",
     "search.button": "Search",
     "search.aria": "Search",
 
