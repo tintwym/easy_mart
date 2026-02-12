@@ -59,10 +59,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
     const { t, categoryName } = useTranslations();
     const [sidebarLogoutOpen, setSidebarLogoutOpen] = useState(false);
-    const {
-        auth,
-        categories = [],
-    } = page.props;
+    const { auth, categories = [] } = page.props;
     const searchQuery =
         (page.props as { searchQuery?: string }).searchQuery ?? '';
     const currentLocation = (() => {
