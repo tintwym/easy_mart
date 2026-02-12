@@ -31,6 +31,7 @@ class ChatController extends Controller
             ->withCount('messages')
             ->with(['messages' => fn ($q) => $q->latest()->limit(1)])
             ->latest('updated_at')
+            ->limit(30)
             ->get();
     }
 
@@ -58,7 +59,20 @@ class ChatController extends Controller
             ->update(['read_at' => now()]);
 
         $conversation->load(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name,region']);
-        $messagesCollection = $conversation->messages()->with('user:id,name')->oldest()->get();
+
+        $messagesPageSize = 50;
+        $messagesCollection = $conversation->messages()
+            ->with('user:id,name')
+            ->latest()
+            ->limit($messagesPageSize + 1)
+            ->get();
+        $messagesHasMore = $messagesCollection->count() > $messagesPageSize;
+        if ($messagesHasMore) {
+            $messagesCollection = $messagesCollection->take($messagesPageSize);
+        }
+        // Chronological order: oldest first (first sent at top), newest at bottom
+        $messagesCollection = $messagesCollection->sortBy('created_at')->values();
+
         $otherReadAtRaw = ConversationRead::where('conversation_id', $conversation->id)->where('user_id', $otherUserId)->value('last_read_at');
         $otherReadAt = $otherReadAtRaw ? \Carbon\Carbon::parse($otherReadAtRaw) : null;
         $messages = $messagesCollection->map(function ($msg) use ($user, $otherReadAt) {
@@ -77,6 +91,7 @@ class ChatController extends Controller
             'conversations' => $conversations,
             'conversation' => $conversation,
             'messages' => $messages,
+            'messages_has_more' => $messagesHasMore,
         ]);
     }
 

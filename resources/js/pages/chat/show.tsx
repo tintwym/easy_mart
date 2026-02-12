@@ -90,6 +90,7 @@ type Props = {
     conversations: ConversationItem[];
     conversation: Conversation;
     messages: Message[];
+    messages_has_more?: boolean;
 };
 
 export default function ChatShow({
@@ -123,8 +124,14 @@ export default function ChatShow({
         });
     };
 
+    // Ensure chronological order: oldest first (first sent at top), newest at bottom
+    const sortedMessages = [...messages].sort(
+        (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+
     // Group messages by date for timestamps
-    const messageGroups = messages.reduce<
+    const messageGroups = sortedMessages.reduce<
         Array<{ date: string; msgs: Message[] }>
     >((groups, msg) => {
         const date = msg.created_at.split('T')[0];
