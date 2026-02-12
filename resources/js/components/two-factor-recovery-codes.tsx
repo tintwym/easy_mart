@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import RecoveryCodeController from '@/actions/Laravel/Fortify/Http/Controllers/RecoveryCodeController';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { useTranslations } from '@/hooks/use-translations';
 import AlertError from './alert-error';
-import RecoveryCodeController from '@/actions/Laravel/Fortify/Http/Controllers/RecoveryCodeController';
 
 type Props = {
     recoveryCodesList: string[];

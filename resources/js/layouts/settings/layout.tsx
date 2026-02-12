@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
+import AppTwoFactorController from '@/actions/App/Http/Controllers/Settings/TwoFactorAuthenticationController';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -9,7 +10,6 @@ import { cn, toUrl } from '@/lib/utils';
 import { edit } from '@/routes/profile';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
-import AppTwoFactorController from '@/actions/App/Http/Controllers/Settings/TwoFactorAuthenticationController';
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentUrl } = useCurrentUrl();

@@ -9,8 +9,13 @@
     "nav.open_menu": "打开菜单",
     "nav.user_menu": "用户菜单",
     "nav.navigation_menu": "导航菜单",
+    "nav.hello_sign_in": "你好，请登录",
+    "nav.account_and_lists": "账户与列表",
+    "nav.returns": "退货",
+    "nav.and_orders": "与订单",
+    "nav.shop_essentials": "选购日常用品",
 
-    "search.placeholder": "搜索商品",
+    "search.placeholder": "搜索 EasyMart",
     "search.button": "搜索",
     "search.aria": "搜索",
 

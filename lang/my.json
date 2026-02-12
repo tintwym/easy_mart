@@ -9,8 +9,13 @@
     "nav.open_menu": "မီနူး ဖွင့်မည်",
     "nav.user_menu": "အသုံးပြုသူ မီနူး",
     "nav.navigation_menu": "သွားလာရေး မီနူး",
+    "nav.hello_sign_in": "မင်္ဂလာပါ၊ ဝင်ရောက်ပါ",
+    "nav.account_and_lists": "အကောင့်နှင့် စာရင်းများ",
+    "nav.returns": "ပြန်အမ်းမှု",
+    "nav.and_orders": "နှင့် အော်ဒါများ",
+    "nav.shop_essentials": "နေ့စဉ် အခြေခံပစ္စည်းများ ဝယ်ယူပါ",
 
-    "search.placeholder": "ပစ္စည်းရှာမည်",
+    "search.placeholder": "EasyMart ရှာမည်",
     "search.button": "ရှာမည်",
     "search.aria": "ရှာမည်",
 
