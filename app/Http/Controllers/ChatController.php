@@ -7,6 +7,7 @@ use App\Models\ConversationRead;
 use App\Models\Listing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +22,7 @@ class ChatController extends Controller
         ]);
     }
 
-    protected function getConversationsForUser(string $userId)
+    protected function getConversationsForUser(string $userId, int $limit = 30)
     {
         return Conversation::with(['listing:id,title,image_path,price,user_id', 'buyer:id,name', 'listing.user:id,name,region'])
             ->where(function ($q) use ($userId) {
@@ -31,7 +32,7 @@ class ChatController extends Controller
             ->withCount('messages')
             ->with(['messages' => fn ($q) => $q->latest()->limit(1)])
             ->latest('updated_at')
-            ->limit(30)
+            ->limit($limit)
             ->get();
     }
 
@@ -85,7 +86,11 @@ class ChatController extends Controller
             return $arr;
         })->values()->all();
 
-        $conversations = $this->getConversationsForUser($user->id);
+        $conversations = Cache::remember(
+            "chat.sidebar.{$user->id}",
+            now()->addSeconds(10),
+            fn () => $this->getConversationsForUser($user->id, 15)
+        );
 
         return Inertia::render('chat/show', [
             'conversations' => $conversations,
@@ -129,6 +134,8 @@ class ChatController extends Controller
         ]);
 
         $conversation->touch();
+
+        Cache::forget("chat.sidebar.{$user->id}");
 
         return back();
     }

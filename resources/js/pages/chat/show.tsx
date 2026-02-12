@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
     Check,
@@ -7,10 +7,21 @@ import {
     Search,
     Send,
 } from 'lucide-react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCurrency } from '@/hooks/use-currency';
 import AppLayout from '@/layouts/app-layout';
 
@@ -99,15 +110,41 @@ export default function ChatShow({
     messages,
 }: Props) {
     const { auth } = usePage<{ auth: { user?: { id: string } } }>().props;
-    const { formatPrice } = useCurrency();
+    const { formatPrice, currency } = useCurrency();
     const currentUserId = auth?.user?.id;
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [offerModalOpen, setOfferModalOpen] = useState(false);
+    const [offerPrice, setOfferPrice] = useState('');
+    const [offerSubmitting, setOfferSubmitting] = useState(false);
+    const [loadingConversationId, setLoadingConversationId] = useState<
+        string | null
+    >(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         body: '',
     });
 
     // Show seller (listing owner) as the other party name
     const otherUser = conversation.listing.user ?? conversation.buyer;
+
+    const submitOffer = (e: React.FormEvent) => {
+        e.preventDefault();
+        const num = parseFloat(offerPrice.replace(/,/g, ''));
+        if (Number.isNaN(num) || num < 0) return;
+        const offerText = `I'm offering ${formatPrice(num, conversation.listing.user?.region)}`;
+        setOfferSubmitting(true);
+        router.post(
+            `/chat/${conversation.id}/messages`,
+            { body: offerText },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setOfferPrice('');
+                    setOfferModalOpen(false);
+                },
+                onFinish: () => setOfferSubmitting(false),
+            },
+        );
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -174,9 +211,30 @@ export default function ChatShow({
                                         conv.id === conversation.id;
                                     return (
                                         <li key={conv.id}>
-                                            <Link
-                                                href={`/chat/${conv.id}`}
-                                                className={`flex items-center gap-3 rounded-lg p-3 transition-colors ${
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (
+                                                        conv.id ===
+                                                        conversation.id
+                                                    )
+                                                        return;
+                                                    setLoadingConversationId(
+                                                        conv.id,
+                                                    );
+                                                    router.get(
+                                                        `/chat/${conv.id}`,
+                                                        undefined,
+                                                        {
+                                                            preserveState: false,
+                                                            onFinish: () =>
+                                                                setLoadingConversationId(
+                                                                    null,
+                                                                ),
+                                                        },
+                                                    );
+                                                }}
+                                                className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-left transition-colors ${
                                                     isActive
                                                         ? 'bg-muted'
                                                         : 'hover:bg-muted/50'
@@ -236,7 +294,7 @@ export default function ChatShow({
                                                         </div>
                                                     )}
                                                 </div>
-                                            </Link>
+                                            </button>
                                         </li>
                                     );
                                 })}
@@ -250,207 +308,330 @@ export default function ChatShow({
 
                 {/* Right panel - Conversation */}
                 <main className="flex min-w-0 flex-1 flex-col bg-muted/20">
-                    {/* Chat header */}
-                    <div className="flex items-center justify-between border-b border-border/50 bg-background px-4 py-3">
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="md:hidden"
-                                asChild
-                            >
-                                <Link href="/chat" aria-label="Back to chats">
-                                    <ArrowLeft className="size-4" />
+                    {loadingConversationId ? (
+                        <>
+                            <div className="flex items-center gap-3 border-b border-border/50 bg-background px-4 py-3">
+                                <Skeleton className="size-10 shrink-0 rounded-full" />
+                                <div className="flex-1 space-y-1">
+                                    <Skeleton className="h-5 w-32" />
+                                    <Skeleton className="h-3 w-16" />
+                                </div>
+                            </div>
+                            <div className="border-b border-border/50 bg-background px-4 py-3">
+                                <div className="flex gap-3">
+                                    <Skeleton className="size-14 shrink-0 rounded-lg" />
+                                    <div className="min-w-0 flex-1 space-y-2">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-3 w-20" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex-1 space-y-4 p-4">
+                                <Skeleton className="mx-auto h-4 w-48" />
+                                <div className="space-y-2">
+                                    <Skeleton className="ml-0 h-12 w-3/4 rounded-2xl" />
+                                    <Skeleton className="mr-0 ml-auto h-10 w-1/2 rounded-2xl" />
+                                    <Skeleton className="ml-0 h-12 w-2/3 rounded-2xl" />
+                                </div>
+                            </div>
+                            <div className="border-t border-border/50 bg-background p-4">
+                                <Skeleton className="h-12 w-full rounded-lg" />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* Chat header */}
+                            <div className="flex items-center justify-between border-b border-border/50 bg-background px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="md:hidden"
+                                        asChild
+                                    >
+                                        <Link
+                                            href="/chat"
+                                            aria-label="Back to chats"
+                                        >
+                                            <ArrowLeft className="size-4" />
+                                        </Link>
+                                    </Button>
+                                    <Avatar className="size-10 shrink-0">
+                                        <AvatarFallback className="text-sm font-medium">
+                                            {getInitials(otherUser?.name ?? '')}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold">
+                                            {otherUser?.name ?? 'Unknown'}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            Online
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Item summary */}
+                            <div className="border-b border-border/50 bg-background px-4 py-3">
+                                <Link
+                                    href={`/listings/${conversation.listing.id}`}
+                                    className="flex items-center gap-3"
+                                >
+                                    <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+                                        {(conversation.listing.image_url ??
+                                        conversation.listing.image_path) ? (
+                                            <img
+                                                src={
+                                                    conversation.listing
+                                                        .image_url ??
+                                                    conversation.listing
+                                                        .image_path ??
+                                                    ''
+                                                }
+                                                alt=""
+                                                className="size-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
+                                                —
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate font-medium">
+                                            {conversation.listing.title}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {formatPrice(
+                                                conversation.listing.price,
+                                                conversation.listing.user
+                                                    ?.region,
+                                            )}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        size="sm"
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setOfferModalOpen(true);
+                                        }}
+                                    >
+                                        Make offer
+                                    </Button>
                                 </Link>
-                            </Button>
-                            <Avatar className="size-10 shrink-0">
-                                <AvatarFallback className="text-sm font-medium">
-                                    {getInitials(otherUser?.name ?? '')}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-semibold">
-                                    {otherUser?.name ?? 'Unknown'}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    Online
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    Only you can see this
                                 </p>
                             </div>
-                        </div>
-                    </div>
 
-                    {/* Item summary */}
-                    <div className="border-b border-border/50 bg-background px-4 py-3">
-                        <Link
-                            href={`/listings/${conversation.listing.id}`}
-                            className="flex items-center gap-3"
-                        >
-                            <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
-                                {(conversation.listing.image_url ??
-                                conversation.listing.image_path) ? (
-                                    <img
-                                        src={
-                                            conversation.listing.image_url ??
-                                            conversation.listing.image_path ??
-                                            ''
-                                        }
-                                        alt=""
-                                        className="size-full object-cover"
-                                    />
+                            {/* Make offer modal */}
+                            <Dialog
+                                open={offerModalOpen}
+                                onOpenChange={setOfferModalOpen}
+                            >
+                                <DialogContent className="sm:max-w-md">
+                                    <form onSubmit={submitOffer}>
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Make an offer
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                Enter your offer price for{' '}
+                                                {conversation.listing.title}. It
+                                                will be sent as a message in the
+                                                chat.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="offer-price">
+                                                    Your offer (
+                                                    {currency.symbol})
+                                                </Label>
+                                                <Input
+                                                    id="offer-price"
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    placeholder={String(
+                                                        conversation.listing
+                                                            .price,
+                                                    )}
+                                                    value={offerPrice}
+                                                    onChange={(e) =>
+                                                        setOfferPrice(
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    disabled={offerSubmitting}
+                                                />
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    setOfferModalOpen(false)
+                                                }
+                                                disabled={offerSubmitting}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                disabled={
+                                                    offerSubmitting ||
+                                                    !offerPrice.trim()
+                                                }
+                                            >
+                                                {offerSubmitting
+                                                    ? 'Sending…'
+                                                    : 'Send offer'}
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
+
+                            {/* Messages - WhatsApp style */}
+                            <div className="flex-1 overflow-y-auto bg-muted/30 p-4">
+                                {messages.length === 0 ? (
+                                    <p className="py-8 text-center text-sm text-muted-foreground">
+                                        No messages yet. Say hello!
+                                    </p>
                                 ) : (
-                                    <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-                                        —
+                                    <div className="space-y-4">
+                                        {messageGroups.map((group) => (
+                                            <div key={group.date}>
+                                                <p className="mb-3 text-center text-xs text-muted-foreground">
+                                                    {formatChatDate(
+                                                        group.msgs[0]
+                                                            .created_at,
+                                                    )}
+                                                </p>
+                                                <div className="space-y-0.5">
+                                                    {group.msgs.map(
+                                                        (msg, i) => {
+                                                            const isOwn =
+                                                                msg.user_id ===
+                                                                currentUserId;
+                                                            const prev =
+                                                                group.msgs[
+                                                                    i - 1
+                                                                ];
+                                                            const prevSameSender =
+                                                                prev &&
+                                                                prev.user_id ===
+                                                                    msg.user_id;
+                                                            return (
+                                                                <div
+                                                                    key={msg.id}
+                                                                    className={`flex ${
+                                                                        isOwn
+                                                                            ? 'justify-end'
+                                                                            : 'justify-start'
+                                                                    }`}
+                                                                >
+                                                                    <div
+                                                                        className={`max-w-[85%] rounded-2xl px-3 py-1.5 shadow-sm ${
+                                                                            isOwn
+                                                                                ? `rounded-br-md ${
+                                                                                      prevSameSender
+                                                                                          ? 'rounded-tr-md'
+                                                                                          : ''
+                                                                                  } bg-[#005c4b] text-[#e9edef]`
+                                                                                : `rounded-bl-md ${
+                                                                                      prevSameSender
+                                                                                          ? 'rounded-tl-md'
+                                                                                          : ''
+                                                                                  } border border-border bg-background`
+                                                                        }`}
+                                                                    >
+                                                                        <p className="text-sm break-words">
+                                                                            {
+                                                                                msg.body
+                                                                            }
+                                                                        </p>
+                                                                        <div
+                                                                            className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
+                                                                                isOwn
+                                                                                    ? 'text-[#8696a0]'
+                                                                                    : 'text-muted-foreground'
+                                                                            }`}
+                                                                        >
+                                                                            <span>
+                                                                                {formatMessageTime(
+                                                                                    msg.created_at,
+                                                                                )}
+                                                                            </span>
+                                                                            {isOwn &&
+                                                                                msg.status && (
+                                                                                    <span
+                                                                                        className={
+                                                                                            msg.status ===
+                                                                                            'seen'
+                                                                                                ? 'text-[#53bdeb]'
+                                                                                                : ''
+                                                                                        }
+                                                                                    >
+                                                                                        {msg.status ===
+                                                                                        'sent' ? (
+                                                                                            <Check className="size-3.5" />
+                                                                                        ) : (
+                                                                                            <CheckCheck className="size-3.5" />
+                                                                                        )}
+                                                                                    </span>
+                                                                                )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div ref={messagesEndRef} />
                                     </div>
                                 )}
                             </div>
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate font-medium">
-                                    {conversation.listing.title}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                    {formatPrice(
-                                        conversation.listing.price,
-                                        conversation.listing.user?.region,
-                                    )}
-                                </p>
-                            </div>
-                            <Button size="sm" asChild>
-                                <Link
-                                    href={`/listings/${conversation.listing.id}`}
+
+                            {/* Input - WhatsApp style */}
+                            <form
+                                onSubmit={submitMessage}
+                                className="flex items-end gap-2 border-t border-border/50 bg-background px-4 py-3"
+                            >
+                                <button
+                                    type="button"
+                                    className="shrink-0 rounded-full p-2.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    aria-label="Attach"
                                 >
-                                    Make offer
-                                </Link>
-                            </Button>
-                        </Link>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Only you can see this
-                        </p>
-                    </div>
-
-                    {/* Messages - WhatsApp style */}
-                    <div className="flex-1 overflow-y-auto bg-muted/30 p-4">
-                        {messages.length === 0 ? (
-                            <p className="py-8 text-center text-sm text-muted-foreground">
-                                No messages yet. Say hello!
-                            </p>
-                        ) : (
-                            <div className="space-y-4">
-                                {messageGroups.map((group) => (
-                                    <div key={group.date}>
-                                        <p className="mb-3 text-center text-xs text-muted-foreground">
-                                            {formatChatDate(
-                                                group.msgs[0].created_at,
-                                            )}
-                                        </p>
-                                        <div className="space-y-0.5">
-                                            {group.msgs.map((msg, i) => {
-                                                const isOwn =
-                                                    msg.user_id ===
-                                                    currentUserId;
-                                                const prev = group.msgs[i - 1];
-                                                const prevSameSender =
-                                                    prev &&
-                                                    prev.user_id ===
-                                                        msg.user_id;
-                                                return (
-                                                    <div
-                                                        key={msg.id}
-                                                        className={`flex ${
-                                                            isOwn
-                                                                ? 'justify-end'
-                                                                : 'justify-start'
-                                                        }`}
-                                                    >
-                                                        <div
-                                                            className={`max-w-[85%] rounded-2xl px-3 py-1.5 shadow-sm ${
-                                                                isOwn
-                                                                    ? `rounded-br-md ${
-                                                                          prevSameSender
-                                                                              ? 'rounded-tr-md'
-                                                                              : ''
-                                                                      } bg-[#005c4b] text-[#e9edef]`
-                                                                    : `rounded-bl-md ${
-                                                                          prevSameSender
-                                                                              ? 'rounded-tl-md'
-                                                                              : ''
-                                                                      } border border-border bg-background`
-                                                            }`}
-                                                        >
-                                                            <p className="text-sm break-words">
-                                                                {msg.body}
-                                                            </p>
-                                                            <div
-                                                                className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
-                                                                    isOwn
-                                                                        ? 'text-[#8696a0]'
-                                                                        : 'text-muted-foreground'
-                                                                }`}
-                                                            >
-                                                                <span>
-                                                                    {formatMessageTime(
-                                                                        msg.created_at,
-                                                                    )}
-                                                                </span>
-                                                                {isOwn &&
-                                                                    msg.status && (
-                                                                        <span
-                                                                            className={
-                                                                                msg.status ===
-                                                                                'seen'
-                                                                                    ? 'text-[#53bdeb]'
-                                                                                    : ''
-                                                                            }
-                                                                        >
-                                                                            {msg.status ===
-                                                                            'sent' ? (
-                                                                                <Check className="size-3.5" />
-                                                                            ) : (
-                                                                                <CheckCheck className="size-3.5" />
-                                                                            )}
-                                                                        </span>
-                                                                    )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ))}
-                                <div ref={messagesEndRef} />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Input - WhatsApp style */}
-                    <form
-                        onSubmit={submitMessage}
-                        className="flex items-end gap-2 border-t border-border/50 bg-background px-4 py-3"
-                    >
-                        <button
-                            type="button"
-                            className="shrink-0 rounded-full p-2.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-                            aria-label="Attach"
-                        >
-                            <ImagePlus className="size-6" />
-                        </button>
-                        <input
-                            type="text"
-                            value={data.body}
-                            onChange={(e) => setData('body', e.target.value)}
-                            placeholder="Message"
-                            className="min-w-0 flex-1 rounded-full border border-input bg-muted/50 py-2.5 pr-4 pl-5 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                        />
-                        <Button
-                            type="submit"
-                            size="icon"
-                            className="h-10 w-10 shrink-0 rounded-full bg-[#005c4b] hover:bg-[#004d40]"
-                            disabled={processing || !data.body.trim()}
-                        >
-                            <Send className="size-5" />
-                        </Button>
-                        <InputError message={errors.body} />
-                    </form>
+                                    <ImagePlus className="size-6" />
+                                </button>
+                                <input
+                                    type="text"
+                                    value={data.body}
+                                    onChange={(e) =>
+                                        setData('body', e.target.value)
+                                    }
+                                    placeholder="Message"
+                                    className="min-w-0 flex-1 rounded-full border border-input bg-muted/50 py-2.5 pr-4 pl-5 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                                />
+                                <Button
+                                    type="submit"
+                                    size="icon"
+                                    className="h-10 w-10 shrink-0 rounded-full bg-[#005c4b] hover:bg-[#004d40]"
+                                    disabled={processing || !data.body.trim()}
+                                >
+                                    <Send className="size-5" />
+                                </Button>
+                                <InputError message={errors.body} />
+                            </form>
+                        </>
+                    )}
                 </main>
             </div>
         </AppLayout>
