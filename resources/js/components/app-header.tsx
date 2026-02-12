@@ -126,23 +126,23 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <AppLogo />
                     </Link>
 
-                    {/* Search: single bar (input + amber search button) */}
+                    {/* Search: single bar (input + amber search button), rounded on all sides */}
                     <form
                         onSubmit={searchFormSubmit}
-                        className="flex min-w-0 flex-1 items-center gap-2 md:min-w-[200px]"
+                        className="flex min-w-0 flex-1 items-center md:min-w-[200px]"
                     >
-                        <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-r-md border border-input sm:min-w-[180px]">
+                        <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-input bg-background md:min-w-[180px]">
                             <input
                                 type="search"
                                 name="q"
                                 defaultValue={searchQuery}
                                 placeholder={t('search.placeholder')}
-                                className="min-w-0 flex-1 border-0 bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+                                className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
                                 aria-label={t('search.aria')}
                             />
                             <button
                                 type="submit"
-                                className="flex h-9 w-10 shrink-0 items-center justify-center bg-amber-400 text-gray-800 hover:bg-amber-500 md:w-12"
+                                className="flex h-full min-h-[44px] w-12 shrink-0 items-center justify-center bg-amber-400 text-gray-900 hover:bg-amber-500 md:min-h-0 md:w-12"
                                 aria-label={t('search.button')}
                             >
                                 <Search className="size-5" />
@@ -317,8 +317,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
                 </div>
 
-                {/* Row 2: Category bar within container (hamburger + All, category links) */}
-                <div className="border-t border-sidebar-border/60 bg-muted/50">
+                {/* Row 2: Category bar — hidden on mobile (categories are in sidebar) */}
+                <div className="hidden border-t border-sidebar-border/60 bg-muted/50 md:block">
                     <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-3 py-1.5 text-sm sm:px-4">
                         <button
                             type="button"
