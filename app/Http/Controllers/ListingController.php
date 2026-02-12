@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Stripe\Checkout\Session as StripeSession;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Stripe;
 
 class ListingController extends Controller
 {
@@ -167,9 +170,92 @@ class ListingController extends Controller
         return redirect()->route('dashboard')->with('status', 'Listing deleted.');
     }
 
+    /**
+     * Start promote checkout: create Stripe session for trend price ($10), redirect to Stripe.
+     * After payment, user is sent to promoteSuccess which sets trending_until.
+     */
     public function promote(Request $request, Listing $listing): RedirectResponse
     {
         $this->authorize('update', $listing);
+
+        $days = config('shop.trend_duration_days', 7);
+        $amount = (float) config('shop.trend_price', 10);
+        $secret = config('services.stripe.secret');
+
+        if (! $secret) {
+            return redirect()
+                ->route('listings.show', $listing)
+                ->with('error', 'Payment is not configured. Please try again later.');
+        }
+
+        try {
+            Stripe::setApiKey($secret);
+            $session = StripeSession::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => 'Promote listing: '.$listing->title,
+                            'description' => "Make this listing trend for {$days} days (appears higher in search).",
+                        ],
+                        'unit_amount' => (int) round($amount * 100),
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => route('listings.promote.success').'?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('listings.show', $listing),
+                'metadata' => [
+                    'listing_id' => $listing->id,
+                    'type' => 'promote',
+                ],
+            ]);
+        } catch (ApiErrorException $e) {
+            return redirect()
+                ->route('listings.show', $listing)
+                ->with('error', 'Could not start checkout. Please try again.');
+        }
+
+        return redirect()->away($session->url);
+    }
+
+    /**
+     * After successful Stripe payment for promote: set listing trending_until and redirect.
+     */
+    public function promoteSuccess(Request $request): RedirectResponse
+    {
+        $sessionId = $request->query('session_id');
+        if (! $sessionId) {
+            return redirect()->route('dashboard')->with('error', 'Invalid checkout session.');
+        }
+
+        $secret = config('services.stripe.secret');
+        if (! $secret) {
+            return redirect()->route('dashboard')->with('error', 'Payment configuration error.');
+        }
+
+        Stripe::setApiKey($secret);
+        try {
+            $session = StripeSession::retrieve($sessionId);
+        } catch (ApiErrorException) {
+            return redirect()->route('dashboard')->with('error', 'Invalid checkout session.');
+        }
+
+        if (($session->payment_status ?? '') !== 'paid') {
+            return redirect()->route('dashboard')->with('error', 'Payment was not completed.');
+        }
+
+        $listingId = $session->metadata->listing_id ?? null;
+        $type = $session->metadata->type ?? null;
+        if (! $listingId || $type !== 'promote') {
+            return redirect()->route('dashboard')->with('error', 'Invalid session.');
+        }
+
+        $listing = Listing::find($listingId);
+        if (! $listing || $listing->user_id !== $request->user()->id) {
+            return redirect()->route('dashboard')->with('error', 'Listing not found or access denied.');
+        }
 
         $days = config('shop.trend_duration_days', 7);
         $listing->update([

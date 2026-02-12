@@ -543,56 +543,57 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             aria-label={t('search.aria')}
                         />
                     </div>
-                    {sortedLocations.length > 0 ? (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button
-                                    type="button"
-                                    className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    <div className="hidden shrink-0 sm:block">
+                        {sortedLocations.length > 0 ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                    >
+                                        <MapPin className="size-4 shrink-0" />
+                                        <span className="min-w-0 flex-1 truncate">
+                                            {currentLocation ??
+                                                t('location.all_of', {
+                                                    region: regionLabel,
+                                                })}
+                                        </span>
+                                        <ChevronDown className="size-4 shrink-0" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-[220px] p-1"
                                 >
-                                    <MapPin className="size-4 shrink-0" />
-                                    <span className="min-w-0 flex-1 truncate">
-                                        {currentLocation ??
-                                            t('location.all_of', {
-                                                region: regionLabel,
-                                            })}
-                                    </span>
-                                    <ChevronDown className="size-4 shrink-0" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                className="w-[220px] p-1"
-                            >
-                                <Link
-                                    href={dashboard().url}
-                                    className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                                >
-                                    {t('location.all_of', {
-                                        region: regionLabel,
-                                    })}
-                                </Link>
-                                {sortedLocations.map((loc) => {
-                                    const km = getDistanceKm(loc);
-                                    return (
-                                        <Link
-                                            key={loc.name}
-                                            href={
-                                                dashboard({
-                                                    query: {
-                                                        location: loc.name,
-                                                    },
-                                                }).url
-                                            }
-                                            className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                                        >
-                                            {loc.name}
-                                            {km != null && (
-                                                <span className="ml-1.5 text-muted-foreground">
-                                                    ·{' '}
-                                                    {km < 1
-                                                        ? `${Math.round(km * 1000)} m`
-                                                        : `${km.toFixed(1)} km`}
+                                    <Link
+                                        href={dashboard().url}
+                                        className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                    >
+                                        {t('location.all_of', {
+                                            region: regionLabel,
+                                        })}
+                                    </Link>
+                                    {sortedLocations.map((loc) => {
+                                        const km = getDistanceKm(loc);
+                                        return (
+                                            <Link
+                                                key={loc.name}
+                                                href={
+                                                    dashboard({
+                                                        query: {
+                                                            location: loc.name,
+                                                        },
+                                                    }).url
+                                                }
+                                                className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                            >
+                                                {loc.name}
+                                                {km != null && (
+                                                    <span className="ml-1.5 text-muted-foreground">
+                                                        ·{' '}
+                                                        {km < 1
+                                                            ? `${Math.round(km * 1000)} m`
+                                                            : `${km.toFixed(1)} km`}
                                                 </span>
                                             )}
                                         </Link>
@@ -610,6 +611,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </span>
                         </div>
                     )}
+                    </div>
                     <Button
                         type="submit"
                         size="sm"

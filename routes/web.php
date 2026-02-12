@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('upgrades', [UpgradeController::class, 'index'])->name('upgrades.index');
     Route::post('upgrades/slots', [UpgradeController::class, 'purchaseSlots'])->name('upgrades.slots');
     Route::post('listings/{listing}/promote', [ListingController::class, 'promote'])->name('listings.promote');
+    Route::get('checkout/promote/success', [ListingController::class, 'promoteSuccess'])->name('listings.promote.success');
     Route::get('chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('chat/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.messages.store');

@@ -111,7 +111,11 @@ export default function ShowListing({
     reviewCount,
     trendPriceLabel,
 }: Props) {
-    const { auth } = usePage<SharedData>().props;
+    const pageProps = usePage<SharedData>().props as SharedData & {
+        flash?: { status?: string; error?: string };
+    };
+    const { auth } = pageProps;
+    const flash = pageProps.flash;
     const { formatPrice } = useCurrency();
     const { t, categoryName } = useTranslations();
     const userReview = listing.reviews.find(
@@ -235,6 +239,17 @@ export default function ShowListing({
                         Back
                     </Link>
                 </Button>
+
+                {flash?.status && (
+                    <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950/30 dark:text-green-200">
+                        {flash.status}
+                    </div>
+                )}
+                {flash?.error && (
+                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-200">
+                        {flash.error}
+                    </div>
+                )}
 
                 {/* Large product image at top (Carousell-style) */}
                 <div className="mb-8 aspect-square w-full overflow-hidden rounded-xl bg-muted sm:aspect-[4/3]">
