@@ -1,7 +1,9 @@
 /// <reference types="vite/client" />
 
 declare module 'virtual:pwa-register' {
-    export function registerSW(options?: { immediate?: boolean }): Promise<void>;
+    export function registerSW(options?: {
+        immediate?: boolean;
+    }): Promise<void>;
 }
 
 // Wayfinder-generated action modules (resolved at build time by Vite)
