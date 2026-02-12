@@ -17,6 +17,7 @@ export type Auth = {
     user: User | null;
     cartCount?: number;
     cartListingIds?: string[];
+    chatUnreadCount?: number;
 };
 
 export type TwoFactorSetupData = {

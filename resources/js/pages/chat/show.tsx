@@ -7,7 +7,7 @@ import {
     Search,
     Send,
 } from 'lucide-react';
-import { useCallback, useRef, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -113,34 +113,33 @@ function getCsrfToken(): string {
     );
 }
 
-export default function ChatShow({
-    conversations,
-    conversation,
-    messages: initialMessages,
-}: Props) {
-    const { auth } = usePage<{ auth: { user?: { id: string } } }>().props;
-    const { formatPrice, currency } = useCurrency();
-    const currentUserId = auth?.user?.id;
+/** Message list with polling; keyed by conversation.id so state resets when switching chats. */
+function ChatMessageList({
+    conversationId,
+    initialMessages,
+    currentUserId,
+    otherTypingName,
+}: {
+    conversationId: string;
+    initialMessages: Message[];
+    currentUserId: string | undefined;
+    otherTypingName: string | null;
+}) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [offerModalOpen, setOfferModalOpen] = useState(false);
-    const [offerPrice, setOfferPrice] = useState('');
-    const [offerSubmitting, setOfferSubmitting] = useState(false);
-    const [loadingConversationId, setLoadingConversationId] = useState<
-        string | null
-    >(null);
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
-    const [otherTypingName, setOtherTypingName] = useState<string | null>(null);
-    const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const { data, setData, post, processing, errors, reset } = useForm({
-        body: '',
-    });
-
-    // Keep messages in sync with Inertia props when conversation or initial data changes
-    useEffect(() => {
-        setMessages(initialMessages);
-    }, [conversation.id, initialMessages]);
-
+    const [appendedMessages, setAppendedMessages] = useState<Message[]>([]);
     const lastMessageCreatedRef = useRef<string | null>(null);
+
+    const messages = useMemo(() => {
+        const byId = new Map<string, Message>();
+        for (const m of initialMessages) byId.set(m.id, m);
+        for (const m of appendedMessages) byId.set(m.id, m);
+        return Array.from(byId.values()).sort(
+            (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime(),
+        );
+    }, [initialMessages, appendedMessages]);
+
     useEffect(() => {
         if (messages.length > 0 && messages[messages.length - 1]?.created_at) {
             lastMessageCreatedRef.current =
@@ -148,14 +147,13 @@ export default function ChatShow({
         }
     }, [messages]);
 
-    // Poll for new messages (Messenger-style)
     useEffect(() => {
         const interval = setInterval(async () => {
             const after = lastMessageCreatedRef.current;
             if (!after) return;
             try {
                 const res = await fetch(
-                    `/chat/${conversation.id}/messages/since?after=${encodeURIComponent(after)}`,
+                    `/chat/${conversationId}/messages/since?after=${encodeURIComponent(after)}`,
                     {
                         credentials: 'include',
                         headers: { Accept: 'application/json' },
@@ -166,14 +164,17 @@ export default function ChatShow({
                     messages: Message[];
                 };
                 if (newMsgs.length > 0) {
-                    setMessages((prev) => {
-                        const ids = new Set(prev.map((m) => m.id));
+                    setAppendedMessages((prev) => {
+                        const ids = new Set(
+                            initialMessages
+                                .map((m) => m.id)
+                                .concat(prev.map((m) => m.id)),
+                        );
                         const added = newMsgs.filter((m) => !ids.has(m.id));
                         if (added.length === 0) return prev;
-                        const next = [...prev, ...added];
-                        const last = next[next.length - 1]?.created_at;
+                        const last = added[added.length - 1]?.created_at;
                         if (last) lastMessageCreatedRef.current = last;
-                        return next;
+                        return [...prev, ...added];
                     });
                 }
             } catch {
@@ -181,7 +182,134 @@ export default function ChatShow({
             }
         }, 3000);
         return () => clearInterval(interval);
-    }, [conversation.id]);
+    }, [conversationId, initialMessages]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const sortedMessages = messages;
+    const messageGroups = sortedMessages.reduce<
+        Array<{ date: string; msgs: Message[] }>
+    >((groups: Array<{ date: string; msgs: Message[] }>, msg: Message) => {
+        const date = msg.created_at.split('T')[0];
+        const last = groups[groups.length - 1];
+        if (last && last.date === date) {
+            last.msgs.push(msg);
+        } else {
+            groups.push({ date, msgs: [msg] });
+        }
+        return groups;
+    }, []);
+
+    return (
+        <div className="flex-1 overflow-y-auto bg-muted/30 p-4">
+            {messages.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                    No messages yet. Say hello!
+                </p>
+            ) : (
+                <div className="space-y-4">
+                    {messageGroups.map(
+                        (group: { date: string; msgs: Message[] }) => (
+                            <div key={group.date}>
+                                <p className="mb-3 text-center text-xs text-muted-foreground">
+                                    {formatChatDate(group.msgs[0].created_at)}
+                                </p>
+                                <div className="space-y-0.5">
+                                    {group.msgs.map(
+                                        (msg: Message, i: number) => {
+                                            const isOwn =
+                                                msg.user_id === currentUserId;
+                                            const prev = group.msgs[i - 1];
+                                            const prevSameSender =
+                                                prev &&
+                                                prev.user_id === msg.user_id;
+                                            return (
+                                                <div
+                                                    key={msg.id}
+                                                    className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                                                >
+                                                    <div
+                                                        className={`max-w-[85%] rounded-2xl px-3 py-1.5 shadow-sm ${
+                                                            isOwn
+                                                                ? `rounded-br-md ${prevSameSender ? 'rounded-tr-md' : ''} bg-[#005c4b] text-[#e9edef]`
+                                                                : `rounded-bl-md ${prevSameSender ? 'rounded-tl-md' : ''} border border-border bg-background`
+                                                        }`}
+                                                    >
+                                                        <p className="text-sm break-words">
+                                                            {msg.body}
+                                                        </p>
+                                                        <div
+                                                            className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${isOwn ? 'text-[#8696a0]' : 'text-muted-foreground'}`}
+                                                        >
+                                                            <span>
+                                                                {formatMessageTime(
+                                                                    msg.created_at,
+                                                                )}
+                                                            </span>
+                                                            {isOwn &&
+                                                                msg.status && (
+                                                                    <span
+                                                                        className={
+                                                                            msg.status ===
+                                                                            'seen'
+                                                                                ? 'text-[#53bdeb]'
+                                                                                : ''
+                                                                        }
+                                                                    >
+                                                                        {msg.status ===
+                                                                        'sent' ? (
+                                                                            <Check className="size-3.5" />
+                                                                        ) : (
+                                                                            <CheckCheck className="size-3.5" />
+                                                                        )}
+                                                                    </span>
+                                                                )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        },
+                                    )}
+                                </div>
+                            </div>
+                        ),
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+            )}
+            {otherTypingName && (
+                <p className="py-1 text-xs text-muted-foreground italic">
+                    {otherTypingName} is typing…
+                </p>
+            )}
+        </div>
+    );
+}
+
+export default function ChatShow({
+    conversations,
+    conversation,
+    messages: initialMessages,
+}: Props) {
+    const { auth } = usePage<{ auth: { user?: { id: string } } }>().props;
+    const { formatPrice, currency } = useCurrency();
+    const currentUserId = auth?.user?.id;
+    const [offerModalOpen, setOfferModalOpen] = useState(false);
+    const [offerPrice, setOfferPrice] = useState('');
+    const [offerSubmitting, setOfferSubmitting] = useState(false);
+    const [loadingConversationId, setLoadingConversationId] = useState<
+        string | null
+    >(null);
+    const [otherTypingName, setOtherTypingName] = useState<string | null>(null);
+    const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const { data, setData, post, processing, errors, reset } = useForm({
+        body: '',
+    });
 
     // Typing: notify server when user types (throttled)
     const notifyTyping = useCallback(() => {
@@ -252,40 +380,12 @@ export default function ChatShow({
         );
     };
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
     const submitMessage = (e: React.FormEvent) => {
         e.preventDefault();
         post(`/chat/${conversation.id}/messages`, {
             onSuccess: () => reset('body'),
         });
     };
-
-    // Ensure chronological order: oldest first (first sent at top), newest at bottom
-    const sortedMessages = [...messages].sort(
-        (a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-    );
-
-    // Group messages by date for timestamps
-    const messageGroups = sortedMessages.reduce<
-        Array<{ date: string; msgs: Message[] }>
-    >((groups, msg) => {
-        const date = msg.created_at.split('T')[0];
-        const last = groups[groups.length - 1];
-        if (last && last.date === date) {
-            last.msgs.push(msg);
-        } else {
-            groups.push({ date, msgs: [msg] });
-        }
-        return groups;
-    }, []);
 
     return (
         <AppLayout breadcrumbs={[]}>
@@ -615,113 +715,14 @@ export default function ChatShow({
                                 </DialogContent>
                             </Dialog>
 
-                            {/* Messages - WhatsApp style */}
-                            <div className="flex-1 overflow-y-auto bg-muted/30 p-4">
-                                {messages.length === 0 ? (
-                                    <p className="py-8 text-center text-sm text-muted-foreground">
-                                        No messages yet. Say hello!
-                                    </p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {messageGroups.map((group) => (
-                                            <div key={group.date}>
-                                                <p className="mb-3 text-center text-xs text-muted-foreground">
-                                                    {formatChatDate(
-                                                        group.msgs[0]
-                                                            .created_at,
-                                                    )}
-                                                </p>
-                                                <div className="space-y-0.5">
-                                                    {group.msgs.map(
-                                                        (msg, i) => {
-                                                            const isOwn =
-                                                                msg.user_id ===
-                                                                currentUserId;
-                                                            const prev =
-                                                                group.msgs[
-                                                                    i - 1
-                                                                ];
-                                                            const prevSameSender =
-                                                                prev &&
-                                                                prev.user_id ===
-                                                                    msg.user_id;
-                                                            return (
-                                                                <div
-                                                                    key={msg.id}
-                                                                    className={`flex ${
-                                                                        isOwn
-                                                                            ? 'justify-end'
-                                                                            : 'justify-start'
-                                                                    }`}
-                                                                >
-                                                                    <div
-                                                                        className={`max-w-[85%] rounded-2xl px-3 py-1.5 shadow-sm ${
-                                                                            isOwn
-                                                                                ? `rounded-br-md ${
-                                                                                      prevSameSender
-                                                                                          ? 'rounded-tr-md'
-                                                                                          : ''
-                                                                                  } bg-[#005c4b] text-[#e9edef]`
-                                                                                : `rounded-bl-md ${
-                                                                                      prevSameSender
-                                                                                          ? 'rounded-tl-md'
-                                                                                          : ''
-                                                                                  } border border-border bg-background`
-                                                                        }`}
-                                                                    >
-                                                                        <p className="text-sm break-words">
-                                                                            {
-                                                                                msg.body
-                                                                            }
-                                                                        </p>
-                                                                        <div
-                                                                            className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
-                                                                                isOwn
-                                                                                    ? 'text-[#8696a0]'
-                                                                                    : 'text-muted-foreground'
-                                                                            }`}
-                                                                        >
-                                                                            <span>
-                                                                                {formatMessageTime(
-                                                                                    msg.created_at,
-                                                                                )}
-                                                                            </span>
-                                                                            {isOwn &&
-                                                                                msg.status && (
-                                                                                    <span
-                                                                                        className={
-                                                                                            msg.status ===
-                                                                                            'seen'
-                                                                                                ? 'text-[#53bdeb]'
-                                                                                                : ''
-                                                                                        }
-                                                                                    >
-                                                                                        {msg.status ===
-                                                                                        'sent' ? (
-                                                                                            <Check className="size-3.5" />
-                                                                                        ) : (
-                                                                                            <CheckCheck className="size-3.5" />
-                                                                                        )}
-                                                                                    </span>
-                                                                                )}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        },
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                        <div ref={messagesEndRef} />
-                                    </div>
-                                )}
-                                {otherTypingName && (
-                                    <p className="py-1 text-xs text-muted-foreground italic">
-                                        {otherTypingName} is typing…
-                                    </p>
-                                )}
-                            </div>
+                            {/* Messages (keyed by conversation so polling state resets when switching) */}
+                            <ChatMessageList
+                                key={conversation.id}
+                                conversationId={conversation.id}
+                                initialMessages={initialMessages}
+                                currentUserId={currentUserId}
+                                otherTypingName={otherTypingName}
+                            />
 
                             {/* Input - WhatsApp style */}
                             <form
