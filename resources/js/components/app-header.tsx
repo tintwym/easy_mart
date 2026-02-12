@@ -594,23 +594,23 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                         {km < 1
                                                             ? `${Math.round(km * 1000)} m`
                                                             : `${km.toFixed(1)} km`}
-                                                </span>
-                                            )}
-                                        </Link>
-                                    );
-                                })}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    ) : (
-                        <div className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
-                            <MapPin className="size-4 shrink-0" />
-                            <span className="min-w-0 truncate">
-                                {t('location.all_of', {
-                                    region: regionLabel,
-                                })}
-                            </span>
-                        </div>
-                    )}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        );
+                                    })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <div className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
+                                <MapPin className="size-4 shrink-0" />
+                                <span className="min-w-0 truncate">
+                                    {t('location.all_of', {
+                                        region: regionLabel,
+                                    })}
+                                </span>
+                            </div>
+                        )}
                     </div>
                     <Button
                         type="submit"
