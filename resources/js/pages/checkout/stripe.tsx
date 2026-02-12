@@ -70,13 +70,15 @@ function CheckoutForm({ order }: { order: Order }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <PaymentElement
-                options={{
-                    layout: 'accordion',
-                    defaultCollapsed: false,
-                    radios: true,
-                    spacedAccordionItems: true,
-                    wallets: { link: 'never' },
-                }}
+                options={
+                    {
+                        layout: 'accordion',
+                        defaultCollapsed: false,
+                        radios: true,
+                        spacedAccordionItems: true,
+                        wallets: { link: 'never' },
+                    } as React.ComponentProps<typeof PaymentElement>['options']
+                }
             />
             {error && (
                 <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -139,6 +141,7 @@ export default function CheckoutStripe({
         ? loadStripe(stripePublishableKey)
         : null;
     const { resolvedAppearance } = useAppearance();
+    const { formatPrice } = useCurrency();
 
     if (!stripePromise) {
         return (

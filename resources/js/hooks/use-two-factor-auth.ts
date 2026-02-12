@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
+import type { TwoFactorSecretKey, TwoFactorSetupData } from '@/types';
 import RecoveryCodeController from '@/actions/Laravel/Fortify/Http/Controllers/RecoveryCodeController';
 import TwoFactorQrCodeController from '@/actions/Laravel/Fortify/Http/Controllers/TwoFactorQrCodeController';
 import TwoFactorSecretKeyController from '@/actions/Laravel/Fortify/Http/Controllers/TwoFactorSecretKeyController';
-import type { TwoFactorSecretKey, TwoFactorSetupData } from '@/types';
 
 export type UseTwoFactorAuthReturn = {
     qrCodeSvg: string | null;

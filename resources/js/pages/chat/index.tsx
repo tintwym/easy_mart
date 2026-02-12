@@ -9,6 +9,7 @@ type Conversation = {
         id: string;
         title: string;
         image_path: string | null;
+        image_url?: string | null;
         price: number;
         user_id: string;
         user: { id: string; name: string };

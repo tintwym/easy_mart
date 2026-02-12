@@ -574,7 +574,7 @@ export default function ShowListing({
                                         <Button
                                             variant="outline"
                                             className="w-full"
-                                            disabled={isTrending}
+                                            disabled={!!isTrending}
                                             onClick={() =>
                                                 !isTrending &&
                                                 router.post(
