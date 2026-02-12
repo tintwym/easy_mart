@@ -104,8 +104,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     paddingBottom: 0,
                 }}
             >
-                {/* Row 1: Logo, search (full), icons, profile — no wrap on mobile so icons stay in one row */}
-                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-nowrap items-center gap-2 px-3 sm:flex-wrap sm:px-4 md:max-w-7xl md:gap-3">
+                {/* Row 1: Logo, search, icons, profile — mobile: no wrap; tablet/desktop: wrap, max-width */}
+                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-nowrap items-center gap-2 px-3 sm:flex-wrap sm:px-4 md:max-w-7xl md:gap-3 lg:px-6">
                     <div className="md:hidden">
                         <Button
                             variant="ghost"
@@ -127,10 +127,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <AppLogo />
                     </Link>
 
-                    {/* Search: single bar — min width so placeholder isn't truncated on mobile */}
+                    {/* Search: responsive min/max width for mobile, tablet, desktop */}
                     <form
                         onSubmit={searchFormSubmit}
-                        className="flex min-w-[7rem] flex-1 items-center sm:min-w-0 md:min-w-[200px]"
+                        className="flex min-w-[7rem] flex-1 items-center sm:min-w-0 md:min-w-[200px] lg:max-w-xl"
                     >
                         <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-input bg-background sm:min-w-[120px] md:min-w-[180px]">
                             <input
@@ -153,9 +153,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
                     <div className="flex shrink-0 items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
+                            <LanguageSwitcher />
                             {auth?.user && (
                                 <>
-                                    <LanguageSwitcher />
                                     <TooltipProvider delayDuration={0}>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -292,7 +292,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 </>
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <LanguageSwitcher />
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -318,9 +317,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
                 </div>
 
-                {/* Row 2: Category bar — hidden on mobile (categories are in sidebar) */}
+                {/* Row 2: Category bar — hidden on mobile (categories in sidebar); tablet/desktop: visible */}
                 <div className="hidden border-t border-sidebar-border/60 bg-muted/50 md:block">
-                    <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-3 py-1.5 text-sm sm:px-4">
+                    <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-3 py-1.5 text-sm sm:px-4 lg:px-6">
                         <button
                             type="button"
                             className="flex items-center gap-1 rounded px-2 py-1 hover:bg-accent"
@@ -349,7 +348,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetContent
                     side="left"
-                    className="flex h-full w-[min(20rem,85vw)] flex-col items-stretch justify-between bg-sidebar pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)]"
+                    className="flex h-full w-[min(20rem,85vw)] flex-col items-stretch justify-between bg-sidebar pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] md:w-[min(22rem,85vw)]"
                 >
                     <SheetTitle className="sr-only">
                         {t('nav.navigation_menu')}
@@ -416,6 +415,41 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <span>{item.title}</span>
                                 </Link>
                             ))}
+                            {auth?.user && (
+                                <>
+                                    <Link
+                                        href="/chat"
+                                        onClick={() => setSheetOpen(false)}
+                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
+                                    >
+                                        <MessageCircle className="h-5 w-5" />
+                                        <span>{t('nav.chat')}</span>
+                                        {(auth.chatUnreadCount ?? 0) > 0 && (
+                                            <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                {(auth.chatUnreadCount ?? 0) >
+                                                99
+                                                    ? '99+'
+                                                    : auth.chatUnreadCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                    <Link
+                                        href="/cart"
+                                        onClick={() => setSheetOpen(false)}
+                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
+                                    >
+                                        <ShoppingCart className="h-5 w-5" />
+                                        <span>{t('nav.cart')}</span>
+                                        {(auth.cartCount ?? 0) > 0 && (
+                                            <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                {(auth.cartCount ?? 0) > 99
+                                                    ? '99+'
+                                                    : auth.cartCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </>
+                            )}
                         </div>
                         <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border pt-4">
                             {rightNavItems.map((item) => (
