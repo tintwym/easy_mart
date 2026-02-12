@@ -7,7 +7,7 @@ import {
     Settings,
     ShoppingCart,
 } from 'lucide-react';
-import { ChevronDown, Layers, MapPin } from 'lucide-react';
+import { ChevronDown, Layers } from 'lucide-react';
 import { useState } from 'react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LanguageSwitcher } from '@/components/language-switcher';
@@ -25,15 +25,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
-import {
     Sheet,
     SheetContent,
     SheetHeader,
@@ -46,12 +37,10 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { useSortedLocations } from '@/hooks/use-sorted-locations';
 import { useTranslations } from '@/hooks/use-translations';
-import { cn, toUrl } from '@/lib/utils';
+import { toUrl } from '@/lib/utils';
 import { dashboard, login, register } from '@/routes';
 import { edit } from '@/routes/profile';
 import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
@@ -66,9 +55,6 @@ const mainNavItems: NavItem[] = [];
 
 const rightNavItems: NavItem[] = [];
 
-const activeItemStyles =
-    'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
-
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
     const { t, categoryName } = useTranslations();
@@ -76,10 +62,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const {
         auth,
         categories = [],
-        locations = [],
-        regionLabel: regionLabelProp = 'All',
     } = page.props;
-    const regionLabel = String(regionLabelProp ?? 'All');
     const searchQuery =
         (page.props as { searchQuery?: string }).searchQuery ?? '';
     const currentLocation = (() => {
@@ -93,9 +76,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             return null;
         }
     })();
-    const { sortedLocations, getDistanceKm } = useSortedLocations(locations);
     const getInitials = useInitials();
-    const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
     const mobileNavCleanup = useMobileNavigation();
     const [headerLogoutOpen, setHeaderLogoutOpen] = useState(false);
     const [sheetOpen, setSheetOpen] = useState(false);
@@ -117,11 +98,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
         );
     };
 
-    const shopEssentialsLabel =
-        t('nav.shop_essentials') === 'nav.shop_essentials'
-            ? 'Shop Everyday Essentials'
-            : t('nav.shop_essentials');
-
     return (
         <>
             <div
@@ -131,8 +107,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     paddingBottom: 0,
                 }}
             >
-                {/* Row 1: Logo, Categories, icons, profile (old design) */}
-                <div className="mx-auto flex h-14 min-h-[3.5rem] items-center px-3 sm:px-4 md:max-w-7xl">
+                {/* Row 1: Logo, search (full), icons, profile */}
+                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-wrap items-center gap-2 px-3 sm:px-4 md:max-w-7xl md:gap-3">
                     <div className="md:hidden">
                         <Button
                             variant="ghost"
@@ -148,78 +124,36 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <Link
                         href={dashboard()}
                         prefetch
-                        className="flex items-center space-x-2"
+                        className="flex shrink-0 items-center space-x-2"
                     >
                         <AppLogo />
                     </Link>
 
-                    <div className="ml-4 hidden h-full items-center space-x-4 md:flex md:space-x-6">
-                        <NavigationMenu className="flex h-full items-stretch">
-                            <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {categories.length > 0 && (
-                                    <NavigationMenuItem className="relative flex h-full items-center">
-                                        <NavigationMenuTrigger
-                                            className={cn(
-                                                navigationMenuTriggerStyle(),
-                                                'h-9 cursor-pointer gap-1 px-3',
-                                            )}
-                                        >
-                                            <Layers className="mr-1.5 h-4 w-4" />
-                                            {t('nav.categories')}
-                                        </NavigationMenuTrigger>
-                                        <NavigationMenuContent>
-                                            <ul className="grid w-[220px] gap-1 p-2">
-                                                {categories.map((cat) => (
-                                                    <li key={cat.id}>
-                                                        <NavigationMenuLink
-                                                            asChild
-                                                        >
-                                                            <Link
-                                                                href={`/categories/${cat.slug}`}
-                                                                className="block rounded-md px-3 py-2 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground"
-                                                            >
-                                                                {categoryName(
-                                                                    cat,
-                                                                )}
-                                                            </Link>
-                                                        </NavigationMenuLink>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </NavigationMenuContent>
-                                    </NavigationMenuItem>
-                                )}
-                                {mainNavItems.map((item, index) => (
-                                    <NavigationMenuItem
-                                        key={index}
-                                        className="relative flex h-full items-center"
-                                    >
-                                        <Link
-                                            href={item.href}
-                                            className={cn(
-                                                navigationMenuTriggerStyle(),
-                                                whenCurrentUrl(
-                                                    item.href,
-                                                    activeItemStyles,
-                                                ),
-                                                'h-9 cursor-pointer px-3',
-                                            )}
-                                        >
-                                            {item.icon && (
-                                                <item.icon className="mr-2 h-4 w-4" />
-                                            )}
-                                            {item.title}
-                                        </Link>
-                                        {isCurrentUrl(item.href) && (
-                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white" />
-                                        )}
-                                    </NavigationMenuItem>
-                                ))}
-                            </NavigationMenuList>
-                        </NavigationMenu>
-                    </div>
+                    {/* Search: single bar (input + amber search button) */}
+                    <form
+                        onSubmit={searchFormSubmit}
+                        className="flex min-w-0 flex-1 items-center gap-2 md:min-w-[200px]"
+                    >
+                        <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-r-md border border-input sm:min-w-[180px]">
+                            <input
+                                type="search"
+                                name="q"
+                                defaultValue={searchQuery}
+                                placeholder={t('search.placeholder')}
+                                className="min-w-0 flex-1 border-0 bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+                                aria-label={t('search.aria')}
+                            />
+                            <button
+                                type="submit"
+                                className="flex h-9 w-10 shrink-0 items-center justify-center bg-amber-400 text-gray-800 hover:bg-amber-500 md:w-12"
+                                aria-label={t('search.button')}
+                            >
+                                <Search className="size-5" />
+                            </button>
+                        </div>
+                    </form>
 
-                    <div className="ml-auto flex items-center space-x-2">
+                    <div className="flex shrink-0 items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
                             {auth?.user && (
                                 <>
@@ -374,125 +308,30 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
                 </div>
 
-                {/* Row 2: Search bar (old design) */}
-                <form
-                    onSubmit={searchFormSubmit}
-                    className="flex w-full flex-wrap items-center gap-2 border-t border-sidebar-border/60 bg-muted/30 px-3 py-3 sm:px-4 md:mx-auto md:max-w-7xl"
-                >
-                    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 sm:min-w-[200px]">
-                        <Search className="size-5 shrink-0 text-muted-foreground" />
-                        <input
-                            type="search"
-                            name="q"
-                            defaultValue={searchQuery}
-                            placeholder={t('search.placeholder')}
-                            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                            aria-label={t('search.aria')}
-                        />
-                    </div>
-                    <div className="hidden shrink-0 sm:block">
-                        {sortedLocations.length > 0 ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        type="button"
-                                        className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                                    >
-                                        <MapPin className="size-4 shrink-0" />
-                                        <span className="min-w-0 flex-1 truncate">
-                                            {currentLocation ??
-                                                t('location.all_of', {
-                                                    region: regionLabel,
-                                                })}
-                                        </span>
-                                        <ChevronDown className="size-4 shrink-0" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    align="end"
-                                    className="w-[220px] p-1"
+                {/* Row 2: Category bar within container (hamburger + All, category links) */}
+                <div className="border-t border-sidebar-border/60 bg-muted/50">
+                    <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-3 py-1.5 text-sm sm:px-4">
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 rounded px-2 py-1 hover:bg-accent"
+                            aria-label={t('nav.open_menu')}
+                            onClick={() => setSheetOpen(true)}
+                        >
+                            <Menu className="size-4" />
+                            <span>All</span>
+                        </button>
+                        <nav className="flex flex-wrap items-center gap-1">
+                            {categories.slice(0, 10).map((cat) => (
+                                <Link
+                                    key={cat.id}
+                                    href={`/categories/${cat.slug}`}
+                                    className="rounded px-2 py-1 hover:bg-accent"
                                 >
-                                    <Link
-                                        href={dashboard().url}
-                                        className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                                    >
-                                        {t('location.all_of', {
-                                            region: regionLabel,
-                                        })}
-                                    </Link>
-                                    {sortedLocations.map((loc) => {
-                                        const km = getDistanceKm(loc);
-                                        return (
-                                            <Link
-                                                key={loc.name}
-                                                href={
-                                                    dashboard({
-                                                        query: {
-                                                            location: loc.name,
-                                                        },
-                                                    }).url
-                                                }
-                                                className="block rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                                            >
-                                                {loc.name}
-                                                {km != null && (
-                                                    <span className="ml-1.5 text-muted-foreground">
-                                                        ·{' '}
-                                                        {km < 1
-                                                            ? `${Math.round(km * 1000)} m`
-                                                            : `${km.toFixed(1)} km`}
-                                                    </span>
-                                                )}
-                                            </Link>
-                                        );
-                                    })}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <div className="flex h-9 max-w-[11rem] min-w-[11rem] shrink-0 items-center gap-2 overflow-hidden rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
-                                <MapPin className="size-4 shrink-0" />
-                                <span className="min-w-0 truncate">
-                                    {t('location.all_of', {
-                                        region: regionLabel,
-                                    })}
-                                </span>
-                            </div>
-                        )}
+                                    {categoryName(cat)}
+                                </Link>
+                            ))}
+                        </nav>
                     </div>
-                    <Button
-                        type="submit"
-                        size="sm"
-                        className="shrink-0 bg-green-600 hover:bg-green-700"
-                    >
-                        {t('search.button')}
-                    </Button>
-                </form>
-
-                {/* Row 3: Category bar only (hamburger + All, category links, Shop Everyday Essentials) */}
-                <div className="flex flex-wrap items-center gap-2 border-t border-sidebar-border/60 bg-muted/50 px-3 py-1.5 text-sm sm:px-4">
-                    <button
-                        type="button"
-                        className="flex items-center gap-1 rounded px-2 py-1 hover:bg-accent"
-                        aria-label={t('nav.open_menu')}
-                        onClick={() => setSheetOpen(true)}
-                    >
-                        <Menu className="size-4" />
-                        <span>All</span>
-                    </button>
-                    <nav className="flex flex-wrap items-center gap-1">
-                        {categories.slice(0, 10).map((cat) => (
-                            <Link
-                                key={cat.id}
-                                href={`/categories/${cat.slug}`}
-                                className="rounded px-2 py-1 hover:bg-accent"
-                            >
-                                {categoryName(cat)}
-                            </Link>
-                        ))}
-                    </nav>
-                    <span className="ml-auto font-medium">
-                        {shopEssentialsLabel}
-                    </span>
                 </div>
             </div>
 
