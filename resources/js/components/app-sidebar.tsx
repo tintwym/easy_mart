@@ -3,7 +3,6 @@ import {
     BookOpen,
     Folder,
     LayoutGrid,
-    MessageCircle,
     Package,
     ShoppingCart,
 } from 'lucide-react';
@@ -35,11 +34,6 @@ const allNavItems: NavItem[] = [
         icon: Package,
     },
     {
-        title: 'Chat',
-        href: '/chat',
-        icon: MessageCircle,
-    },
-    {
         title: 'Cart',
         href: '/cart',
         icon: ShoppingCart,
@@ -64,10 +58,7 @@ export function AppSidebar() {
     const mainNavItems = auth?.user
         ? allNavItems
         : allNavItems.filter(
-              (item) =>
-                  item.title !== 'Upgrades' &&
-                  item.title !== 'Chat' &&
-                  item.title !== 'Cart',
+              (item) => item.title !== 'Upgrades' && item.title !== 'Cart',
           );
 
     return (

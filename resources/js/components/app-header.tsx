@@ -358,22 +358,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </SheetHeader>
                     <div className="flex h-full flex-1 flex-col p-4">
                         <div className="flex flex-1 flex-col gap-1 text-sm">
-                            {auth?.user && (
-                                <Link
-                                    href="/chat"
-                                    className="relative flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                >
-                                    <MessageCircle className="h-4 w-4" />
-                                    {t('nav.chat')}
-                                    {(auth.chatUnreadCount ?? 0) > 0 && (
-                                        <span className="flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                                            {(auth.chatUnreadCount ?? 0) > 99
-                                                ? '99+'
-                                                : auth.chatUnreadCount}
-                                        </span>
-                                    )}
-                                </Link>
-                            )}
                             {categories.length > 0 && (
                                 <Collapsible
                                     defaultOpen={false}
@@ -414,9 +398,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <span>{item.title}</span>
                                 </Link>
                             ))}
-                        </div>
-                        <div className="py-2">
-                            <LanguageSwitcher />
                         </div>
                         <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border pt-4">
                             {rightNavItems.map((item) => (
