@@ -237,6 +237,7 @@ export default function CreateListing({
                             id="image"
                             type="file"
                             accept="image/*"
+                            capture="environment"
                             onChange={(e) =>
                                 setData('image', e.target.files?.[0] ?? null)
                             }

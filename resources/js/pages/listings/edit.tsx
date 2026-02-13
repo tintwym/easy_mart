@@ -267,6 +267,7 @@ export default function EditListing({ listing, categories }: Props) {
                             id="image"
                             type="file"
                             accept="image/*"
+                            capture="environment"
                             onChange={(e) =>
                                 setData('image', e.target.files?.[0] ?? null)
                             }
