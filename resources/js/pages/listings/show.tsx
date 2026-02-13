@@ -19,11 +19,11 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { SharedData } from '@/types';
 
-const CONDITION_LABELS: Record<string, string> = {
-    new: 'New',
-    like_new: 'Lightly used',
-    good: 'Good',
-    fair: 'Fair',
+const CONDITION_KEYS: Record<string, string> = {
+    new: 'listing.condition_new',
+    like_new: 'listing.condition_like_new',
+    good: 'listing.condition_good',
+    fair: 'listing.condition_fair',
 };
 
 function getInitials(name: string): string {
@@ -43,7 +43,10 @@ function formatDate(dateString: string): string {
     });
 }
 
-function formatRelativeTime(dateString: string): string {
+function formatRelativeTime(
+    dateString: string,
+    t: (key: string, params?: Record<string, string | number>) => string,
+): string {
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -51,15 +54,23 @@ function formatRelativeTime(dateString: string): string {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return t('time.just_now');
     if (diffMins < 60)
-        return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+        return diffMins === 1
+            ? t('time.minute_ago')
+            : t('time.minutes_ago', { count: diffMins });
     if (diffHours < 24)
-        return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-    if (diffDays === 1) return '1 day ago';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30)
-        return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) === 1 ? '' : 's'} ago`;
+        return diffHours === 1
+            ? t('time.hour_ago')
+            : t('time.hours_ago', { count: diffHours });
+    if (diffDays === 1) return t('time.day_ago');
+    if (diffDays < 7) return t('time.days_ago', { count: diffDays });
+    if (diffDays < 30) {
+        const weeks = Math.floor(diffDays / 7);
+        return weeks === 1
+            ? t('time.week_ago')
+            : t('time.weeks_ago', { count: weeks });
+    }
     return formatDate(dateString);
 }
 
@@ -151,7 +162,7 @@ export default function ShowListing({
                             className="inline-flex items-center gap-2"
                         >
                             <ShoppingBag className="mr-2 size-4" />
-                            Buy
+                            {t('listing.buy')}
                         </Link>
                     </Button>
                     <Button variant="outline" className="w-full" asChild>
@@ -160,7 +171,7 @@ export default function ShowListing({
                             className="inline-flex items-center gap-2"
                         >
                             <ShoppingCart className="mr-2 size-4" />
-                            In cart
+                            {t('listing.in_cart')}
                         </Link>
                     </Button>
                 </>
@@ -175,7 +186,7 @@ export default function ShowListing({
                         }
                     >
                         <ShoppingBag className="mr-2 size-4" />
-                        Buy
+                        {t('listing.buy')}
                     </Button>
                     <Button
                         variant="outline"
@@ -185,7 +196,7 @@ export default function ShowListing({
                         }
                     >
                         <ShoppingCart className="mr-2 size-4" />
-                        Add to cart
+                        {t('listing.add_to_cart')}
                     </Button>
                 </>
             )}
@@ -196,7 +207,7 @@ export default function ShowListing({
             className="w-full"
             onClick={() => router.post(`/listings/${listing.id}/chat`)}
         >
-            Make Offer
+            {t('listing.make_offer')}
         </Button>
     );
 
@@ -205,19 +216,19 @@ export default function ShowListing({
             <Button className="w-full" asChild>
                 <Link href="/login" className="inline-flex items-center gap-2">
                     <ShoppingBag className="mr-2 size-4" />
-                    Sign in to buy
+                    {t('listing.sign_in_to_buy')}
                 </Link>
             </Button>
             <Button variant="outline" className="w-full" asChild>
                 <Link href="/login" className="inline-flex items-center gap-2">
                     <ShoppingCart className="mr-2 size-4" />
-                    Sign in to add to cart
+                    {t('listing.sign_in_to_add_to_cart')}
                 </Link>
             </Button>
         </div>
     ) : (
         <Button variant="outline" className="w-full" asChild>
-            <Link href="/login">Sign in to make offer</Link>
+            <Link href="/login">{t('listing.sign_in_to_make_offer')}</Link>
         </Button>
     );
 
@@ -236,7 +247,7 @@ export default function ShowListing({
                         className="inline-flex items-center gap-2"
                     >
                         <ArrowLeft className="size-4" />
-                        Back
+                        {t('common.back')}
                     </Link>
                 </Button>
 
@@ -261,7 +272,7 @@ export default function ShowListing({
                         />
                     ) : (
                         <div className="flex size-full items-center justify-center text-muted-foreground">
-                            No image
+                            {t('listing.no_image')}
                         </div>
                     )}
                 </div>
@@ -283,14 +294,15 @@ export default function ShowListing({
                             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                                 <span className="inline-flex items-center gap-1.5">
                                     <Tag className="size-4 shrink-0" />
-                                    {CONDITION_LABELS[listing.condition] ??
-                                        listing.condition}
+                                    {CONDITION_KEYS[listing.condition]
+                                        ? t(CONDITION_KEYS[listing.condition])
+                                        : listing.condition}
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
                                     <Users className="size-4 shrink-0" />
                                     {listing.meetup_location
-                                        ? 'Meetup'
-                                        : 'Meet-up'}
+                                        ? t('listing.meetup')
+                                        : t('listing.meet_up')}
                                 </span>
                                 {listing.meetup_location && (
                                     <span className="inline-flex items-center gap-1.5">
@@ -314,17 +326,22 @@ export default function ShowListing({
 
                         {/* Details */}
                         <section>
-                            <h2 className="mb-4 font-semibold">Details</h2>
+                            <h2 className="mb-4 font-semibold">
+                                {t('listing.details')}
+                            </h2>
                             <dl className="space-y-4">
                                 <div>
                                     <dt className="text-sm text-muted-foreground">
-                                        Listed
+                                        {t('listing.listed')}
                                     </dt>
                                     <dd className="mt-1">
-                                        {formatRelativeTime(listing.created_at)}
+                                        {formatRelativeTime(
+                                            listing.created_at,
+                                            t,
+                                        )}
                                         {listing.user && (
                                             <>
-                                                {' by '}
+                                                {t('listing.listed_by')}
                                                 <span className="font-medium">
                                                     {listing.user.name}
                                                 </span>
@@ -337,20 +354,26 @@ export default function ShowListing({
 
                         {/* Description */}
                         <section>
-                            <h2 className="mb-4 font-semibold">Description</h2>
+                            <h2 className="mb-4 font-semibold">
+                                {t('listing.description')}
+                            </h2>
                             <p className="whitespace-pre-wrap text-muted-foreground">
                                 {listing.description ||
-                                    'No description provided.'}
+                                    t('listing.no_description')}
                             </p>
                         </section>
 
                         {/* Deal method */}
                         <section>
-                            <h2 className="mb-4 font-semibold">Deal method</h2>
+                            <h2 className="mb-4 font-semibold">
+                                {t('listing.deal_method')}
+                            </h2>
                             <p className="text-muted-foreground">
                                 {listing.meetup_location
-                                    ? `Meetup · ${listing.meetup_location}`
-                                    : 'Meet-up'}
+                                    ? t('listing.meetup_with_location', {
+                                          location: listing.meetup_location,
+                                      })
+                                    : t('listing.meet_up')}
                             </p>
                         </section>
 
@@ -358,14 +381,15 @@ export default function ShowListing({
                         <section className="border-t pt-8">
                             <div className="flex flex-wrap items-center justify-between gap-4">
                                 <h2 className="text-xl font-semibold">
-                                    Reviews for {listing.user?.name ?? 'Seller'}
+                                    {t('listing.reviews_for')}{' '}
+                                    {listing.user?.name ?? t('listing.seller')}
                                     {reviewCount > 0 && (
                                         <span className="ml-2 font-normal text-muted-foreground">
                                             {averageRating.toFixed(1)}★ (
                                             {reviewCount}{' '}
                                             {reviewCount === 1
-                                                ? 'review'
-                                                : 'reviews'}
+                                                ? t('listing.review')
+                                                : t('listing.reviews')}
                                             )
                                         </span>
                                     )}
@@ -394,12 +418,12 @@ export default function ShowListing({
                                 >
                                     <h3 className="mb-4 font-medium">
                                         {userReview
-                                            ? 'Update your review'
-                                            : 'Write a review'}
+                                            ? t('listing.update_your_review')
+                                            : t('listing.write_a_review')}
                                     </h3>
                                     <div className="space-y-4">
                                         <div>
-                                            <Label>Rating</Label>
+                                            <Label>{t('listing.rating')}</Label>
                                             <InputError
                                                 message={errors.rating}
                                             />
@@ -430,7 +454,7 @@ export default function ShowListing({
                                         </div>
                                         <div>
                                             <Label htmlFor="comment">
-                                                Comment (optional)
+                                                {t('listing.comment_optional')}
                                             </Label>
                                             <textarea
                                                 id="comment"
@@ -442,7 +466,9 @@ export default function ShowListing({
                                                         e.target.value,
                                                     )
                                                 }
-                                                placeholder="Share your experience with this product..."
+                                                placeholder={t(
+                                                    'listing.review_placeholder',
+                                                )}
                                                 className="mt-2 flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                             />
                                             <InputError
@@ -454,8 +480,8 @@ export default function ShowListing({
                                             disabled={processing}
                                         >
                                             {userReview
-                                                ? 'Update review'
-                                                : 'Submit review'}
+                                                ? t('listing.update_review')
+                                                : t('listing.submit_review')}
                                         </Button>
                                     </div>
                                 </form>
@@ -467,16 +493,15 @@ export default function ShowListing({
                                         href="/login"
                                         className="font-medium hover:underline"
                                     >
-                                        Sign in
-                                    </Link>{' '}
-                                    to leave a review.
+                                        {t('listing.sign_in_to_leave_review')}
+                                    </Link>
                                 </p>
                             )}
 
                             <div className="mt-8 space-y-6">
                                 {listing.reviews.length === 0 ? (
                                     <p className="text-muted-foreground">
-                                        No reviews yet. Be the first to review!
+                                        {t('listing.no_reviews_yet')}
                                     </p>
                                 ) : (
                                     listing.reviews.map((review) => (
@@ -500,11 +525,14 @@ export default function ShowListing({
                                                         <p className="font-medium">
                                                             {review.user
                                                                 ?.name ??
-                                                                'Anonymous'}
+                                                                t(
+                                                                    'listing.anonymous',
+                                                                )}
                                                         </p>
                                                         <p className="text-sm text-muted-foreground">
                                                             {formatRelativeTime(
                                                                 review.created_at,
+                                                                t,
                                                             )}
                                                         </p>
                                                     </div>
@@ -543,7 +571,9 @@ export default function ShowListing({
                     {/* Sidebar - Meet the seller + Buy/Add to cart (right side, Carousell-style) */}
                     <aside className="hidden md:sticky md:top-4 md:block md:self-start">
                         <div className="space-y-6 rounded-xl border border-border/50 bg-muted/20 p-6">
-                            <h2 className="font-semibold">Meet the seller</h2>
+                            <h2 className="font-semibold">
+                                {t('listing.meet_the_seller')}
+                            </h2>
                             {listing.user && (
                                 <div className="flex items-center gap-4">
                                     <Avatar className="size-14 shrink-0">
@@ -564,8 +594,8 @@ export default function ShowListing({
                                                 {averageRating.toFixed(1)}★ (
                                                 {reviewCount}{' '}
                                                 {reviewCount === 1
-                                                    ? 'review'
-                                                    : 'reviews'}
+                                                    ? t('listing.review')
+                                                    : t('listing.reviews')}
                                                 )
                                             </p>
                                         )}
@@ -583,7 +613,7 @@ export default function ShowListing({
                                             <Link
                                                 href={`/listings/${listing.id}/edit`}
                                             >
-                                                Edit listing
+                                                {t('listing.edit_listing')}
                                             </Link>
                                         </Button>
                                         <Button
@@ -599,8 +629,10 @@ export default function ShowListing({
                                         >
                                             <Sparkles className="mr-2 size-4" />
                                             {isTrending
-                                                ? 'Promoted'
-                                                : `Make it trend (${trendPriceLabel})`}
+                                                ? t('listing.promoted')
+                                                : t('listing.make_it_trend', {
+                                                      price: trendPriceLabel,
+                                                  })}
                                         </Button>
                                     </>
                                 ) : (
@@ -628,7 +660,7 @@ export default function ShowListing({
                                         className="inline-flex items-center gap-2"
                                     >
                                         <ShoppingBag className="size-4" />
-                                        Buy
+                                        {t('listing.buy')}
                                     </Link>
                                 </Button>
                                 <Button
@@ -641,7 +673,7 @@ export default function ShowListing({
                                         className="inline-flex items-center gap-2"
                                     >
                                         <ShoppingCart className="size-4" />
-                                        In cart
+                                        {t('listing.in_cart')}
                                     </Link>
                                 </Button>
                             </>
@@ -657,7 +689,7 @@ export default function ShowListing({
                                     }
                                 >
                                     <ShoppingBag className="mr-2 size-4" />
-                                    Buy
+                                    {t('listing.buy')}
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -669,7 +701,7 @@ export default function ShowListing({
                                     }
                                 >
                                     <ShoppingCart className="mr-2 size-4" />
-                                    Add to cart
+                                    {t('listing.add_to_cart')}
                                 </Button>
                             </>
                         )}
@@ -684,7 +716,7 @@ export default function ShowListing({
                                 router.post(`/listings/${listing.id}/chat`)
                             }
                         >
-                            Make Offer
+                            {t('listing.make_offer')}
                         </Button>
                     </div>
                 )}
@@ -699,7 +731,7 @@ export default function ShowListing({
                                 className="inline-flex items-center gap-2"
                             >
                                 <ShoppingBag className="size-4" />
-                                Sign in to buy
+                                {t('listing.sign_in_to_buy')}
                             </Link>
                         </Button>
                         <Button
@@ -712,7 +744,7 @@ export default function ShowListing({
                                 className="inline-flex items-center gap-2"
                             >
                                 <ShoppingCart className="size-4" />
-                                Sign in to add to cart
+                                {t('listing.sign_in_to_add_to_cart')}
                             </Link>
                         </Button>
                     </div>
@@ -724,7 +756,9 @@ export default function ShowListing({
                             className="min-h-12 flex-1 touch-manipulation"
                             asChild
                         >
-                            <Link href="/login">Sign in to make offer</Link>
+                            <Link href="/login">
+                                {t('listing.sign_in_to_make_offer')}
+                            </Link>
                         </Button>
                     </div>
                 )}

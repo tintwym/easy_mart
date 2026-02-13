@@ -12,15 +12,18 @@ import { useCurrency } from '@/hooks/use-currency';
 import { useTranslations } from '@/hooks/use-translations';
 import type { SharedData } from '@/types';
 
-const CONDITION_LABELS: Record<string, string> = {
-    new: 'New',
-    like_new: 'Lightly used',
-    good: 'Good',
-    fair: 'Fair',
+const CONDITION_KEYS: Record<string, string> = {
+    new: 'listing.condition_new',
+    like_new: 'listing.condition_like_new',
+    good: 'listing.condition_good',
+    fair: 'listing.condition_fair',
 };
 
-function formatRelativeTime(dateString: string | undefined): string {
-    if (!dateString) return 'Recently';
+function formatRelativeTime(
+    dateString: string | undefined,
+    t: (key: string, params?: Record<string, string | number>) => string,
+): string {
+    if (!dateString) return t('time.recently');
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -28,12 +31,19 @@ function formatRelativeTime(dateString: string | undefined): string {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return t('time.just_now');
     if (diffMins < 60)
-        return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+        return diffMins === 1
+            ? t('time.minute_ago')
+            : t('time.minutes_ago', { count: diffMins });
     if (diffHours < 24)
-        return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+        return diffHours === 1
+            ? t('time.hour_ago')
+            : t('time.hours_ago', { count: diffHours });
+    if (diffDays < 7)
+        return diffDays === 1
+            ? t('time.day_ago')
+            : t('time.days_ago', { count: diffDays });
 
     return date.toLocaleDateString();
 }
@@ -90,18 +100,18 @@ export function ListingCard({ listing }: ListingCardProps) {
                     />
                 ) : (
                     <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-                        No image
+                        {t('listing.no_image')}
                     </div>
                 )}
                 {/* Overlay: time (top-left), trending badge, ellipsis (top-right) */}
                 <div className="absolute inset-x-0 top-0 flex items-start justify-between p-2">
                     <div className="flex flex-col gap-1">
                         <span className="rounded bg-black/40 px-1.5 py-0.5 text-xs text-white">
-                            {formatRelativeTime(listing.created_at)}
+                            {formatRelativeTime(listing.created_at, t)}
                         </span>
                         {isTrending && (
                             <span className="rounded bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground">
-                                Trending
+                                {t('listing.trending')}
                             </span>
                         )}
                     </div>
@@ -170,8 +180,10 @@ export function ListingCard({ listing }: ListingCardProps) {
                     </p>
                 </Link>
                 <p className="text-xs text-muted-foreground">
-                    {CONDITION_LABELS[listing.condition] ?? listing.condition} ·{' '}
-                    {listing.user?.name ?? 'Unknown'}
+                    {CONDITION_KEYS[listing.condition]
+                        ? t(CONDITION_KEYS[listing.condition])
+                        : listing.condition}{' '}
+                    · {listing.user?.name ?? t('common.unknown')}
                 </p>
 
                 {/* Add to cart - only for business sellers */}

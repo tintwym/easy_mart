@@ -8,7 +8,7 @@ import {
     ShoppingCart,
 } from 'lucide-react';
 import { ChevronDown, Layers } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LogoutConfirmDialog } from '@/components/logout-confirm-dialog';
@@ -77,6 +77,26 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const mobileNavCleanup = useMobileNavigation();
     const [headerLogoutOpen, setHeaderLogoutOpen] = useState(false);
     const [sheetOpen, setSheetOpen] = useState(false);
+
+    // From iPad mini (md) up: don't show the side drawer
+    useEffect(() => {
+        const closeIfMdOrUp = () => {
+            if (window.matchMedia('(min-width: 768px)').matches) {
+                setSheetOpen(false);
+            }
+        };
+        closeIfMdOrUp();
+        window.addEventListener('resize', closeIfMdOrUp);
+        return () => window.removeEventListener('resize', closeIfMdOrUp);
+    }, []);
+
+    const currentPath = (() => {
+        try {
+            return new URL(page.url, window?.location?.origin).pathname ?? '';
+        } catch {
+            return '';
+        }
+    })();
     const searchFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
@@ -104,121 +124,122 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     paddingBottom: 0,
                 }}
             >
-                {/* Row 1: Logo, search, icons, profile — mobile: no wrap; tablet/desktop: wrap, max-width */}
-                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-nowrap items-center gap-2 px-3 sm:flex-wrap sm:px-4 md:max-w-7xl md:gap-3 lg:px-6">
-                    <div className="md:hidden">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="mr-1 flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation sm:mr-2 sm:h-10 sm:w-10"
-                            aria-label={t('nav.open_menu')}
-                            onClick={() => setSheetOpen(true)}
+                {/* Row 1: Logo left, search center, icons right — from iPad mini (md) up same as desktop */}
+                <div className="mx-auto flex h-14 min-h-[3.5rem] flex-nowrap items-center gap-2 px-3 sm:flex-wrap sm:px-4 md:max-w-7xl md:gap-4 md:px-6">
+                    {/* Left: hamburger (mobile), logo */}
+                    <div className="flex shrink-0 items-center gap-2 md:gap-4">
+                        <div className="md:hidden">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="mr-1 flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation sm:mr-2 sm:h-10 sm:w-10"
+                                aria-label={t('nav.open_menu')}
+                                onClick={() => setSheetOpen(true)}
+                            >
+                                <Menu className="h-5 w-5" />
+                            </Button>
+                        </div>
+                        <Link
+                            href={dashboard()}
+                            prefetch
+                            className="hidden shrink-0 items-center space-x-2 sm:flex"
                         >
-                            <Menu className="h-5 w-5" />
-                        </Button>
+                            <AppLogo />
+                        </Link>
                     </div>
 
-                    {/* Logo: hidden on mobile (branding is in sidebar); visible from sm up */}
-                    <Link
-                        href={dashboard()}
-                        prefetch
-                        className="hidden shrink-0 items-center space-x-2 sm:flex"
-                    >
-                        <AppLogo />
-                    </Link>
+                    {/* Center: search bar (more width on mobile; centered on md+) */}
+                    <div className="flex min-w-0 flex-[2] basis-0 justify-center md:flex-1 md:basis-auto md:px-4">
+                        <form
+                            onSubmit={searchFormSubmit}
+                            className="w-full max-w-full min-w-0 md:max-w-lg"
+                        >
+                            <div className="relative flex min-w-0 items-center overflow-hidden rounded-lg border border-input bg-background">
+                                <input
+                                    type="search"
+                                    name="q"
+                                    defaultValue={searchQuery}
+                                    placeholder={t('search.placeholder')}
+                                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-10 pl-3 text-sm outline-none placeholder:text-muted-foreground md:pr-10 md:pl-4"
+                                    aria-label={t('search.aria')}
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute top-0 right-0 flex h-full min-h-[44px] w-10 items-center justify-center bg-transparent text-muted-foreground transition-colors hover:text-foreground md:h-9 md:min-h-0 md:w-10"
+                                    aria-label={t('search.button')}
+                                >
+                                    <Search className="size-5 shrink-0" />
+                                </button>
+                            </div>
+                        </form>
+                    </div>
 
-                    {/* Search: responsive min/max width for mobile, tablet, desktop */}
-                    <form
-                        onSubmit={searchFormSubmit}
-                        className="flex min-w-[7rem] flex-1 items-center sm:min-w-0 md:min-w-[200px] lg:max-w-xl"
-                    >
-                        <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-input bg-background sm:min-w-[120px] md:min-w-[180px]">
-                            <input
-                                type="search"
-                                name="q"
-                                defaultValue={searchQuery}
-                                placeholder={t('search.placeholder')}
-                                className="min-w-[4rem] flex-1 border-0 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground sm:min-w-0"
-                                aria-label={t('search.aria')}
-                            />
-                            <button
-                                type="submit"
-                                className="flex h-full min-h-[44px] w-12 shrink-0 items-center justify-center bg-amber-400 text-gray-900 hover:bg-amber-500 md:min-h-0 md:w-12"
-                                aria-label={t('search.button')}
-                            >
-                                <Search className="size-5" />
-                            </button>
-                        </div>
-                    </form>
-
-                    <div className="flex shrink-0 items-center space-x-2">
+                    {/* Right: language (desktop only), chat, cart, profile */}
+                    <div className="flex shrink-0 items-center gap-1 md:gap-2">
                         <div className="relative flex items-center space-x-1">
-                            <LanguageSwitcher />
-                            {auth?.user && (
-                                <>
-                                    <TooltipProvider delayDuration={0}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="group flex h-11 min-h-[44px] w-11 min-w-[44px] cursor-pointer touch-manipulation sm:h-9 sm:w-9"
-                                                    aria-label="Chat"
-                                                    asChild
-                                                >
-                                                    <Link
-                                                        href="/chat"
-                                                        className="relative"
-                                                    >
-                                                        <MessageCircle className="!size-5 opacity-80 group-hover:opacity-100" />
-                                                        {(auth.chatUnreadCount ??
-                                                            0) > 0 && (
-                                                            <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                                                                {(auth.chatUnreadCount ??
-                                                                    0) > 99
-                                                                    ? '99+'
-                                                                    : auth.chatUnreadCount}
-                                                            </span>
-                                                        )}
-                                                    </Link>
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{t('nav.chat')}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                    <TooltipProvider delayDuration={0}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="group relative flex h-11 min-h-[44px] w-11 min-w-[44px] cursor-pointer touch-manipulation sm:h-9 sm:w-9"
-                                                    aria-label="Cart"
-                                                    asChild
-                                                >
-                                                    <Link href="/cart">
-                                                        <ShoppingCart className="!size-5 opacity-80 group-hover:opacity-100" />
-                                                        {(auth.cartCount ?? 0) >
-                                                            0 && (
-                                                            <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                                                                {(auth.cartCount ??
-                                                                    0) > 99
-                                                                    ? '99+'
-                                                                    : auth.cartCount}
-                                                            </span>
-                                                        )}
-                                                    </Link>
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{t('nav.cart')}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </>
-                            )}
+                            <div className="hidden md:block">
+                                <LanguageSwitcher />
+                            </div>
+                            <TooltipProvider delayDuration={0}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="group flex h-11 min-h-[44px] w-11 min-w-[44px] cursor-pointer touch-manipulation sm:h-9 sm:w-9 md:h-9 md:w-9"
+                                            aria-label="Chat"
+                                            asChild
+                                        >
+                                            <Link
+                                                href="/chat"
+                                                className="relative"
+                                            >
+                                                <MessageCircle className="!size-5 opacity-80 group-hover:opacity-100" />
+                                                {(auth?.chatUnreadCount ?? 0) >
+                                                    0 && (
+                                                    <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                        {(auth?.chatUnreadCount ??
+                                                            0) > 99
+                                                            ? '99+'
+                                                            : auth?.chatUnreadCount}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{t('nav.chat')}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider delayDuration={0}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="group relative flex h-11 min-h-[44px] w-11 min-w-[44px] cursor-pointer touch-manipulation sm:h-9 sm:w-9 md:h-9 md:w-9"
+                                            aria-label="Cart"
+                                            asChild
+                                        >
+                                            <Link href="/cart">
+                                                <ShoppingCart className="!size-5 opacity-80 group-hover:opacity-100" />
+                                                {(auth?.cartCount ?? 0) > 0 && (
+                                                    <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                                                        {(auth?.cartCount ??
+                                                            0) > 99
+                                                            ? '99+'
+                                                            : auth?.cartCount}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{t('nav.cart')}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                             <div className="ml-1 hidden gap-1 md:flex">
                                 {rightNavItems.map((item) => (
                                     <TooltipProvider
@@ -256,10 +277,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         <DropdownMenuTrigger asChild>
                                             <Button
                                                 variant="ghost"
-                                                className="flex size-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-1 sm:size-10"
+                                                className="flex size-10 min-h-[44px] min-w-[44px] touch-manipulation rounded-full p-0.5 md:size-9 md:min-h-9 md:min-w-9"
                                                 aria-label={t('nav.user_menu')}
                                             >
-                                                <Avatar className="size-8 overflow-hidden rounded-full sm:size-8">
+                                                <Avatar className="size-8 overflow-hidden rounded-full md:size-8">
                                                     <AvatarImage
                                                         src={auth.user.avatar}
                                                         alt={auth.user.name}
@@ -291,11 +312,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     />
                                 </>
                             ) : (
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5 md:gap-2">
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="min-h-[44px] touch-manipulation sm:min-h-0"
+                                        className="min-h-[44px] touch-manipulation md:min-h-0"
                                         asChild
                                     >
                                         <Link href={login()}>
@@ -304,7 +325,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     </Button>
                                     <Button
                                         size="sm"
-                                        className="min-h-[44px] touch-manipulation sm:min-h-0"
+                                        className="min-h-[44px] touch-manipulation md:min-h-0"
                                         asChild
                                     >
                                         <Link href={register()}>
@@ -317,29 +338,38 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
                 </div>
 
-                {/* Row 2: Category bar — hidden on mobile (categories in sidebar); tablet/desktop: visible */}
-                <div className="hidden border-t border-sidebar-border/60 bg-muted/50 md:block">
-                    <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-3 py-1.5 text-sm sm:px-4 lg:px-6">
-                        <button
-                            type="button"
-                            className="flex items-center gap-1 rounded px-2 py-1 hover:bg-accent"
-                            aria-label={t('nav.open_menu')}
-                            onClick={() => setSheetOpen(true)}
-                        >
-                            <Menu className="size-4" />
-                            <span>All</span>
-                        </button>
-                        <nav className="flex flex-wrap items-center gap-1">
-                            {categories.slice(0, 10).map((cat) => (
-                                <Link
-                                    key={cat.id}
-                                    href={`/categories/${cat.slug}`}
-                                    className="rounded px-2 py-1 hover:bg-accent"
-                                >
-                                    {categoryName(cat)}
-                                </Link>
-                            ))}
-                        </nav>
+                {/* Row 2: Category bar — hidden on mobile; from iPad mini (md) up same as desktop (scrollable row) */}
+                <div className="hidden border-t border-border/60 bg-muted/30 md:block">
+                    <div className="mx-auto max-w-7xl px-6 py-2 [scrollbar-width:none] md:overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        <div className="flex min-w-0 items-center justify-start gap-2 text-sm md:min-w-max md:flex-nowrap md:pr-4">
+                            {/* All: link to home, no icon, no highlight color */}
+                            <Link
+                                href="/"
+                                className="flex shrink-0 items-center rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                                {t('nav.all')}
+                            </Link>
+                            <nav className="flex shrink-0 items-center gap-2 md:flex-nowrap">
+                                {categories.slice(0, 10).map((cat) => {
+                                    const isActive =
+                                        currentPath ===
+                                        `/categories/${cat.slug}`;
+                                    return (
+                                        <Link
+                                            key={cat.id}
+                                            href={`/categories/${cat.slug}`}
+                                            className={`rounded-md px-2.5 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                                isActive
+                                                    ? 'bg-primary font-medium text-primary-foreground'
+                                                    : 'text-muted-foreground hover:text-accent-foreground'
+                                            }`}
+                                        >
+                                            {categoryName(cat)}
+                                        </Link>
+                                    );
+                                })}
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -451,14 +481,20 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 </>
                             )}
                         </div>
-                        <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border pt-4">
+                        <div className="mt-auto flex flex-col gap-0.5 border-t border-sidebar-border pt-2">
+                            <div className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 md:hidden">
+                                <span className="text-muted-foreground">
+                                    {t('nav.language')}
+                                </span>
+                                <LanguageSwitcher />
+                            </div>
                             {rightNavItems.map((item) => (
                                 <a
                                     key={item.title}
                                     href={toUrl(item.href)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium"
+                                    className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 font-medium"
                                 >
                                     {item.icon && (
                                         <item.icon className="h-5 w-5" />
@@ -468,7 +504,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             ))}
                             {auth?.user ? (
                                 <>
-                                    <div className="flex min-h-[44px] items-center gap-3 rounded-md px-2 py-2">
+                                    <div className="flex min-h-[44px] items-center gap-3 rounded-md px-2 py-1.5">
                                         <Avatar className="size-9 shrink-0 overflow-hidden rounded-full">
                                             <AvatarImage
                                                 src={auth.user.avatar}
@@ -484,14 +520,14 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     </div>
                                     <Link
                                         href={edit()}
-                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
+                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 font-medium hover:bg-sidebar-accent"
                                     >
                                         <Settings className="h-4 w-4" />
                                         {t('nav.settings')}
                                     </Link>
                                     <button
                                         type="button"
-                                        className="flex min-h-[44px] w-full touch-manipulation items-center gap-2 rounded-md px-2 py-2 text-left font-medium hover:bg-sidebar-accent"
+                                        className="flex min-h-[44px] w-full touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 text-left font-medium hover:bg-sidebar-accent"
                                         onClick={() =>
                                             setSidebarLogoutOpen(true)
                                         }
@@ -508,13 +544,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <>
                                     <Link
                                         href={login()}
-                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
+                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 font-medium hover:bg-sidebar-accent"
                                     >
                                         {t('nav.log_in')}
                                     </Link>
                                     <Link
                                         href={register()}
-                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
+                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 font-medium hover:bg-sidebar-accent"
                                     >
                                         {t('nav.register')}
                                     </Link>

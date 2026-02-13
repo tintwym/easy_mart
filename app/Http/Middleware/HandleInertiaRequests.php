@@ -40,18 +40,21 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $locale = app()->getLocale();
-        $translations = Cache::remember(
-            'translations.'.$locale,
-            now()->addHour(),
-            function () use ($locale) {
-                $path = lang_path($locale.'.json');
-                if (! file_exists($path)) {
-                    return [];
-                }
-
-                return (array) json_decode((string) file_get_contents($path), true);
+        $path = lang_path($locale.'.json');
+        $loadTranslations = function () use ($path) {
+            if (! file_exists($path)) {
+                return [];
             }
-        );
+            $decoded = json_decode((string) file_get_contents($path), true);
+            return is_array($decoded) ? $decoded : [];
+        };
+
+        if (app()->environment('local')) {
+            $translations = $loadTranslations();
+        } else {
+            $cacheKey = 'translations.'.$locale.(file_exists($path) ? '.'.filemtime($path) : '');
+            $translations = Cache::remember($cacheKey, now()->addDays(1), $loadTranslations);
+        }
 
         $user = $request->user();
         $cartItems = $user ? $user->cartItems()->get(['listing_id']) : null;
