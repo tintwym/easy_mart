@@ -125,14 +125,14 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                 }}
             >
                 {/* Row 1: Logo left, search center, icons right — from iPad mini (md) up same as desktop */}
-                <div className="mx-auto flex h-12 min-h-[3rem] flex-nowrap items-center gap-1.5 px-2 sm:flex-wrap sm:gap-2 sm:px-4 md:max-w-7xl md:h-14 md:min-h-[3.5rem] md:gap-4 md:px-6">
+                <div className="mx-auto flex h-12 min-h-[3rem] flex-nowrap items-center gap-1.5 px-2 sm:flex-wrap sm:gap-2 sm:px-4 md:h-14 md:min-h-[3.5rem] md:max-w-7xl md:gap-4 md:px-6">
                     {/* Left: hamburger (mobile), logo */}
                     <div className="flex shrink-0 items-center gap-1.5 md:gap-4">
                         <div className="md:hidden">
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="flex h-9 min-h-[36px] w-9 min-w-[36px] touch-manipulation sm:h-10 sm:w-10 sm:min-h-[40px] sm:min-w-[40px]"
+                                className="flex h-9 min-h-[36px] w-9 min-w-[36px] touch-manipulation sm:h-10 sm:min-h-[40px] sm:w-10 sm:min-w-[40px]"
                                 aria-label={t('nav.open_menu')}
                                 onClick={() => setSheetOpen(true)}
                             >
