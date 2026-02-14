@@ -24,8 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $appUrl = config('app.url', '');
-        if ($this->app->environment('production') || str_starts_with($appUrl, 'https://')) {
+        // Only force HTTPS in production. In local/dev, use whatever scheme the server uses
+        // so assets load correctly (php artisan serve is HTTP-only; forcing https causes ERR_CONNECTION_CLOSED).
+        if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
         $this->configureDefaults();

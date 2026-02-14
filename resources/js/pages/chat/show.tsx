@@ -562,19 +562,13 @@ export default function ChatShow({
                             {/* Chat header */}
                             <div className="flex items-center justify-between border-b border-border/50 bg-background px-4 py-3">
                                 <div className="flex items-center gap-3">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="md:hidden"
-                                        asChild
+                                    <Link
+                                        href="/chat"
+                                        aria-label="Back to chats"
+                                        className="flex size-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-md text-foreground hover:bg-accent md:hidden"
                                     >
-                                        <Link
-                                            href="/chat"
-                                            aria-label="Back to chats"
-                                        >
-                                            <ArrowLeft className="size-4" />
-                                        </Link>
-                                    </Button>
+                                        <ArrowLeft className="size-5" />
+                                    </Link>
                                     <Avatar className="size-10 shrink-0">
                                         <AvatarFallback className="text-sm font-medium">
                                             {getInitials(otherUser?.name ?? '')}
