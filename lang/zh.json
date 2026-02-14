@@ -57,7 +57,7 @@
     "listing.condition": "成色",
     "listing.price": "价格（:symbol）",
     "listing.meetup_location": "面交地点（选填）",
-    "listing.meetup_placeholder": "例如：金文泰景（丹戎巴葛路 89-91 街区）",
+    "listing.meetup_placeholder": "例如：街道、地铁站或地标",
     "listing.meetup_help": "如需面交，请在此填写地点。",
     "listing.image_optional": "图片（选填，留空则保留当前图片）",
     "listing.current_image": "当前",

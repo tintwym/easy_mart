@@ -57,7 +57,7 @@
     "listing.condition": "Condition",
     "listing.price": "Price (:symbol)",
     "listing.meetup_location": "Meetup location (optional)",
-    "listing.meetup_placeholder": "e.g. Commonwealth View (Blks 89-91 Tanglin Halt Road)",
+    "listing.meetup_placeholder": "e.g. Street name, MRT station, or landmark",
     "listing.meetup_help": "If you want to meet up for the sale, add the location here.",
     "listing.image_optional": "Image (optional, leave empty to keep current)",
     "listing.current_image": "Current",

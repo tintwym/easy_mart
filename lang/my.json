@@ -57,7 +57,7 @@
     "listing.condition": "အခြေအနေ",
     "listing.price": "ဈေးနှုန်း (:symbol)",
     "listing.meetup_location": "တွေ့ဆုံမည့်နေရာ (ရွေးချယ်နိုင်)",
-    "listing.meetup_placeholder": "ဥပမာ - လမ်းနာမည်၊ မြို့နယ်",
+    "listing.meetup_placeholder": "ဥပမာ - လမ်းနာမည်၊ ဘူတာရုံ သို့မဟုတ် အမှတ်အသား",
     "listing.meetup_help": "လက်ခံရောင်းချရန် တွေ့ဆုံမည့်နေရာ ထည့်ပါ။",
     "listing.image_optional": "ဓာတ်ပုံ (ရွေးချယ်နိုင်၊ ဗလာထားရင် လက်ရှိအတိုင်း)",
     "listing.current_image": "လက်ရှိ",
