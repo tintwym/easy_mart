@@ -37,10 +37,9 @@ Or use the shortcut scripts:
 - **iOS**: `npm run cap:ios` (builds web, syncs, opens Xcode)
 - **Android**: `npm run cap:android` (builds web, syncs, opens Android Studio)
 
-## Submitting to the stores
+## Publishing to the stores
 
-- **Apple App Store**: In Xcode, set up signing (Apple Developer account), then Archive and upload to App Store Connect.
-- **Google Play**: In Android Studio, build a release bundle (e.g. Build → Generate Signed Bundle / APK) and upload to Google Play Console.
+See **[docs/STORE_PUBLISHING.md](STORE_PUBLISHING.md)** for step-by-step instructions to publish EasyMart on Google Play and the Apple App Store (accounts, signing, build, and submission).
 
 ## Notes
 
