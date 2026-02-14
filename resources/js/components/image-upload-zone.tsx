@@ -1,5 +1,5 @@
 import { CloudUpload } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -31,6 +31,17 @@ export function ImageUploadZone({
 }: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!value || !value.type.startsWith('image/')) {
+            setPreviewUrl(null);
+            return;
+        }
+        const url = URL.createObjectURL(value);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+    }, [value]);
 
     const handleFile = (file: File | null) => {
         if (file && !file.type.startsWith('image/')) return;
@@ -97,17 +108,27 @@ export function ImageUploadZone({
                             error && 'border-destructive',
                         )}
                     >
-                        <CloudUpload className="size-10 text-muted-foreground" />
-                        <span className="font-semibold text-foreground">
-                            {uploadLabel}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                            {hintLabel}
-                        </span>
-                        {value && (
-                            <span className="text-xs text-muted-foreground">
-                                {value.name}
-                            </span>
+                        {previewUrl ? (
+                            <>
+                                <img
+                                    src={previewUrl}
+                                    alt=""
+                                    className="max-h-32 w-auto max-w-full rounded object-contain"
+                                />
+                                <span className="text-xs text-muted-foreground">
+                                    {value?.name}
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                <CloudUpload className="size-10 text-muted-foreground" />
+                                <span className="font-semibold text-foreground">
+                                    {uploadLabel}
+                                </span>
+                                <span className="text-sm text-muted-foreground">
+                                    {hintLabel}
+                                </span>
+                            </>
                         )}
                     </button>
                     {error && (
