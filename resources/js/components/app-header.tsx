@@ -445,41 +445,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <span>{item.title}</span>
                                 </Link>
                             ))}
-                            {auth?.user && (
-                                <>
-                                    <Link
-                                        href="/chat"
-                                        onClick={() => setSheetOpen(false)}
-                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
-                                    >
-                                        <MessageCircle className="h-5 w-5" />
-                                        <span>{t('nav.chat')}</span>
-                                        {(auth.chatUnreadCount ?? 0) > 0 && (
-                                            <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                                                {(auth.chatUnreadCount ?? 0) >
-                                                99
-                                                    ? '99+'
-                                                    : auth.chatUnreadCount}
-                                            </span>
-                                        )}
-                                    </Link>
-                                    <Link
-                                        href="/cart"
-                                        onClick={() => setSheetOpen(false)}
-                                        className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-2 font-medium hover:bg-sidebar-accent"
-                                    >
-                                        <ShoppingCart className="h-5 w-5" />
-                                        <span>{t('nav.cart')}</span>
-                                        {(auth.cartCount ?? 0) > 0 && (
-                                            <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                                                {(auth.cartCount ?? 0) > 99
-                                                    ? '99+'
-                                                    : auth.cartCount}
-                                            </span>
-                                        )}
-                                    </Link>
-                                </>
-                            )}
                         </div>
                         <div className="mt-auto flex flex-col gap-0.5 border-t border-sidebar-border pt-2">
                             <div className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 md:hidden">
