@@ -1,5 +1,5 @@
 import { CloudUpload } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -31,17 +31,17 @@ export function ImageUploadZone({
 }: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const previewUrl = useMemo(() => {
+        if (!value || !value.type.startsWith('image/')) return null;
+        return URL.createObjectURL(value);
+    }, [value]);
 
     useEffect(() => {
-        if (!value || !value.type.startsWith('image/')) {
-            setPreviewUrl(null);
-            return;
-        }
-        const url = URL.createObjectURL(value);
-        setPreviewUrl(url);
-        return () => URL.revokeObjectURL(url);
-    }, [value]);
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
 
     const handleFile = (file: File | null) => {
         if (file && !file.type.startsWith('image/')) return;
