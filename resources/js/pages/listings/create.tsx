@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import Heading from '@/components/heading';
+import { ImageUploadZone } from '@/components/image-upload-zone';
 import InputError from '@/components/input-error';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -229,21 +230,18 @@ export default function CreateListing({
                         <InputError message={errors.meetup_location} />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="image">
-                            {t('listing.image_optional_create')}
-                        </Label>
-                        <Input
-                            id="image"
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            onChange={(e) =>
-                                setData('image', e.target.files?.[0] ?? null)
-                            }
-                        />
-                        <InputError message={errors.image} />
-                    </div>
+                    <ImageUploadZone
+                        id="image"
+                        label={t('listing.upload_photos')}
+                        uploadLabel={t('listing.upload_file')}
+                        hintLabel={t('listing.drag_drop_hint')}
+                        value={data.image}
+                        onChange={(file) => setData('image', file)}
+                        accept="image/*"
+                        capture="environment"
+                        required
+                        error={errors.image}
+                    />
 
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <Button

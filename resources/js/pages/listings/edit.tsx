@@ -2,6 +2,7 @@ import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useEffect } from 'react';
 import Heading from '@/components/heading';
+import { ImageUploadZone } from '@/components/image-upload-zone';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -239,13 +240,12 @@ export default function EditListing({ listing, categories }: Props) {
                         <InputError message={errors.meetup_location} />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="image">
-                            {t('listing.image_optional')}
-                        </Label>
+                    <div className="space-y-3">
                         {(listing.image_url ?? listing.image_path) && (
-                            <p className="text-sm text-muted-foreground">
-                                {t('listing.current_image')}{' '}
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                                <span className="shrink-0 pt-2 text-sm font-medium text-muted-foreground sm:w-32 sm:pt-2.5">
+                                    {t('listing.current_image')}
+                                </span>
                                 <img
                                     src={
                                         listing.image_url ??
@@ -253,9 +253,9 @@ export default function EditListing({ listing, categories }: Props) {
                                         ''
                                     }
                                     alt=""
-                                    className="mt-1 h-20 w-20 rounded object-cover"
+                                    className="h-20 w-20 rounded object-cover"
                                 />
-                            </p>
+                            </div>
                         )}
                         {data.image && (
                             <NewImagePreview
@@ -263,16 +263,17 @@ export default function EditListing({ listing, categories }: Props) {
                                 label={t('listing.new_image')}
                             />
                         )}
-                        <Input
+                        <ImageUploadZone
                             id="image"
-                            type="file"
+                            label={t('listing.upload_photos')}
+                            uploadLabel={t('listing.upload_file')}
+                            hintLabel={t('listing.drag_drop_hint')}
+                            value={data.image}
+                            onChange={(file) => setData('image', file)}
                             accept="image/*"
                             capture="environment"
-                            onChange={(e) =>
-                                setData('image', e.target.files?.[0] ?? null)
-                            }
+                            error={errors.image}
                         />
-                        <InputError message={errors.image} />
                     </div>
 
                     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
