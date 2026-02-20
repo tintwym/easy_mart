@@ -105,6 +105,7 @@
     "listing.sign_in_to_leave_review": "登录后可留下评价。",
     "listing.no_reviews_yet": "暂无评价，快来写第一条吧！",
     "listing.meet_the_seller": "联系卖家",
+    "listing.related_products": "猜你喜欢",
     "listing.sign_in_to_make_offer": "登录以出价",
     "listing.no_image": "暂无图片",
     "listing.anonymous": "匿名",
@@ -225,5 +226,19 @@
     "twofa.enable_modal_description": "请使用认证应用扫描二维码或输入设置密钥以完成启用。",
     "twofa.confirm": "确认",
     "twofa.continue": "继续",
-    "twofa.close": "关闭"
+    "twofa.close": "关闭",
+    "chatbot.title": "帮助",
+    "chatbot.welcome": "你好！可以问我关于帮助、联系或价格。",
+    "chatbot.placeholder": "输入消息…",
+    "chatbot.open_label": "打开聊天",
+    "chatbot.close_label": "关闭聊天",
+    "chatbot.panel_label": "聊天",
+    "chatbot.input_label": "消息",
+    "chatbot.send_label": "发送",
+    "chatbot.help_reply": "您可以浏览商品、加入购物车或与卖家聊天。使用菜单进入购物车或聊天。",
+    "chatbot.contact_reply": "如需支持，请使用应用内的联系选项或发送邮件。",
+    "chatbot.price_reply": "价格由卖家设定。请查看每个商品的标价，使用加入购物车或议价。",
+    "chatbot.support_reply": "如需帮助，请前往设置或通过应用联系我们。",
+    "chatbot.greeting_reply": "你好！有什么可以帮您？",
+    "chatbot.default_reply": "感谢您的消息！如需具体帮助，可尝试询问「帮助」「联系」或「价格」。"
 }

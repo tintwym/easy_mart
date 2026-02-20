@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
+import { AdSlot } from '@/components/ad-slot';
 import { ListingCard } from '@/components/listing-card';
 import type { ListingCardListing } from '@/components/listing-card';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,12 @@ export default function Dashboard({ listings = [] }: Props) {
                         )}
                     </div>
                 </section>
+
+                <AdSlot
+                    slotId="dashboard-below-listings"
+                    size="banner"
+                    className="my-4"
+                />
 
                 {/* Add product FAB - safe area for mobile notches/home indicator */}
                 <Button

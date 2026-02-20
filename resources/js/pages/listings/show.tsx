@@ -9,7 +9,12 @@ import {
     Tag,
     Users,
 } from 'lucide-react';
+import { AdSlot } from '@/components/ad-slot';
 import InputError from '@/components/input-error';
+import {
+    ListingCard,
+    type ListingCardListing,
+} from '@/components/listing-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -114,6 +119,7 @@ type Props = {
     reviewCount: number;
     trendPriceLabel: string;
     trendDurationDays: number;
+    relatedListings: ListingCardListing[];
 };
 
 export default function ShowListing({
@@ -121,6 +127,7 @@ export default function ShowListing({
     averageRating,
     reviewCount,
     trendPriceLabel,
+    relatedListings,
 }: Props) {
     const pageProps = usePage<SharedData>().props as SharedData & {
         flash?: { status?: string; error?: string };
@@ -645,6 +652,25 @@ export default function ShowListing({
                         </div>
                     </aside>
                 </div>
+
+                {/* Related products */}
+                {relatedListings.length > 0 && (
+                    <section className="mt-12 border-t pt-8">
+                        <h2 className="mb-4 text-xl font-semibold">
+                            {t('listing.related_products')}
+                        </h2>
+                        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-3">
+                            {relatedListings.map((rel) => (
+                                <li key={rel.id}>
+                                    <ListingCard listing={rel} />
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
+
+                {/* Ad slot - below main content */}
+                <AdSlot slotId="listing-below" className="mt-8" />
 
                 {/* Mobile sticky footer - Buy first, Add to cart second. Shown when sidebar hidden (below md). */}
                 {showBuyerActions && isBusinessSeller && auth?.user && (

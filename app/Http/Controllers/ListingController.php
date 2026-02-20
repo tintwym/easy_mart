@@ -27,12 +27,20 @@ class ListingController extends Controller
         $trendPrice = config('shop.trend_price', 10);
         $trendDays = config('shop.trend_duration_days', 7);
 
+        $relatedListings = Listing::with(['category', 'user:id,name,seller_type,region'])
+            ->where('category_id', $listing->category_id)
+            ->where('id', '!=', $listing->id)
+            ->latest()
+            ->limit(6)
+            ->get();
+
         return Inertia::render('listings/show', [
             'listing' => $listing,
             'averageRating' => round((float) $listing->reviews->avg('rating'), 1),
             'reviewCount' => $listing->reviews->count(),
             'trendPriceLabel' => $currency['symbol'].$trendPrice.' for '.$trendDays.' days',
             'trendDurationDays' => $trendDays,
+            'relatedListings' => $relatedListings,
         ]);
     }
 

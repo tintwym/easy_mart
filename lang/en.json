@@ -105,6 +105,7 @@
     "listing.sign_in_to_leave_review": "Sign in to leave a review.",
     "listing.no_reviews_yet": "No reviews yet. Be the first to review!",
     "listing.meet_the_seller": "Meet the seller",
+    "listing.related_products": "You might also like",
     "listing.sign_in_to_make_offer": "Sign in to make offer",
     "listing.no_image": "No image",
     "listing.anonymous": "Anonymous",
@@ -225,5 +226,19 @@
     "twofa.enable_modal_description": "To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app",
     "twofa.confirm": "Confirm",
     "twofa.continue": "Continue",
-    "twofa.close": "Close"
+    "twofa.close": "Close",
+    "chatbot.title": "Help",
+    "chatbot.welcome": "Hi! Ask me about help, contact, or pricing.",
+    "chatbot.placeholder": "Type a message…",
+    "chatbot.open_label": "Open chat",
+    "chatbot.close_label": "Close chat",
+    "chatbot.panel_label": "Chat",
+    "chatbot.input_label": "Message",
+    "chatbot.send_label": "Send",
+    "chatbot.help_reply": "You can browse listings, add items to cart, or chat with sellers. Use the menu to go to Cart or Chat.",
+    "chatbot.contact_reply": "For support, please use the contact option in the app or email the store.",
+    "chatbot.price_reply": "Prices are set by sellers. Check each listing for the price and use Add to cart or Make offer.",
+    "chatbot.support_reply": "For help, go to Settings or contact us through the app.",
+    "chatbot.greeting_reply": "Hello! How can I help you today?",
+    "chatbot.default_reply": "Thanks for your message! For specific help, try asking about \"help\", \"contact\", or \"price\"."
 }
