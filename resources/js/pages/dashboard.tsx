@@ -3,8 +3,8 @@ import { Plus } from 'lucide-react';
 import { AdSlot } from '@/components/ad-slot';
 import { ListingCard } from '@/components/listing-card';
 import type { ListingCardListing } from '@/components/listing-card';
-import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/hooks/use-translations';
+import { cn } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
@@ -67,18 +67,17 @@ export default function Dashboard({ listings = [] }: Props) {
                 />
 
                 {/* Add product FAB - safe area for mobile notches/home indicator */}
-                <Button
-                    size="icon"
-                    className="fixed [right:max(1.5rem,env(safe-area-inset-right))] right-6 [bottom:max(1.5rem,env(safe-area-inset-bottom))] bottom-6 z-40 flex size-14 min-h-[56px] min-w-[56px] touch-manipulation rounded-full shadow-lg"
-                    asChild
+                <Link
+                    href="/listings/create"
+                    aria-label={t('dashboard.add_product')}
+                    className={cn(
+                        'fixed z-40 flex size-12 min-h-[48px] min-w-[48px] items-center justify-center touch-manipulation rounded-full',
+                        'bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-opacity hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                        'right-[max(1.5rem,env(safe-area-inset-right))] bottom-[max(1.5rem,env(safe-area-inset-bottom))]',
+                    )}
                 >
-                    <Link
-                        href="/listings/create"
-                        aria-label={t('dashboard.add_product')}
-                    >
-                        <Plus className="size-7" />
-                    </Link>
-                </Button>
+                    <Plus className="size-5" />
+                </Link>
             </div>
         </AppLayout>
     );

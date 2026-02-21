@@ -72,17 +72,18 @@ export function ChatbotWidget() {
 
     return (
         <>
-            <Button
-                size="icon"
+            <button
+                type="button"
                 aria-label={t('chatbot.open_label')}
                 onClick={() => setOpen(true)}
                 className={cn(
-                    'fixed z-50 flex size-14 min-h-[56px] min-w-[56px] touch-manipulation rounded-full shadow-lg',
+                    'fixed z-50 flex size-12 min-h-[48px] min-w-[48px] items-center justify-center touch-manipulation rounded-full',
+                    'bg-slate-700 text-white shadow-md transition-colors hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2',
                     'right-[max(1rem,env(safe-area-inset-right))] bottom-[max(5rem,calc(env(safe-area-inset-bottom)+5rem))]',
                 )}
             >
-                <MessageCircle className="size-7" />
-            </Button>
+                <MessageCircle className="size-5" />
+            </button>
 
             {open && (
                 <div
