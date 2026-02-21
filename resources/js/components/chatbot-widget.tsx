@@ -77,8 +77,8 @@ export function ChatbotWidget() {
                 aria-label={t('chatbot.open_label')}
                 onClick={() => setOpen(true)}
                 className={cn(
-                    'fixed z-50 flex size-12 min-h-[48px] min-w-[48px] items-center justify-center touch-manipulation rounded-full',
-                    'bg-slate-700 text-white shadow-md transition-colors hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2',
+                    'fixed z-50 flex size-12 min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center rounded-full',
+                    'bg-slate-700 text-white shadow-md transition-colors hover:bg-slate-600 focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                     'right-[max(1rem,env(safe-area-inset-right))] bottom-[max(5rem,calc(env(safe-area-inset-bottom)+5rem))]',
                 )}
             >

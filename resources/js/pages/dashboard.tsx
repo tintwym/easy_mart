@@ -4,8 +4,8 @@ import { AdSlot } from '@/components/ad-slot';
 import { ListingCard } from '@/components/listing-card';
 import type { ListingCardListing } from '@/components/listing-card';
 import { useTranslations } from '@/hooks/use-translations';
-import { cn } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
@@ -71,8 +71,8 @@ export default function Dashboard({ listings = [] }: Props) {
                     href="/listings/create"
                     aria-label={t('dashboard.add_product')}
                     className={cn(
-                        'fixed z-40 flex size-12 min-h-[48px] min-w-[48px] items-center justify-center touch-manipulation rounded-full',
-                        'bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-opacity hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                        'fixed z-40 flex size-12 min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center rounded-full',
+                        'bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-opacity hover:opacity-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
                         'right-[max(1.5rem,env(safe-area-inset-right))] bottom-[max(1.5rem,env(safe-area-inset-bottom))]',
                     )}
                 >
