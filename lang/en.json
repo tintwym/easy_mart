@@ -31,6 +31,15 @@
     "common.add": "Add",
     "common.saving": "Saving…",
 
+    "download.title": "Download EasyMart for Android",
+    "download.description": "Get the EasyMart app and shop on your phone. No app store required.",
+    "download.button": "Download APK",
+    "download.instructions_title": "How to install",
+    "download.step1": "Tap the download button above and save the APK file.",
+    "download.step2": "Open the downloaded file. If prompted, allow installation from unknown sources (Settings → Security).",
+    "download.step3": "Follow the prompts to install, then open EasyMart.",
+    "download.coming_soon": "The Android APK is not available yet. Check back later or use the website.",
+
     "dashboard.title": "Dashboard",
     "dashboard.no_listings": "No listings yet.",
     "dashboard.add_product": "Add product",
@@ -83,6 +92,7 @@
     "listing.creating": "Creating…",
     "listing.image_optional_create": "Image (optional)",
     "nav.all": "All",
+    "nav.download_app": "Download Android app",
     "listing.details": "Details",
     "listing.listed": "Listed",
     "listing.listed_by": " by ",

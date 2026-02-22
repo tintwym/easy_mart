@@ -31,6 +31,15 @@
     "common.add": "添加",
     "common.saving": "保存中…",
 
+    "download.title": "下载 EasyMart Android 版",
+    "download.description": "在手机上使用 EasyMart 应用购物，无需通过应用商店。",
+    "download.button": "下载 APK",
+    "download.instructions_title": "安装方法",
+    "download.step1": "点击上方下载按钮，保存 APK 文件。",
+    "download.step2": "打开下载的文件。若提示允许未知来源安装，请在设置中开启。",
+    "download.step3": "按提示完成安装，然后打开 EasyMart。",
+    "download.coming_soon": "Android APK 暂未提供，请稍后再试或使用网页版。",
+
     "dashboard.title": "首页",
     "dashboard.no_listings": "暂无商品。",
     "dashboard.add_product": "添加商品",
@@ -83,6 +92,7 @@
     "listing.creating": "创建中…",
     "listing.image_optional_create": "图片（选填）",
     "nav.all": "全部",
+    "nav.download_app": "下载 Android 版",
     "listing.details": "详情",
     "listing.listed": "发布于",
     "listing.listed_by": " 由 ",

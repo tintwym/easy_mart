@@ -96,10 +96,10 @@ export default function CreateListing({
                     description={t('listing.create_listing')}
                 />
                 <p className="mt-2 text-sm text-muted-foreground">
-                    {t('listing.your_listings')}: {listingCount} /{' '}
-                    {maxListingSlots}
+                    {t('listing.your_listings')}: {listingCount}
+                    {maxListingSlots < 10000 && ` / ${maxListingSlots}`}
                 </p>
-                {!canCreate && (
+                {!canCreate && maxListingSlots < 10000 && (
                     <Alert className="mt-4 border-amber-500/50 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/20">
                         <AlertDescription>
                             {t('listing.listing_limit')}{' '}

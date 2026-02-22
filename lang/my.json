@@ -31,6 +31,15 @@
     "common.add": "ထည့်မည်",
     "common.saving": "သိမ်းနေသည်…",
 
+    "download.title": "Android အတွက် EasyMart ဒေါင်းလုဒ်",
+    "download.description": "ဖုန်းမှာ EasyMart အက်ပ်သုံးပါ။ အက်ပ်စတိုးမလိုပါ။",
+    "download.button": "APK ဒေါင်းလုဒ်",
+    "download.instructions_title": "ထည့်သွင်းနည်း",
+    "download.step1": "အပေါ်က ဒေါင်းလုဒ် ခလုတ်ကို နှိပ်ပြီး APK ဖိုင်ကို သိမ်းပါ။",
+    "download.step2": "ဒေါင်းလုဒ်လုပ်ထားတဲ့ ဖိုင်ကို ဖွင့်ပါ။ မသိရသေးသော ရင်းမြစ်မှ ထည့်သွင်းခွင့် တောင်းရင် Settings → Security မှာ ဖွင့်ပါ။",
+    "download.step3": "ညွှန်ကြားချက်အတိုင်း ထည့်သွင်းပြီး EasyMart ကို ဖွင့်ပါ။",
+    "download.coming_soon": "Android APK မရနိုင်သေးပါ။ နောက်မှ ပြန်ကြည့်ပါ သို့မဟုတ် ဝဘ်သုံးပါ။",
+
     "dashboard.title": "ပင်မစာမျက်နှာ",
     "dashboard.no_listings": "ပစ္စည်းမရှိသေးပါ။",
     "dashboard.add_product": "ပစ္စည်းထည့်မည်",
@@ -83,6 +92,7 @@
     "listing.creating": "ဖန်တီးနေသည်…",
     "listing.image_optional_create": "ဓာတ်ပုံ (ရွေးချယ်နိုင်)",
     "nav.all": "အားလုံး",
+    "nav.download_app": "Android အက်ပ် ဒေါင်းလုဒ်",
     "listing.details": "အသေးစိတ်",
     "listing.listed": "ကြော်ငြာတင်သည့်ရက်",
     "listing.listed_by": " မှ ",

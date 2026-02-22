@@ -9,6 +9,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UpgradeController;
 use App\Models\Category;
 use App\Models\Listing;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -62,6 +63,17 @@ Route::redirect('/dashboard', '/');
 
 // Categories landing (optional)
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+// Download Android APK (direct distribution, no store)
+Route::get('/download', function () {
+    $apkPath = public_path('downloads/easymart.apk');
+    $apkAvailable = File::exists($apkPath);
+
+    return Inertia::render('download', [
+        'apkAvailable' => $apkAvailable,
+        'apkUrl' => $apkAvailable ? asset('downloads/easymart.apk') : null,
+    ]);
+})->name('download');
 
 // Category page: browse listings by category
 Route::get('/categories/{slug}', function (string $slug) {

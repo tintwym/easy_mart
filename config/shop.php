@@ -93,14 +93,14 @@ return [
     | Listing limits by seller type
     |--------------------------------------------------------------------------
     |
-    | Base number of listing slots per account. Users can purchase extra slots.
-    | Total = base_limit + extra_listing_slots (purchased).
+    | Base number of listing slots per account. Set to a high number for
+    | unlimited listings. Users can purchase extra slots (no-op when unlimited).
     |
     */
 
     'listing_limits' => [
-        'individual' => 3,
-        'business' => 5,
+        'individual' => 999_999,
+        'business' => 999_999,
     ],
 
     /*

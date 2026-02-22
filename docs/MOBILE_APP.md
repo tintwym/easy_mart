@@ -41,6 +41,16 @@ Or use the shortcut scripts:
 
 See **[docs/STORE_PUBLISHING.md](STORE_PUBLISHING.md)** for step-by-step instructions to publish EasyMart on Google Play and the Apple App Store (accounts, signing, build, and submission).
 
+## Direct APK distribution (no store)
+
+You can offer the Android APK for download from your own site so users can install without the Play Store:
+
+1. **Build a release APK** in Android Studio (Build → Build Bundle(s) / APK(s) → Build APK(s), or use a signed release APK).
+2. **Copy the APK** to `public/downloads/easymart.apk` in this project (create the `downloads` folder if needed).
+3. **Deploy** your site. The **Download** page will be available at `/download` with a download button and install instructions.
+
+Users open your site on their phone, go to **/download**, tap **Download APK**, and install (they may need to allow “Install from unknown sources” in Android settings once).
+
 ## Notes
 
 - The app is a WebView pointing at your Laravel URL. No separate front-end codebase.

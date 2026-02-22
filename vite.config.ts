@@ -23,7 +23,8 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            // CSS is imported in app.tsx; avoid separate entry to prevent "preloaded but not used" warning
+            input: ['resources/js/app.tsx'],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),

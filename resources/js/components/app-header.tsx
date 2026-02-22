@@ -453,6 +453,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 </span>
                                 <LanguageSwitcher />
                             </div>
+                            <Link
+                                href="/download"
+                                onClick={() => setSheetOpen(false)}
+                                className="flex min-h-[44px] touch-manipulation items-center gap-2 rounded-md px-2 py-1.5 font-medium hover:bg-sidebar-accent md:hidden"
+                            >
+                                {t('nav.download_app')}
+                            </Link>
                             {rightNavItems.map((item) => (
                                 <a
                                     key={item.title}
