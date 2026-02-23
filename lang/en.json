@@ -39,6 +39,10 @@
     "download.step2": "Open the downloaded file. If prompted, allow installation from unknown sources (Settings → Security).",
     "download.step3": "Follow the prompts to install, then open EasyMart.",
     "download.coming_soon": "The Android APK is not available yet. Check back later or use the website.",
+    "download.android": "Android",
+    "download.ios": "iPhone / iPad",
+    "download.ios_button": "Get on App Store",
+    "download.ios_coming_soon": "iOS app coming soon. Use the website on Safari in the meantime.",
 
     "dashboard.title": "Dashboard",
     "dashboard.no_listings": "No listings yet.",

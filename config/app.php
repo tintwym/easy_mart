@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | iOS App Store / TestFlight URL
+    |--------------------------------------------------------------------------
+    |
+    | When set, the /download page shows an "Get on App Store" or TestFlight
+    | link for iOS. Leave empty until the app is on the store or TestFlight.
+    |
+    */
+
+    'ios_store_url' => env('APP_IOS_STORE_URL', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Allow Destructive DB Commands in Production
     |--------------------------------------------------------------------------
     |

@@ -64,14 +64,16 @@ Route::redirect('/dashboard', '/');
 // Categories landing (optional)
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// Download Android APK (direct distribution, no store)
+// Download app (Android APK + optional iOS App Store / TestFlight)
 Route::get('/download', function () {
     $apkPath = public_path('downloads/easymart.apk');
     $apkAvailable = File::exists($apkPath);
+    $iosStoreUrl = config('app.ios_store_url', '');
 
     return Inertia::render('download', [
         'apkAvailable' => $apkAvailable,
         'apkUrl' => $apkAvailable ? asset('downloads/easymart.apk') : null,
+        'iosStoreUrl' => $iosStoreUrl ?: null,
     ]);
 })->name('download');
 

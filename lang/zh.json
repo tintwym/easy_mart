@@ -39,6 +39,10 @@
     "download.step2": "打开下载的文件。若提示允许未知来源安装，请在设置中开启。",
     "download.step3": "按提示完成安装，然后打开 EasyMart。",
     "download.coming_soon": "Android APK 暂未提供，请稍后再试或使用网页版。",
+    "download.android": "Android",
+    "download.ios": "iPhone / iPad",
+    "download.ios_button": "在 App Store 下载",
+    "download.ios_coming_soon": "iOS 版即将推出，请先使用 Safari 打开网页版。",
 
     "dashboard.title": "首页",
     "dashboard.no_listings": "暂无商品。",

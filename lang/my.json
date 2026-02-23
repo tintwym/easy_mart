@@ -39,6 +39,10 @@
     "download.step2": "ဒေါင်းလုဒ်လုပ်ထားတဲ့ ဖိုင်ကို ဖွင့်ပါ။ မသိရသေးသော ရင်းမြစ်မှ ထည့်သွင်းခွင့် တောင်းရင် Settings → Security မှာ ဖွင့်ပါ။",
     "download.step3": "ညွှန်ကြားချက်အတိုင်း ထည့်သွင်းပြီး EasyMart ကို ဖွင့်ပါ။",
     "download.coming_soon": "Android APK မရနိုင်သေးပါ။ နောက်မှ ပြန်ကြည့်ပါ သို့မဟုတ် ဝဘ်သုံးပါ။",
+    "download.android": "Android",
+    "download.ios": "iPhone / iPad",
+    "download.ios_button": "App Store မှ ရယူမည်",
+    "download.ios_coming_soon": "iOS အက်ပ် မကြာမီ ရနိုင်မည်။ ယာယီ Safari မှ ဝဘ်သုံးပါ။",
 
     "dashboard.title": "ပင်မစာမျက်နှာ",
     "dashboard.no_listings": "ပစ္စည်းမရှိသေးပါ။",
