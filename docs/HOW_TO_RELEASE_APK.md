@@ -74,8 +74,9 @@ Android Studio will open with the `android` project.
    - **Password** and **Key alias** + **Key password**.
    - Fill in certificate details (name, org, city, country). Validity e.g. 25 years.
 4. Click **Next**, choose **release** build variant.
-5. Click **Create**. The signed APK is at:  
-   `android/app/build/outputs/apk/release/app-release.apk`
+5. Click **Create**. The signed APK is usually at:  
+   `android/app/release/app-release.apk`  
+   or `android/app/build/outputs/apk/release/app-release.apk`
 
 **Important:** Keep the `.jks` file and all passwords safe. You need them for every future update.
 
@@ -83,9 +84,10 @@ Android Studio will open with the `android` project.
 
 ## Step 5: Put the APK on your site
 
-1. Copy the **release** APK you built (e.g. `app-release.apk`) into your project:
+1. Copy the **release** APK you built into your project (try the first path; if missing, try the second):
    ```bash
-   cp android/app/build/outputs/apk/release/app-release.apk public/downloads/easymart.apk
+   cp android/app/release/app-release.apk public/downloads/easymart.apk
+   # or: cp android/app/build/outputs/apk/release/app-release.apk public/downloads/easymart.apk
    ```
 2. If `public/downloads` doesn’t exist, create it first:
    ```bash
