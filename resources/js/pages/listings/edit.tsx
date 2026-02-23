@@ -271,7 +271,6 @@ export default function EditListing({ listing, categories }: Props) {
                             value={data.image}
                             onChange={(file) => setData('image', file)}
                             accept="image/*"
-                            capture="environment"
                             error={errors.image}
                         />
                     </div>

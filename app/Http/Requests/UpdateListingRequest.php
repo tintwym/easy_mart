@@ -22,7 +22,7 @@ class UpdateListingRequest extends FormRequest
             'category_id' => ['required', 'exists:categories,id'],
             'condition' => ['required', 'string', 'in:new,like_new,good,fair'],
             'price' => ['required', 'numeric', 'min:0'],
-            'image' => ['nullable', 'image', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:10240'], // 10 MB
             'meetup_location' => ['nullable', 'string', 'max:255'],
         ];
     }

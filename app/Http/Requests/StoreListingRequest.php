@@ -22,8 +22,20 @@ class StoreListingRequest extends FormRequest
             'category_id' => ['required', 'exists:categories,id'],
             'condition' => ['required', 'string', 'in:new,like_new,good,fair'],
             'price' => ['required', 'numeric', 'min:0'],
-            'image' => ['required', 'image', 'max:2048'],
+            'image' => ['required', 'image', 'max:10240'], // 10 MB (Laravel max is in KB)
             'meetup_location' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'image.required' => __('listing.image_required'),
+            'image.image' => __('validation.image'),
+            'image.max' => __('listing.image_max_size'),
         ];
     }
 }

@@ -86,12 +86,13 @@ class ListingController extends Controller
                 if ($listingDisk === 'cloudinary') {
                     $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
                 } else {
-                    Storage::disk($listingDisk)->makeDirectory('listings');
                     $imagePath = $request->file('image')->store('listings', $listingDisk);
                 }
             } catch (\Throwable $e) {
                 return redirect()->back()->withErrors(['image' => $e->getMessage()])->withInput();
             }
+        } else {
+            return redirect()->back()->withErrors(['image' => __('listing.image_required_message')])->withInput();
         }
 
         Listing::create([
@@ -137,7 +138,6 @@ class ListingController extends Controller
                 if ($listingDisk === 'cloudinary') {
                     $imagePath = CloudinaryService::upload($request->file('image'), 'listings');
                 } else {
-                    Storage::disk($listingDisk)->makeDirectory('listings');
                     $imagePath = $request->file('image')->store('listings', $listingDisk);
                 }
             } catch (\Throwable $e) {

@@ -238,7 +238,6 @@ export default function CreateListing({
                         value={data.image}
                         onChange={(file) => setData('image', file)}
                         accept="image/*"
-                        capture="environment"
                         required
                         error={errors.image}
                     />
